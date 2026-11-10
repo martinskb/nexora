@@ -23,3 +23,6 @@ backups/
 
 # Documento original da disciplina (resumo em docs/PROJETO.md)
 *.pdf
+
+# Esboços temporários de brainstorming
+.superpowers/
