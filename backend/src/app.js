@@ -9,6 +9,7 @@ import { errorHandler, notFound } from './middlewares/errorHandler.js';
 export const app = express();
 
 app.disable('x-powered-by');
+if (env.trustProxy) app.set('trust proxy', env.trustProxy);
 app.use(helmet());
 app.use(cors({ origin: env.corsOrigin, credentials: true }));
 app.use(express.json({ limit: '100kb' }));
