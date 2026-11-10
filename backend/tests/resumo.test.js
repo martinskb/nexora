@@ -17,24 +17,25 @@ async function cenario() {
   const arroz = await criar({ nome: 'Arroz', preco: 5 });
   const feijao = await criar({ nome: 'Feijão', preco: 8 });
   const oleo = await criar({ nome: 'Óleo', preco: 7 });
+  const grupo = (await agente.post('/api/canais').send({ nome: 'Grupo' })).body.canal;
 
-  async function vender(itens, canal, quando) {
-    const { body } = await agente.post('/api/vendas').send({ itens, canal });
+  async function vender(itens, canalId, quando) {
+    const { body } = await agente.post('/api/vendas').send({ itens, canalId });
     await pool.query('UPDATE vendas SET criado_em = ? WHERE id = ?', [new Date(quando), body.venda.id]);
     return body.venda;
   }
 
-  // 01/11 09:00 local — balcão: 3 arroz (15) + 1 feijão (8) = 23
-  await vender([{ produtoId: arroz.id, quantidade: 3 }, { produtoId: feijao.id, quantidade: 1 }], 'balcao', '2026-11-01T12:00:00Z');
-  // 01/11 23:00 local (02/11 02:00 UTC) — WhatsApp: 2 feijão = 16
-  await vender([{ produtoId: feijao.id, quantidade: 2 }], 'whatsapp', '2026-11-02T02:00:00Z');
-  // 03/11 local — cancelada: 10 óleo = 70 (não entra nos totais)
-  const cancelada = await vender([{ produtoId: oleo.id, quantidade: 10 }], 'balcao', '2026-11-03T15:00:00Z');
+  // 01/11 09:00 local — sem canal: 3 arroz (15) + 1 feijão (8) = 23
+  await vender([{ produtoId: arroz.id, quantidade: 3 }, { produtoId: feijao.id, quantidade: 1 }], null, '2026-11-01T12:00:00Z');
+  // 01/11 23:00 local (02/11 02:00 UTC) — canal Grupo: 2 feijão = 16
+  await vender([{ produtoId: feijao.id, quantidade: 2 }], grupo.id, '2026-11-02T02:00:00Z');
+  // 03/11 local — cancelada, no canal Grupo: 10 óleo = 70 (não entra nos totais nem na origem)
+  const cancelada = await vender([{ produtoId: oleo.id, quantidade: 10 }], grupo.id, '2026-11-03T15:00:00Z');
   await agente.post(`/api/vendas/${cancelada.id}/cancelar`).send({ motivo: 'Teste' });
   // 31/10 local — fora do período
-  await vender([{ produtoId: oleo.id, quantidade: 50 }], 'balcao', '2026-10-31T12:00:00Z');
+  await vender([{ produtoId: oleo.id, quantidade: 50 }], null, '2026-10-31T12:00:00Z');
 
-  return { ...ctx, arroz, feijao, oleo };
+  return { ...ctx, arroz, feijao, oleo, grupo };
 }
 
 describe('Resumo de vendas (F5)', () => {
@@ -45,13 +46,32 @@ describe('Resumo de vendas (F5)', () => {
     expect(res.body.totais).toEqual({ valor: 39, vendas: 2, ticketMedio: 19.5, canceladas: 1, valorCancelado: 70 });
   });
 
-  it('separa o valor por origem (Balcão × WhatsApp)', async () => {
-    const { agente } = await cenario();
+  it('separa o valor por origem, maior valor primeiro, sem contar canceladas', async () => {
+    const { agente, grupo } = await cenario();
     const { body } = await agente.get(`/api/resumo?${PERIODO}`);
     expect(body.porCanal).toEqual([
-      { canal: 'balcao', vendas: 1, valor: 23 },
-      { canal: 'whatsapp', vendas: 1, valor: 16 },
+      { canalId: null, nome: null, vendas: 1, valor: 23 },
+      { canalId: grupo.id, nome: 'Grupo', vendas: 1, valor: 16 },
     ]);
+    expect(body.temCanais).toBe(true);
+  });
+
+  it('loja sem canais: temCanais falso e só a linha sem canal', async () => {
+    const { agente } = await criarLojaLogada();
+    const p = (await agente.post('/api/produtos').send({ nome: 'Arroz', preco: 5, quantidade: 10 })).body.produto;
+    await agente.post('/api/vendas').send({ itens: [{ produtoId: p.id, quantidade: 1 }] });
+    const de = new Date(Date.now() - 86_400_000).toISOString();
+    const ate = new Date(Date.now() + 86_400_000).toISOString();
+    const { body } = await agente.get(`/api/resumo?de=${de}&ate=${ate}`);
+    expect(body.temCanais).toBe(false);
+    expect(body.porCanal).toEqual([{ canalId: null, nome: null, vendas: 1, valor: 5 }]);
+  });
+
+  it('todos os canais arquivados: temCanais falso', async () => {
+    const { agente, grupo } = await cenario();
+    await agente.put(`/api/canais/${grupo.id}`).send({ ativo: false });
+    const { body } = await agente.get(`/api/resumo?${PERIODO}`);
+    expect(body.temCanais).toBe(false);
   });
 
   it('agrupa por dia no horário local (23h de Belém conta no mesmo dia) e inclui dias sem venda', async () => {
