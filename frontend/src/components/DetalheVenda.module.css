@@ -50,6 +50,10 @@
   border-bottom: 1px solid var(--cor-borda);
 }
 
+.item {
+  display: grid;
+}
+
 .itens small {
   color: var(--cor-texto-suave);
 }
@@ -57,6 +61,7 @@
 .valor {
   font-weight: 600;
   white-space: nowrap;
+  font-family: var(--fonte-num);
   font-variant-numeric: tabular-nums;
 }
 

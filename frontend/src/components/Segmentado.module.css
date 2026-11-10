@@ -18,7 +18,7 @@
   display: flex;
   padding: 3px;
   gap: 3px;
-  background: var(--cor-fundo);
+  background: var(--cor-superficie);
   border: 1px solid var(--cor-borda);
   border-radius: var(--raio-md);
 }
@@ -51,9 +51,8 @@
 }
 
 .ativa {
-  background: var(--cor-superficie);
-  color: var(--cor-texto);
-  box-shadow: var(--sombra-sm);
+  background: var(--cor-texto);
+  color: var(--cor-superficie);
 }
 
 .compacto .legenda {

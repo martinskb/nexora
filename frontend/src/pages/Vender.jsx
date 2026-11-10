@@ -9,6 +9,7 @@ import { Botao } from '../components/Botao.jsx'
 import { Carrinho } from '../components/Carrinho.jsx'
 import { IconeBusca, IconeCaixa, IconeMais } from '../components/Icones.jsx'
 import { Modal } from '../components/Modal.jsx'
+import { Preco } from '../components/Preco.jsx'
 import { SeloEstoque } from '../components/SeloEstoque.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
 import { useMediaQuery } from '../hooks/useMediaQuery.js'
@@ -204,15 +205,19 @@ export default function Vender() {
                   aria-label={`Adicionar ${p.nome}`}
                 >
                   <span className={estilos.nomeProduto}>{p.nome}</span>
-                  <span className={estilos.precoProduto}>{formatarMoeda(p.preco)}</span>
-                  <span className={estilos.rodapeProduto}>
-                    <SeloEstoque produto={p} />
+                  <span className={estilos.linhaPreco}>
+                    <Preco valor={p.preco} etiqueta />
                     {noCarrinho > 0 ? (
-                      <span className={estilos.naVenda}>{noCarrinho} na venda</span>
+                      <span className={estilos.naVenda} aria-label={`${noCarrinho} na venda`}>
+                        {noCarrinho}
+                      </span>
                     ) : (
-                      <IconeMais className={estilos.mais} />
+                      <span className={estilos.mais} aria-hidden="true">
+                        <IconeMais />
+                      </span>
                     )}
                   </span>
+                  <SeloEstoque produto={p} />
                 </button>
               </li>
             )
@@ -230,7 +235,7 @@ export default function Vender() {
           <div className={estilos.barraResumo}>
             <span>
               <small>{totalUnidades === 1 ? '1 item' : `${totalUnidades} itens`}</small>
-              <strong>{formatarMoeda(total)}</strong>
+              <Preco valor={total} />
             </span>
             <Botao onClick={() => setCarrinhoAberto(true)}>Revisar e confirmar</Botao>
           </div>

@@ -3,27 +3,8 @@
   gap: var(--esp-4);
 }
 
-.topo {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--esp-3);
-}
-
 .titulo {
-  font-size: var(--texto-xl);
-}
-
-.novaVenda {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--toque-min);
-  padding: 0 var(--esp-5);
-  border-radius: var(--raio-md);
-  background: var(--cor-primaria);
-  color: var(--cor-sobre-primaria);
-  font-weight: 600;
-  text-decoration: none;
+  font-size: var(--texto-2xl);
 }
 
 .filtros {
@@ -100,6 +81,7 @@
 
 .hora {
   font-weight: 700;
+  font-family: var(--fonte-num);
   font-variant-numeric: tabular-nums;
   color: var(--cor-texto-suave);
 }
@@ -120,9 +102,13 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0 var(--esp-1);
+  gap: 0 var(--esp-3);
   color: var(--cor-texto-suave);
   font-size: var(--texto-xs);
+}
+
+.canal {
+  font-weight: 600;
 }
 
 .canal_whatsapp {
@@ -131,7 +117,6 @@
 }
 
 .seloCancelada {
-  margin-left: var(--esp-1);
   padding: 0 0.5em;
   border-radius: 999px;
   background: var(--cor-erro-suave);
@@ -141,6 +126,7 @@
 
 .valor {
   font-weight: 700;
+  font-family: var(--fonte-num);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }

@@ -53,6 +53,7 @@
 .entrada,
 .saida {
   font-weight: 700;
+  font-family: var(--fonte-num);
   font-variant-numeric: tabular-nums;
 }
 
@@ -62,4 +63,10 @@
 
 .saida {
   color: var(--cor-erro);
+}
+
+.motivo {
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-xs);
+  font-style: italic;
 }

@@ -4,7 +4,7 @@
 }
 
 .titulo {
-  font-size: var(--texto-xl);
+  font-size: var(--texto-2xl);
 }
 
 .subtitulo,
@@ -56,7 +56,10 @@
 }
 
 .filtro strong {
-  font-size: var(--texto-xl);
+  font-family: var(--fonte-num);
+  font-stretch: 85%;
+  font-weight: 800;
+  font-size: var(--texto-2xl);
   line-height: 1.1;
 }
 
@@ -184,6 +187,7 @@
 .saldo strong {
   font-size: 2.5rem;
   line-height: 1;
+  font-family: var(--fonte-num);
   font-variant-numeric: tabular-nums;
 }
 
@@ -208,4 +212,9 @@
 .situacao_zerado {
   background: var(--cor-erro-suave);
   color: var(--cor-erro);
+}
+
+.avisoMinimo {
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-xs);
 }

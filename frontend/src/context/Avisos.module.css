@@ -39,7 +39,7 @@
 
 .erro {
   background: var(--cor-erro);
-  color: #fff;
+  color: var(--cor-sobre-erro);
 }
 
 .fechar {

@@ -1,6 +1,10 @@
 .pagina {
   min-height: 100dvh;
   display: grid;
+}
+
+.lado {
+  display: grid;
   grid-template-rows: auto 1fr;
   padding: var(--esp-3) var(--esp-4) var(--esp-6);
 }
@@ -41,7 +45,7 @@
 }
 
 .titulo {
-  font-size: var(--texto-xl);
+  font-size: var(--texto-2xl);
 }
 
 .subtitulo {
@@ -61,8 +65,95 @@
   font-weight: 600;
 }
 
+/* ---------- Painel de apresentação (só em telas grandes) ---------- */
+.painel {
+  display: none;
+}
+
 @media (min-width: 480px) {
   .cartao {
     padding: var(--esp-6);
   }
+}
+
+@media (min-width: 960px) {
+  .pagina {
+    grid-template-columns: minmax(380px, 5fr) 6fr;
+  }
+
+  .painel {
+    display: grid;
+    align-content: center;
+    gap: var(--esp-5);
+    padding: var(--esp-7);
+    background: var(--cor-primaria);
+    color: var(--cor-sobre-primaria);
+  }
+
+  /* No painel a marca já está ao lado; o cabeçalho do formulário fica mais discreto. */
+  .slogan {
+    display: none;
+  }
+}
+
+.painelTitulo {
+  max-width: 12ch;
+  font-family: var(--fonte-titulo);
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: clamp(2.75rem, 4.4vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.painelTexto {
+  max-width: 38ch;
+  font-size: var(--texto-lg);
+  line-height: 1.45;
+  opacity: 0.92;
+}
+
+/* Exemplo: um produto vendido e o saldo que baixou sozinho. */
+.exemplo {
+  justify-self: start;
+  display: grid;
+  justify-items: start;
+  gap: var(--esp-3);
+  min-width: 260px;
+  margin-top: var(--esp-3);
+  padding: var(--esp-4) var(--esp-5) var(--esp-5);
+  border-radius: var(--raio-lg);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  box-shadow: var(--sombra-md);
+  transform: rotate(-2deg);
+}
+
+.exemploNome {
+  font-weight: 700;
+  font-size: var(--texto-lg);
+}
+
+.exemploSaldo {
+  display: flex;
+  align-items: baseline;
+  gap: var(--esp-2);
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-sm);
+}
+
+.exemploSaldo s,
+.exemploSaldo strong {
+  font-family: var(--fonte-num);
+  font-variant-numeric: tabular-nums;
+}
+
+.exemploSaldo s {
+  font-size: var(--texto-md);
+}
+
+.exemploSaldo strong {
+  color: var(--cor-primaria);
+  font-size: var(--texto-lg);
+  font-weight: 800;
 }

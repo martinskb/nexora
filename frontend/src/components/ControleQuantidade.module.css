@@ -34,6 +34,7 @@
   background: transparent;
   text-align: center;
   font-weight: 700;
+  font-family: var(--fonte-num);
   font-variant-numeric: tabular-nums;
 }
 

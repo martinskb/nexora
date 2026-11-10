@@ -3,48 +3,14 @@
   gap: var(--esp-4);
 }
 
-.topo {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--esp-3);
-}
-
 .titulo {
-  font-size: var(--texto-xl);
+  font-size: var(--texto-2xl);
   overflow-wrap: anywhere;
 }
 
-.subtitulo,
 .info {
   color: var(--cor-texto-suave);
   font-size: var(--texto-sm);
-}
-
-.novaVenda {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--esp-2);
-  min-height: 48px;
-  padding: 0 var(--esp-5);
-  border-radius: var(--raio-md);
-  background: var(--cor-primaria);
-  color: var(--cor-sobre-primaria);
-  font-weight: 700;
-  text-decoration: none;
-  box-shadow: var(--sombra-sm);
-}
-
-.novaVenda:hover {
-  background: var(--cor-primaria-hover);
-}
-
-@media (max-width: 479px) {
-  .novaVenda {
-    width: 100%;
-    justify-content: center;
-  }
 }
 
 .erro {
@@ -55,12 +21,93 @@
 
 .conteudo {
   display: grid;
-  gap: var(--esp-4);
+  gap: var(--esp-6);
   transition: opacity 0.15s;
 }
 
 .atualizando {
   opacity: 0.5;
+}
+
+/* ---------- Abertura: o número do período, sem moldura ---------- */
+.abertura {
+  display: grid;
+  gap: var(--esp-1);
+  padding-top: var(--esp-2);
+}
+
+.rotulo {
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-md);
+}
+
+.heroi {
+  margin-top: var(--esp-1);
+  line-height: 1;
+}
+
+/* Números de apoio lado a lado, separados por um fio vertical. */
+.apoio {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-3) 0;
+  margin: var(--esp-3) 0 0;
+}
+
+.apoio > div {
+  display: grid;
+  gap: 2px;
+  padding-right: var(--esp-5);
+}
+
+.apoio > div + div {
+  padding-left: var(--esp-5);
+  border-left: 1px solid var(--cor-borda);
+}
+
+.apoio dt {
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-sm);
+}
+
+.apoio dd {
+  margin: 0;
+  font-family: var(--fonte-num);
+  font-stretch: 85%;
+  font-size: var(--texto-xl);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.nota {
+  margin-top: var(--esp-2);
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-sm);
+}
+
+.nota a {
+  color: var(--cor-primaria);
+  font-weight: 700;
+}
+
+/* ---------- Seções de detalhe ---------- */
+.grade {
+  display: grid;
+  align-items: start;
+  gap: var(--esp-3);
+}
+
+@media (min-width: 900px) {
+  .grade {
+    grid-template-columns: 1fr 1fr;
+  }
+  .largo {
+    grid-column: 1 / -1;
+  }
+  /* Estoque ocupa a coluna da esquerda; origem e mais vendidos empilham à direita. */
+  .colunaInteira {
+    grid-row: span 2;
+  }
 }
 
 .cartao {
@@ -74,82 +121,8 @@
   border-radius: var(--raio-lg);
 }
 
-/* Números do período */
-.numeros {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--esp-3);
-}
-
-.numeros .cartao {
-  gap: var(--esp-1);
-}
-
-.destaque {
-  grid-column: 1 / -1;
-}
-
-@media (min-width: 768px) {
-  .numeros {
-    grid-template-columns: 2fr 1fr 1fr;
-  }
-  .destaque {
-    grid-column: auto;
-  }
-}
-
-.rotulo {
-  color: var(--cor-texto-suave);
-  font-size: var(--texto-sm);
-}
-
-.heroi {
-  font-size: 3rem;
-  line-height: 1.1;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.valor {
-  font-size: var(--texto-xl);
-  font-weight: 700;
-}
-
-.nota {
-  color: var(--cor-texto-suave);
-  font-size: var(--texto-xs);
-}
-
-.semVendas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--esp-2);
-  color: var(--cor-texto-suave);
-  font-size: var(--texto-sm);
-}
-
-.semVendas a {
-  color: var(--cor-primaria);
-  font-weight: 600;
-}
-
-/* Cartões de detalhe */
-.grade {
-  display: grid;
-  gap: var(--esp-3);
-}
-
-@media (min-width: 900px) {
-  .grade {
-    grid-template-columns: 1fr 1fr;
-  }
-  .largo {
-    grid-column: 1 / -1;
-  }
-}
-
 .tituloCartao {
-  font-size: var(--texto-md);
+  font-size: var(--texto-lg);
 }
 
 .tituloCartao small {
@@ -206,6 +179,7 @@
 
 .valorOrigem {
   text-align: right;
+  font-family: var(--fonte-num);
   font-variant-numeric: tabular-nums;
 }
 
@@ -239,9 +213,12 @@
 }
 
 .qtdRanking {
+  display: flex;
+  gap: var(--esp-3);
   color: var(--cor-texto-suave);
   font-size: var(--texto-sm);
   white-space: nowrap;
+  font-family: var(--fonte-num);
   font-variant-numeric: tabular-nums;
 }
 
@@ -266,11 +243,31 @@
 /* Alertas de estoque */
 .resumoAlertas {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--esp-2);
-  color: var(--cor-alerta);
-  font-weight: 600;
+  gap: var(--esp-1) var(--esp-2);
   font-size: var(--texto-sm);
+  font-weight: 600;
+}
+
+.resumoAlertas svg {
+  color: var(--cor-alerta);
+}
+
+.contaZerado,
+.contaAcabando {
+  padding: 0.1em 0.6em;
+  border-radius: 999px;
+}
+
+.contaZerado {
+  background: var(--cor-erro-suave);
+  color: var(--cor-erro);
+}
+
+.contaAcabando {
+  background: var(--cor-alerta-suave);
+  color: var(--cor-alerta);
 }
 
 .alertas {
@@ -279,17 +276,23 @@
   padding: 0;
 }
 
-.alertas li {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--esp-3);
-  padding: var(--esp-2) 0;
-  border-bottom: 1px solid var(--cor-borda);
+.alertas li + li {
+  border-top: 1px solid var(--cor-borda);
 }
 
-.alertas a {
+.linhaAlerta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  min-height: var(--toque-min);
   color: var(--cor-texto);
   font-weight: 600;
+  text-decoration: none;
+}
+
+.linhaAlerta:hover span:first-child {
+  text-decoration: underline;
 }
 
 .zerado,
@@ -308,7 +311,10 @@
 }
 
 .verTodos {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--toque-min);
   color: var(--cor-primaria);
-  font-weight: 600;
+  font-weight: 700;
   font-size: var(--texto-sm);
 }

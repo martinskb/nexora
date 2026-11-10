@@ -12,7 +12,7 @@
 }
 
 .titulo {
-  font-size: var(--texto-xl);
+  font-size: var(--texto-2xl);
 }
 
 .contagem,
@@ -123,7 +123,10 @@
   grid-area: info;
   justify-self: start;
   color: var(--cor-texto-suave);
+  font-family: var(--fonte-num);
+  font-weight: 700;
   font-size: var(--texto-sm);
+  font-variant-numeric: tabular-nums;
 }
 
 .saldo {

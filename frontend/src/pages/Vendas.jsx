@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { vendasApi } from '../api/vendas.js'
 import { Alerta } from '../components/Alerta.jsx'
 import { Botao } from '../components/Botao.jsx'
@@ -113,12 +112,7 @@ export default function Vendas() {
 
   return (
     <section className={estilos.pagina}>
-      <header className={estilos.topo}>
-        <h1 className={estilos.titulo}>Vendas</h1>
-        <Link to="/vender" className={estilos.novaVenda}>
-          Nova venda
-        </Link>
-      </header>
+      <h1 className={estilos.titulo}>Vendas</h1>
 
       <div className={estilos.filtros}>
         <Segmentado
@@ -171,8 +165,8 @@ export default function Vendas() {
                     <span className={estilos.resumo}>
                       <span className={estilos.produtos}>{v.resumo}</span>
                       <span className={estilos.meta}>
-                        {v.quantidadeItens === 1 ? '1 item' : `${v.quantidadeItens} itens`} ·{' '}
-                        <span className={estilos[`canal_${v.canal}`]}>{CANAL_ROTULO[v.canal]}</span>
+                        <span>{v.quantidadeItens === 1 ? '1 item' : `${v.quantidadeItens} itens`}</span>
+                        <span className={`${estilos.canal} ${estilos[`canal_${v.canal}`]}`}>{CANAL_ROTULO[v.canal]}</span>
                         {v.status === 'cancelada' && <span className={estilos.seloCancelada}>Cancelada</span>}
                       </span>
                     </span>

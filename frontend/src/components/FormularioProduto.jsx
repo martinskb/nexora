@@ -128,17 +128,17 @@ export function FormularioProduto({ produto, aoSalvar, aoRemover, aoCancelar }) 
           </span>
           <span className={estilos.ajuda}>A quantidade muda sozinha a cada venda.</span>
           <Link to={`/estoque?produto=${produto.id}`} className={estilos.linkAjuste}>
-            Registrar entrada ou corrigir estoque →
+            Registrar entrada ou corrigir estoque
           </Link>
         </div>
       )}
 
       <CampoTexto
-        rotulo="Avisar quando chegar a (opcional)"
+        rotulo="Avisar quando restarem (opcional)"
         name="estoqueMinimo"
         inputMode="numeric"
         placeholder="Ex.: 3"
-        dica="Mostramos um alerta quando o estoque ficar nessa quantidade ou menos."
+        dica="Com 3, por exemplo, o produto aparece como “Acabando” quando restarem 3 unidades ou menos."
         value={valores.estoqueMinimo}
         onChange={alterar}
         erro={erros.estoqueMinimo}

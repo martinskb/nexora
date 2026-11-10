@@ -187,8 +187,10 @@ export default function Estoque() {
               <strong>{produtoAberto.quantidade}</strong>
               <span className={`${estilos.situacao} ${estilos[`situacao_${situacaoEstoque(produtoAberto)}`]}`}>
                 {ROTULO_SITUACAO[situacaoEstoque(produtoAberto)]}
-                {produtoAberto.estoqueMinimo > 0 && ` · aviso em ${produtoAberto.estoqueMinimo} un.`}
               </span>
+              {produtoAberto.estoqueMinimo > 0 && (
+                <span className={estilos.avisoMinimo}>Aviso quando restarem {produtoAberto.estoqueMinimo} un.</span>
+              )}
             </div>
             <AjusteEstoque key={produtoAberto.id} produto={produtoAberto} aoAjustar={aoAjustar} />
             <div>

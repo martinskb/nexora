@@ -1,6 +1,6 @@
 .selo {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.25em;
   padding: 0.2em 0.6em;
   border-radius: 999px;
@@ -11,7 +11,9 @@
 }
 
 .selo strong {
+  font-family: var(--fonte-num);
   font-size: var(--texto-sm);
+  font-weight: 800;
 }
 
 .baixo {
@@ -26,4 +28,7 @@
 
 .rotulo {
   font-weight: 600;
+  padding-left: 0.5em;
+  margin-left: 0.25em;
+  border-left: 1px solid currentColor;
 }

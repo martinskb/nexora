@@ -42,7 +42,11 @@ export async function api(path, { method = 'GET', body, signal } = {}) {
 
   if (!res.ok) {
     if (res.status === 401 && aoPerderSessao) aoPerderSessao()
-    const message = data?.erro || 'Algo deu errado. Tente novamente.'
+    const message =
+      data?.erro ||
+      (res.status >= 500
+        ? 'O servidor não conseguiu concluir agora. Seus dados não foram alterados. Tente de novo em instantes.'
+        : `Não foi possível concluir a operação (código ${res.status}). Atualize a página e tente de novo.`)
     throw new ApiError(message, res.status, data?.detalhes)
   }
   return data

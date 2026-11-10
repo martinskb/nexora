@@ -53,9 +53,11 @@ export function DetalheVenda({ venda, aoCancelar }) {
       <ul className={estilos.itens}>
         {venda.itens.map((i) => (
           <li key={i.produtoId}>
-            <span>
-              <strong>{i.quantidade}×</strong> {i.nome}
-              <small> · {formatarMoeda(i.precoUnitario)} cada</small>
+            <span className={estilos.item}>
+              <span>
+                <strong>{i.quantidade}×</strong> {i.nome}
+              </span>
+              <small>{formatarMoeda(i.precoUnitario)} cada</small>
             </span>
             <span className={estilos.valor}>{formatarMoeda(i.subtotal)}</span>
           </li>

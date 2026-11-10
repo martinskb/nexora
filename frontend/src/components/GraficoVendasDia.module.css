@@ -29,6 +29,7 @@
 .eixoX {
   fill: var(--cor-texto-suave);
   font-size: 11px;
+  font-family: var(--fonte-num);
   font-variant-numeric: tabular-nums;
 }
 
@@ -113,6 +114,7 @@
   margin-top: var(--esp-2);
   border-collapse: collapse;
   font-size: var(--texto-sm);
+  font-family: var(--fonte-num);
   font-variant-numeric: tabular-nums;
 }
 

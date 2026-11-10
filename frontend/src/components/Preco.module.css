@@ -1,0 +1,49 @@
+.preco {
+  display: inline-flex;
+  align-items: flex-start;
+  font-family: var(--fonte-num);
+  font-stretch: 80%;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums lining-nums;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.moeda {
+  font-size: 0.5em;
+  font-weight: 700;
+  margin-top: 0.18em;
+  margin-right: 0.12em;
+}
+
+.reais {
+  font-size: 1em;
+}
+
+/* centavos elevados, como na etiqueta da gôndola */
+.centavos {
+  font-size: 0.56em;
+  margin-top: 0.08em;
+  margin-left: 0.02em;
+}
+
+.md {
+  font-size: 1.5rem;
+}
+
+.lg {
+  font-size: 2rem;
+}
+
+.xl {
+  font-size: clamp(3.25rem, 15vw, 5rem);
+  letter-spacing: -0.02em;
+}
+
+.etiqueta {
+  padding: 0.14em 0.28em 0.1em;
+  border-radius: var(--raio-sm);
+  background: var(--cor-etiqueta);
+  color: var(--cor-sobre-etiqueta);
+}

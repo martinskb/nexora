@@ -1,33 +1,46 @@
 /*
- * NEXORA — base visual.
- * Mobile-first, alto contraste, áreas de toque grandes (mín. 44px),
- * fonte do sistema (carrega rápido e funciona sem internet externa).
+ * NEXORA — base visual "etiqueta de prateleira".
+ * Mobile-first, alto contraste, áreas de toque grandes (mín. 44px).
+ * Duas fontes, embutidas no app (sem serviço externo):
+ *  - Atkinson Hyperlegible Next: textos — desenhada para leitura fácil.
+ *  - Archivo (largura condensada): títulos, preços e quantidades — lembra
+ *    letreiro e etiqueta de mercado, e mantém números alinhados.
+ * O amarelo de etiqueta é reservado a preços e à ação "Vender".
  */
 :root {
   /* Cores */
-  --cor-primaria: #0f766e;
-  --cor-primaria-hover: #115e59;
-  --cor-primaria-suave: #ccfbf1;
-  --cor-texto: #1f2937;
-  --cor-texto-suave: #4b5563;
-  --cor-fundo: #f6f7f9;
+  --cor-primaria: #1d6b47; /* verde-mangueira */
+  --cor-primaria-hover: #155637;
+  --cor-primaria-suave: #dcede2;
+  --cor-sobre-primaria: #ffffff;
+  --cor-etiqueta: #ffd43b; /* amarelo de etiqueta de preço */
+  --cor-etiqueta-hover: #ffc800;
+  --cor-sobre-etiqueta: #14231b;
+  --cor-texto: #14231b;
+  --cor-texto-suave: #4a5a51;
+  --cor-fundo: #eef1ec;
   --cor-superficie: #ffffff;
-  --cor-borda: #d9dde3;
-  --cor-sucesso: #15803d;
-  --cor-sucesso-suave: #dcfce7;
-  --cor-alerta: #b45309;
-  --cor-alerta-suave: #fef3c7;
-  --cor-erro: #b91c1c;
-  --cor-erro-suave: #fee2e2;
+  --cor-borda: #d3dbd4;
+  --cor-sucesso: #1d6b47;
+  --cor-sucesso-suave: #dcede2;
+  --cor-alerta: #9a4a00;
+  --cor-alerta-suave: #ffebc7;
+  --cor-erro: #b42318;
+  --cor-erro-suave: #fde3df;
+  --cor-sobre-erro: #ffffff;
+  --cor-overlay: rgb(20 35 27 / 0.5);
 
   /* Tipografia */
-  --fonte: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --texto-xs: 0.8125rem;
+  --fonte: 'Atkinson Hyperlegible Next Variable', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --fonte-titulo: 'Archivo Variable', var(--fonte);
+  --fonte-num: 'Archivo Variable', var(--fonte);
+  /* Escala: menor texto em 14px — público pode ter pouca prática ou visão cansada */
+  --texto-xs: 0.875rem;
   --texto-sm: 0.9375rem;
   --texto-md: 1rem;
   --texto-lg: 1.25rem;
-  --texto-xl: 1.5rem;
-  --texto-2xl: 2rem;
+  --texto-xl: 1.625rem;
+  --texto-2xl: 2.25rem;
 
   /* Espaçamento */
   --esp-1: 0.25rem;
@@ -38,23 +51,21 @@
   --esp-6: 2rem;
   --esp-7: 3rem;
 
-  /* Formas */
-  --raio-sm: 6px;
-  --raio-md: 10px;
-  --raio-lg: 16px;
-  --sombra-sm: 0 1px 2px rgb(16 24 40 / 0.06), 0 1px 3px rgb(16 24 40 / 0.08);
-  --sombra-md: 0 4px 12px rgb(16 24 40 / 0.08);
+  /* Formas: etiquetas quase retas, cartões levemente arredondados */
+  --raio-sm: 4px;
+  --raio-md: 8px;
+  --raio-lg: 14px;
+  --sombra-sm: 0 1px 2px rgb(20 35 27 / 0.08);
+  --sombra-md: 0 6px 20px rgb(20 35 27 / 0.12);
   --toque-min: 44px;
   /* Altura do menu inferior (celular) */
   --altura-nav-inferior: 64px;
 
   color-scheme: light;
-  --cor-sobre-primaria: #ffffff;
-  --cor-overlay: rgb(15 23 42 / 0.45);
 
-  /* Séries de gráfico (validadas: contraste, daltonismo e separação) */
-  --serie-1: #0d9488; /* Balcão / série única */
-  --serie-2: #eb6834; /* WhatsApp */
+  /* Séries de gráfico (contraste e daltonismo conferidos) */
+  --serie-1: #2a8a5c; /* Balcão / série única */
+  --serie-2: #d9622b; /* WhatsApp */
 
   font-family: var(--fonte);
   font-size: 16px;
@@ -69,51 +80,53 @@
    (data-theme é definido pelo botão de tema e salvo no navegador). */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='claro']) {
-    --cor-primaria: #2dd4bf;
-    --cor-primaria-hover: #5eead4;
-    --cor-primaria-suave: #134e4a;
-    --cor-sobre-primaria: #042f2e;
-    --cor-texto: #e5e7eb;
-    --cor-texto-suave: #a1a8b3;
-    --cor-fundo: #111418;
-    --cor-superficie: #1b1f25;
-    --cor-borda: #343a44;
-    --cor-sucesso: #4ade80;
-    --cor-sucesso-suave: #14321f;
-    --cor-alerta: #fbbf24;
-    --cor-alerta-suave: #3a2a0a;
-    --cor-erro: #f87171;
-    --cor-erro-suave: #3b1414;
+    --cor-primaria: #5fcb94;
+    --cor-primaria-hover: #86dcae;
+    --cor-primaria-suave: #1c3a2a;
+    --cor-sobre-primaria: #0b2017;
+    --cor-texto: #e6ece7;
+    --cor-texto-suave: #9daea3;
+    --cor-fundo: #0f1612;
+    --cor-superficie: #18221c;
+    --cor-borda: #2e3c33;
+    --cor-sucesso: #5fcb94;
+    --cor-sucesso-suave: #1c3a2a;
+    --cor-alerta: #f5b544;
+    --cor-alerta-suave: #3a2a0c;
+    --cor-erro: #f4877b;
+    --cor-erro-suave: #3d1714;
+    --cor-sobre-erro: #2a0a07;
     --cor-overlay: rgb(0 0 0 / 0.6);
     --sombra-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-    --sombra-md: 0 4px 16px rgb(0 0 0 / 0.45);
-    --serie-1: #12a594;
-    --serie-2: #d95926;
+    --sombra-md: 0 6px 20px rgb(0 0 0 / 0.5);
+    --serie-1: #3fae78;
+    --serie-2: #e0733f;
     color-scheme: dark;
   }
 }
 
 :root[data-theme='escuro'] {
-  --cor-primaria: #2dd4bf;
-  --cor-primaria-hover: #5eead4;
-  --cor-primaria-suave: #134e4a;
-  --cor-sobre-primaria: #042f2e;
-  --cor-texto: #e5e7eb;
-  --cor-texto-suave: #a1a8b3;
-  --cor-fundo: #111418;
-  --cor-superficie: #1b1f25;
-  --cor-borda: #343a44;
-  --cor-sucesso: #4ade80;
-  --cor-sucesso-suave: #14321f;
-  --cor-alerta: #fbbf24;
-  --cor-alerta-suave: #3a2a0a;
-  --cor-erro: #f87171;
-  --cor-erro-suave: #3b1414;
+  --cor-primaria: #5fcb94;
+  --cor-primaria-hover: #86dcae;
+  --cor-primaria-suave: #1c3a2a;
+  --cor-sobre-primaria: #0b2017;
+  --cor-texto: #e6ece7;
+  --cor-texto-suave: #9daea3;
+  --cor-fundo: #0f1612;
+  --cor-superficie: #18221c;
+  --cor-borda: #2e3c33;
+  --cor-sucesso: #5fcb94;
+  --cor-sucesso-suave: #1c3a2a;
+  --cor-alerta: #f5b544;
+  --cor-alerta-suave: #3a2a0c;
+  --cor-erro: #f4877b;
+  --cor-erro-suave: #3d1714;
+  --cor-sobre-erro: #2a0a07;
   --cor-overlay: rgb(0 0 0 / 0.6);
   --sombra-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-  --sombra-md: 0 4px 16px rgb(0 0 0 / 0.45);
-  --serie-1: #12a594;
-  --serie-2: #d95926;
+  --sombra-md: 0 6px 20px rgb(0 0 0 / 0.5);
+  --serie-1: #3fae78;
+  --serie-2: #e0733f;
   color-scheme: dark;
 }
 
@@ -140,7 +153,18 @@ h1,
 h2,
 h3 {
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.15;
+  font-family: var(--fonte-titulo);
+  font-stretch: 85%;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+/* Títulos de página: estreitos e pesados, como letreiro. */
+h1 {
+  font-stretch: 75%;
+  font-weight: 800;
+  letter-spacing: -0.005em;
 }
 
 p {

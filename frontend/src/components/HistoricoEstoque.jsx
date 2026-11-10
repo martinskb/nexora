@@ -13,6 +13,12 @@ const ROTULO_TIPO = {
   ajuste: 'Correção de contagem',
 }
 
+function rotulo(m) {
+  if (m.tipo === 'venda' && m.vendaId) return `Venda nº ${m.vendaId}`
+  if (m.tipo === 'cancelamento' && m.vendaId) return `Venda nº ${m.vendaId} cancelada (devolução)`
+  return ROTULO_TIPO[m.tipo] ?? m.tipo
+}
+
 // Motivos que só repetem o tipo não precisam aparecer.
 const MOTIVOS_OBVIOS = new Set(['Quantidade inicial', 'Chegou mercadoria'])
 
@@ -60,22 +66,17 @@ export function HistoricoEstoque({ produtoId }) {
         {estado.itens.map((m) => (
           <li key={m.id} className={estilos.item}>
             <div className={estilos.linha}>
-              <span className={estilos.tipo}>
-                {ROTULO_TIPO[m.tipo] ?? m.tipo}
-                {m.vendaId && <small> · venda nº {m.vendaId}</small>}
-              </span>
+              <span className={estilos.tipo}>{rotulo(m)}</span>
               <span className={m.quantidade >= 0 ? estilos.entrada : estilos.saida}>
                 {m.quantidade > 0 ? '+' : ''}
                 {m.quantidade}
               </span>
             </div>
             <div className={estilos.linha}>
-              <span className={estilos.meta}>
-                {formatarDataHora(m.criadoEm)}
-                {m.motivo && !MOTIVOS_OBVIOS.has(m.motivo) && <> · {m.motivo}</>}
-              </span>
+              <span className={estilos.meta}>{formatarDataHora(m.criadoEm)}</span>
               <span className={estilos.meta}>saldo: {m.saldoApos}</span>
             </div>
+            {m.motivo && !MOTIVOS_OBVIOS.has(m.motivo) && <span className={estilos.motivo}>Motivo: {m.motivo}</span>}
           </li>
         ))}
       </ol>

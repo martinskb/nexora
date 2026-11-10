@@ -7,30 +7,27 @@ import { IconeCaixa, IconeCarrinho, IconeEstoque, IconeInicio, IconeRecibo, Icon
 import { Logo } from './Logo.jsx'
 import estilos from './LayoutApp.module.css'
 
-// Itens do menu. Cada etapa nova acrescenta sua tela aqui.
+// Itens do menu, na ordem do celular. "Vender" é a ação mais frequente no balcão:
+// fica no centro do menu inferior e é o único botão preenchido do cabeçalho.
 const MENU = [
   { para: '/', rotulo: 'Início', Icone: IconeInicio, exato: true },
-  { para: '/vender', rotulo: 'Vender', Icone: IconeCarrinho },
   { para: '/vendas', rotulo: 'Vendas', Icone: IconeRecibo },
+  { para: '/vender', rotulo: 'Vender', Icone: IconeCarrinho, principal: true },
   { para: '/estoque', rotulo: 'Estoque', Icone: IconeEstoque },
   { para: '/produtos', rotulo: 'Produtos', Icone: IconeCaixa },
 ]
 
-function Menu({ className }) {
+const classeLink =
+  (extra = '') =>
+  ({ isActive }) =>
+    [estilos.link, extra, isActive && estilos.ativo].filter(Boolean).join(' ')
+
+function ItemMenu({ para, rotulo, Icone, exato, className }) {
   return (
-    <nav className={className} aria-label="Menu principal">
-      {MENU.map(({ para, rotulo, Icone, exato }) => (
-        <NavLink
-          key={para}
-          to={para}
-          end={exato}
-          className={({ isActive }) => `${estilos.link} ${isActive ? estilos.ativo : ''}`}
-        >
-          <Icone />
-          <span>{rotulo}</span>
-        </NavLink>
-      ))}
-    </nav>
+    <NavLink to={para} end={exato} className={classeLink(className)}>
+      <Icone />
+      <span>{rotulo}</span>
+    </NavLink>
   )
 }
 
@@ -39,6 +36,7 @@ export function LayoutApp() {
   const { loja, sair } = useAuth()
   const navigate = useNavigate()
   const [saindo, setSaindo] = useState(false)
+  const vender = MENU.find((m) => m.principal)
 
   async function aoSair() {
     setSaindo(true)
@@ -50,13 +48,18 @@ export function LayoutApp() {
     <div className={estilos.app}>
       <header className={estilos.cabecalho}>
         <div className={estilos.barra}>
-          <Link to="/" aria-label="Início">
+          <Link to="/" aria-label="Início" className={estilos.marca}>
             <Logo tamanho={30} />
           </Link>
-          <Menu className={estilos.menuTopo} />
+          <nav className={estilos.menuTopo} aria-label="Menu principal">
+            {MENU.filter((m) => !m.principal).map((m) => (
+              <ItemMenu key={m.para} {...m} />
+            ))}
+          </nav>
           <span className={estilos.loja} title={loja?.nome}>
             {loja?.nome}
           </span>
+          <ItemMenu {...vender} className={estilos.venderTopo} />
           <div className={estilos.acoes}>
             <BotaoTema />
             <Botao variante="fantasma" onClick={aoSair} carregando={saindo} aria-label="Sair da conta">
@@ -69,7 +72,11 @@ export function LayoutApp() {
       <main className={estilos.conteudo}>
         <Outlet />
       </main>
-      <Menu className={estilos.menuInferior} />
+      <nav className={estilos.menuInferior} aria-label="Menu principal">
+        {MENU.map((m) => (
+          <ItemMenu key={m.para} {...m} className={m.principal ? estilos.venderInferior : ''} />
+        ))}
+      </nav>
     </div>
   )
 }

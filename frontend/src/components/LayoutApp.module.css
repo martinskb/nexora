@@ -17,6 +17,14 @@
   gap: var(--esp-3);
 }
 
+.marca {
+  display: flex;
+  align-items: center;
+  min-height: var(--toque-min);
+  text-decoration: none;
+  color: inherit;
+}
+
 .loja {
   flex: 1;
   min-width: 0;
@@ -65,7 +73,8 @@
 }
 
 /* Celular: barra fixa no rodapé, ao alcance do polegar. */
-.menuTopo {
+.menuTopo,
+.venderTopo {
   display: none;
 }
 
@@ -76,15 +85,16 @@
   bottom: 0;
   z-index: 10;
   display: flex;
-  justify-content: space-around;
+  align-items: center;
   height: calc(var(--altura-nav-inferior) + env(safe-area-inset-bottom, 0px));
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding: 0 var(--esp-1) env(safe-area-inset-bottom, 0px);
   background: var(--cor-superficie);
   border-top: 1px solid var(--cor-borda);
 }
 
 .menuInferior .link {
   flex: 1;
+  height: 100%;
   flex-direction: column;
   justify-content: center;
   gap: 2px;
@@ -93,8 +103,25 @@
 }
 
 .menuInferior .ativo {
-  background: var(--cor-primaria-suave);
-  color: var(--cor-texto);
+  color: var(--cor-primaria);
+  box-shadow: inset 0 3px 0 var(--cor-primaria);
+}
+
+/* A ação principal: botão preenchido no centro, sem sair da altura do menu
+   (não cobre a barra de total da tela de venda). */
+.menuInferior .venderInferior {
+  flex: 1.15;
+  height: calc(100% - 2 * var(--esp-2));
+  margin: 0 var(--esp-1);
+  border-radius: var(--raio-md);
+  background: var(--cor-etiqueta);
+  color: var(--cor-sobre-etiqueta);
+  font-weight: 700;
+}
+
+.menuInferior .venderInferior.ativo {
+  box-shadow: inset 0 0 0 2px var(--cor-sobre-etiqueta);
+  color: var(--cor-sobre-etiqueta);
 }
 
 /* Telas maiores: menu no topo, sem barra inferior. */
@@ -114,12 +141,33 @@
   }
 
   .menuTopo .link {
-    min-height: 40px;
+    min-height: 60px;
     padding: 0 var(--esp-3);
   }
 
   .menuTopo .ativo {
-    background: var(--cor-primaria-suave);
     color: var(--cor-texto);
+    box-shadow: inset 0 -3px 0 var(--cor-primaria);
+    border-radius: 0;
+  }
+
+  .venderTopo {
+    display: flex;
+    min-height: var(--toque-min);
+    padding: 0 var(--esp-5);
+    background: var(--cor-etiqueta);
+    color: var(--cor-sobre-etiqueta);
+    font-weight: 700;
+    font-size: var(--texto-md);
+  }
+
+  .venderTopo:hover {
+    background: var(--cor-etiqueta-hover);
+    color: var(--cor-sobre-etiqueta);
+  }
+
+  .venderTopo.ativo {
+    box-shadow: inset 0 0 0 2px var(--cor-sobre-etiqueta);
+    color: var(--cor-sobre-etiqueta);
   }
 }

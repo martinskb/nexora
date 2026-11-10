@@ -52,7 +52,7 @@
 
 .perigo {
   background: var(--cor-erro);
-  color: #fff;
+  color: var(--cor-sobre-erro);
 }
 
 .spinner {

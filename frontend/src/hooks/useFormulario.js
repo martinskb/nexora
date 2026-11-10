@@ -34,7 +34,7 @@ export function useFormulario(valoresIniciais) {
         setErros(err.details)
         if (err.status !== 400) setErroGeral(err.message)
       } else {
-        setErroGeral(err.message || 'Algo deu errado. Tente novamente.')
+        setErroGeral(err.message || 'Não foi possível concluir. Verifique sua conexão e tente de novo.')
       }
       return false
     } finally {
