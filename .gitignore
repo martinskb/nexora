@@ -1,0 +1,25 @@
+# Dependências
+node_modules/
+
+# Variáveis de ambiente (credenciais nunca vão para o git)
+.env
+.env.*
+!.env.example
+
+# Build / cache
+dist/
+coverage/
+.vite/
+
+# Backups do banco
+backups/
+*.sql.gz
+
+# Sistema / editores
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# Documento original da disciplina (resumo em docs/PROJETO.md)
+*.pdf

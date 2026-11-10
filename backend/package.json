@@ -1,0 +1,30 @@
+{
+  "name": "nexora-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API REST da NEXORA — controle de vendas e estoque para pequenos comerciantes",
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "db:setup": "node scripts/db-setup.js",
+    "db:setup:test": "NODE_ENV=test node scripts/db-setup.js",
+    "test": "NODE_ENV=test vitest run",
+    "test:watch": "NODE_ENV=test vitest"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.10",
+    "express": "^5.3.0",
+    "helmet": "^8.3.0",
+    "mysql2": "^3.24.6"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.2",
+    "vitest": "^5.1.0"
+  }
+}

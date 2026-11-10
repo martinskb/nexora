@@ -1,0 +1,14 @@
+import { Router } from 'express';
+import { pool } from '../config/db.js';
+
+export const routes = Router();
+
+// Verifica se a API e o banco estão respondendo.
+routes.get('/health', async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', banco: 'ok' });
+  } catch {
+    res.status(503).json({ status: 'erro', banco: 'indisponível' });
+  }
+});
