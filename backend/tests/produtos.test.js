@@ -70,6 +70,24 @@ describe('Produtos — listagem, edição e remoção', () => {
     expect(res.body.produtos.map((p) => p.nome)).toEqual(['Arroz', 'Feijão']);
   });
 
+  it('informa quanto cada produto vendeu nos últimos 30 dias (sem contar canceladas nem vendas antigas)', async () => {
+    const { agente } = await criarLojaLogada();
+    const { body: a } = await agente.post('/api/produtos').send(arroz);
+    const { body: f } = await agente.post('/api/produtos').send({ ...arroz, nome: 'Feijão' });
+    const id = a.produto.id;
+    await agente.post('/api/vendas').send({ itens: [{ produtoId: id, quantidade: 3 }] });
+    await agente.post('/api/vendas').send({ itens: [{ produtoId: id, quantidade: 2 }] });
+    const cancelada = await agente.post('/api/vendas').send({ itens: [{ produtoId: id, quantidade: 4 }] });
+    await agente.post(`/api/vendas/${cancelada.body.venda.id}/cancelar`).send({ motivo: 'Cliente desistiu' });
+    const antiga = await agente.post('/api/vendas').send({ itens: [{ produtoId: id, quantidade: 7 }] });
+    await pool.execute('UPDATE vendas SET criado_em = NOW() - INTERVAL 31 DAY WHERE id = ?', [antiga.body.venda.id]);
+
+    const res = await agente.get('/api/produtos');
+    const porId = Object.fromEntries(res.body.produtos.map((p) => [p.id, p]));
+    expect(porId[id].vendidos30d).toBe(5);
+    expect(porId[f.produto.id].vendidos30d).toBe(0);
+  });
+
   it('edita nome, preço e estoque mínimo', async () => {
     const { agente } = await criarLojaLogada();
     const { body } = await agente.post('/api/produtos').send(arroz);

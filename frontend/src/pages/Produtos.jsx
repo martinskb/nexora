@@ -3,12 +3,17 @@ import { produtosApi } from '../api/produtos.js'
 import { Alerta } from '../components/Alerta.jsx'
 import { Botao } from '../components/Botao.jsx'
 import { FormularioProduto } from '../components/FormularioProduto.jsx'
-import { IconeBusca, IconeCaixa, IconeMais, IconeSeta } from '../components/Icones.jsx'
+import { IconeBusca, IconeCaixa, IconeMais } from '../components/Icones.jsx'
 import { Modal } from '../components/Modal.jsx'
+import { Preco } from '../components/Preco.jsx'
 import { SeloEstoque } from '../components/SeloEstoque.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
-import { formatarMoeda, normalizarTexto } from '../utils/formato.js'
+import { situacaoEstoque } from '../utils/estoque.js'
+import { normalizarTexto } from '../utils/formato.js'
 import estilos from './Produtos.module.css'
+
+// Medidor de estoque: cheio a partir de 3× o mínimo; vazio quando zerado.
+const preenchimento = (p) => Math.min(100, Math.round((p.quantidade / (p.estoqueMinimo * 3)) * 100))
 
 const porNome = (a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' })
 
@@ -49,7 +54,7 @@ export default function Produtos() {
   function aoSalvar(produto, { novo }) {
     setEstado((e) => ({
       ...e,
-      produtos: (novo ? [...e.produtos, produto] : e.produtos.map((p) => (p.id === produto.id ? produto : p))).sort(
+      produtos: (novo ? [...e.produtos, produto] : e.produtos.map((p) => (p.id === produto.id ? { ...p, ...produto } : p))).sort(
         porNome,
       ),
     }))
@@ -121,24 +126,45 @@ export default function Produtos() {
           {filtrados.length === 0 ? (
             <p className={estilos.info}>Nenhum produto encontrado para “{busca}”.</p>
           ) : (
-            <ul className={estilos.lista}>
-              {filtrados.map((p) => (
-                <li key={p.id}>
-                  <button
-                    type="button"
-                    className={estilos.item}
-                    onClick={() => setJanela({ produto: p })}
-                    aria-label={`Editar ${p.nome}`}
-                  >
-                    <span className={estilos.nome}>{p.nome}</span>
-                    <span className={estilos.preco}>{formatarMoeda(p.preco)}</span>
-                    <span className={estilos.saldo}>
-                      <SeloEstoque produto={p} />
-                    </span>
-                    <IconeSeta className={estilos.seta} />
-                  </button>
-                </li>
-              ))}
+            <ul className={estilos.grade}>
+              {filtrados.map((p) => {
+                const situacao = situacaoEstoque(p)
+                return (
+                  <li key={p.id}>
+                    <button
+                      type="button"
+                      className={`${estilos.cartao} ${estilos[situacao]}`}
+                      onClick={() => setJanela({ produto: p })}
+                      aria-label={`Editar ${p.nome}`}
+                    >
+                      <span className={estilos.nome}>{p.nome}</span>
+                      <span className={estilos.linhaPreco}>
+                        <Preco valor={p.preco} etiqueta />
+                        <SeloEstoque produto={p} />
+                      </span>
+                      {p.estoqueMinimo > 0 && (
+                        <span className={estilos.medidor} aria-hidden="true">
+                          <span style={{ width: `${preenchimento(p)}%` }} />
+                        </span>
+                      )}
+                      <span className={estilos.rodape}>
+                        <span>
+                          {p.estoqueMinimo > 0 ? (
+                            <>
+                              Mínimo <strong>{p.estoqueMinimo}</strong>
+                            </>
+                          ) : (
+                            'Sem mínimo'
+                          )}
+                        </span>
+                        <span>
+                          Vendeu <strong>{p.vendidos30d ?? 0}</strong> em 30 dias
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                )
+              })}
             </ul>
           )}
         </>

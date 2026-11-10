@@ -13,6 +13,8 @@ export function paraProdutoPublico(row) {
     estoqueMinimo: row.estoque_minimo,
     criadoEm: row.criado_em,
     atualizadoEm: row.atualizado_em,
+    // Só vem na listagem: unidades vendidas (vendas concluídas) nos últimos 30 dias.
+    ...(row.vendidos_30d !== undefined && { vendidos30d: Number(row.vendidos_30d) }),
   };
 }
 
@@ -20,8 +22,20 @@ export function paraProdutoPublico(row) {
 
 export async function listar(lojaId) {
   const [rows] = await pool.execute(
-    `SELECT ${COLUNAS} FROM produtos WHERE loja_id = ? AND ativo = TRUE ORDER BY nome`,
-    [lojaId],
+    `SELECT p.${COLUNAS.split(', ').join(', p.')},
+            COALESCE(v.vendidos, 0) AS vendidos_30d
+       FROM produtos p
+       LEFT JOIN (
+         SELECT i.produto_id, SUM(i.quantidade) AS vendidos
+           FROM itens_venda i
+           JOIN vendas ve ON ve.id = i.venda_id
+          WHERE ve.loja_id = ? AND ve.status = 'concluida'
+            AND ve.criado_em >= UTC_TIMESTAMP() - INTERVAL 30 DAY
+          GROUP BY i.produto_id
+       ) v ON v.produto_id = p.id
+      WHERE p.loja_id = ? AND p.ativo = TRUE
+      ORDER BY p.nome`,
+    [lojaId, lojaId],
   );
   return rows.map(paraProdutoPublico);
 }
