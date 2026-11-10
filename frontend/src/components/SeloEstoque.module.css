@@ -1,0 +1,29 @@
+.selo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25em;
+  padding: 0.2em 0.6em;
+  border-radius: 999px;
+  font-size: var(--texto-xs);
+  white-space: nowrap;
+  background: var(--cor-primaria-suave);
+  color: var(--cor-texto);
+}
+
+.selo strong {
+  font-size: var(--texto-sm);
+}
+
+.baixo {
+  background: var(--cor-alerta-suave);
+  color: var(--cor-alerta);
+}
+
+.zerado {
+  background: var(--cor-erro-suave);
+  color: var(--cor-erro);
+}
+
+.rotulo {
+  font-weight: 600;
+}

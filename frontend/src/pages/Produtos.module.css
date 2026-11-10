@@ -1,0 +1,154 @@
+.pagina {
+  display: grid;
+  gap: var(--esp-4);
+}
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+}
+
+.titulo {
+  font-size: var(--texto-xl);
+}
+
+.contagem,
+.info {
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-sm);
+}
+
+.erro {
+  display: grid;
+  gap: var(--esp-3);
+  justify-items: start;
+}
+
+.vazio {
+  display: grid;
+  justify-items: center;
+  gap: var(--esp-3);
+  text-align: center;
+  padding: var(--esp-7) var(--esp-4);
+  background: var(--cor-superficie);
+  border: 1px dashed var(--cor-borda);
+  border-radius: var(--raio-lg);
+  color: var(--cor-texto-suave);
+}
+
+.vazio h2 {
+  color: var(--cor-texto);
+  font-size: var(--texto-lg);
+}
+
+.vazio p {
+  max-width: 36ch;
+}
+
+.busca {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.busca svg {
+  position: absolute;
+  left: var(--esp-3);
+  color: var(--cor-texto-suave);
+  pointer-events: none;
+}
+
+.busca input {
+  width: 100%;
+  min-height: var(--toque-min);
+  padding: 0 var(--esp-3) 0 2.5rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie);
+}
+
+.busca input:focus {
+  outline: none;
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 3px var(--cor-primaria-suave);
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  overflow: hidden;
+}
+
+.lista li + li {
+  border-top: 1px solid var(--cor-borda);
+}
+
+/* Celular: nome em cima; preço e saldo embaixo. */
+.item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'nome  seta'
+    'info  seta';
+  align-items: center;
+  column-gap: var(--esp-3);
+  row-gap: var(--esp-1);
+  min-height: 64px;
+  padding: var(--esp-3) var(--esp-4);
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: var(--cor-fundo);
+}
+
+.nome {
+  grid-area: nome;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.preco {
+  grid-area: info;
+  justify-self: start;
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-sm);
+}
+
+.saldo {
+  grid-area: info;
+  justify-self: end;
+}
+
+.seta {
+  grid-area: seta;
+  color: var(--cor-texto-suave);
+}
+
+/* Telas maiores: tudo em uma linha. */
+@media (min-width: 640px) {
+  .item {
+    grid-template-columns: 1fr 120px 150px auto;
+    grid-template-areas: 'nome preco saldo seta';
+  }
+  .preco {
+    grid-area: preco;
+    justify-self: end;
+    font-size: var(--texto-md);
+    color: var(--cor-texto);
+  }
+  .saldo {
+    grid-area: saldo;
+  }
+}

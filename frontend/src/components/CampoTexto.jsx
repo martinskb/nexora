@@ -7,7 +7,7 @@ import estilos from './CampoTexto.module.css'
  * Para type="password", mostra um botão de "ver senha".
  */
 export const CampoTexto = forwardRef(function CampoTexto(
-  { rotulo, erro, dica, type = 'text', className = '', ...props },
+  { rotulo, erro, dica, prefixo, type = 'text', className = '', ...props },
   ref,
 ) {
   const id = useId()
@@ -16,7 +16,12 @@ export const CampoTexto = forwardRef(function CampoTexto(
   const idDica = dica ? `${id}-dica` : undefined
   const idErro = erro ? `${id}-erro` : undefined
 
-  const classesEntrada = [estilos.entrada, ehSenha && estilos.comBotao, erro && estilos.invalida]
+  const classesEntrada = [
+    estilos.entrada,
+    ehSenha && estilos.comBotao,
+    prefixo && estilos.comPrefixo,
+    erro && estilos.invalida,
+  ]
     .filter(Boolean)
     .join(' ')
 
@@ -31,6 +36,11 @@ export const CampoTexto = forwardRef(function CampoTexto(
         </span>
       )}
       <div className={estilos.caixa}>
+        {prefixo && (
+          <span className={estilos.prefixo} aria-hidden="true">
+            {prefixo}
+          </span>
+        )}
         <input
           ref={ref}
           id={id}

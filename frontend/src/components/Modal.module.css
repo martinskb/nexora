@@ -1,0 +1,69 @@
+.dialogo {
+  width: min(100% - 2 * var(--esp-4), 480px);
+  max-height: calc(100dvh - 2 * var(--esp-4));
+  padding: 0;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  box-shadow: var(--sombra-md);
+  overflow: auto;
+}
+
+.dialogo::backdrop {
+  background: var(--cor-overlay);
+}
+
+.dialogo[open] {
+  animation: surgir 0.18s ease-out;
+}
+
+.cabecalho {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-2);
+  padding: var(--esp-3) var(--esp-3) var(--esp-3) var(--esp-5);
+  background: var(--cor-superficie);
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.titulo {
+  font-size: var(--texto-lg);
+}
+
+.corpo {
+  padding: var(--esp-5);
+}
+
+/* No celular, abre como "folha" presa ao rodapé, mais fácil de usar com o polegar. */
+@media (max-width: 539px) {
+  .dialogo {
+    width: 100%;
+    max-width: 100%;
+    margin: auto 0 0;
+    border-radius: var(--raio-lg) var(--raio-lg) 0 0;
+    max-height: 92dvh;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .dialogo[open] {
+    animation: subir 0.2s ease-out;
+  }
+}
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+@keyframes subir {
+  from {
+    transform: translateY(30%);
+    opacity: 0.4;
+  }
+}

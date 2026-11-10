@@ -62,6 +62,46 @@ export const IconeAlerta = (p) => (
   </Icone>
 )
 
+export const IconeInicio = (p) => (
+  <Icone {...p}>
+    <path d="M3 10.5L12 3l9 7.5" />
+    <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5" />
+  </Icone>
+)
+
+export const IconeCaixa = (p) => (
+  <Icone {...p}>
+    <path d="M21 8l-9-5-9 5 9 5 9-5z" />
+    <path d="M3 8v8l9 5 9-5V8" />
+    <path d="M12 13v8" />
+  </Icone>
+)
+
+export const IconeMais = (p) => (
+  <Icone {...p}>
+    <path d="M12 5v14M5 12h14" />
+  </Icone>
+)
+
+export const IconeBusca = (p) => (
+  <Icone {...p}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="M21 21l-4.3-4.3" />
+  </Icone>
+)
+
+export const IconeFechar = (p) => (
+  <Icone {...p}>
+    <path d="M18 6L6 18M6 6l12 12" />
+  </Icone>
+)
+
+export const IconeSeta = (p) => (
+  <Icone {...p}>
+    <path d="M9 18l6-6-6-6" />
+  </Icone>
+)
+
 export const IconeCheck = (p) => (
   <Icone {...p}>
     <circle cx="12" cy="12" r="10" />

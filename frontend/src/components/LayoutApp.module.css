@@ -41,11 +41,85 @@
 .conteudo {
   max-width: 1080px;
   margin: 0 auto;
-  padding: var(--esp-5) var(--esp-4) var(--esp-7);
+  padding: var(--esp-5) var(--esp-4) calc(var(--altura-nav-inferior) + var(--esp-6) + env(safe-area-inset-bottom, 0px));
 }
 
-@media (min-width: 640px) {
+/* ---------- Menu ---------- */
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  color: var(--cor-texto-suave);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--texto-sm);
+  border-radius: var(--raio-md);
+}
+
+.link:hover {
+  color: var(--cor-texto);
+}
+
+.ativo {
+  color: var(--cor-primaria);
+}
+
+/* Celular: barra fixa no rodapé, ao alcance do polegar. */
+.menuTopo {
+  display: none;
+}
+
+.menuInferior {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-around;
+  height: calc(var(--altura-nav-inferior) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--cor-superficie);
+  border-top: 1px solid var(--cor-borda);
+}
+
+.menuInferior .link {
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  font-size: var(--texto-xs);
+  border-radius: 0;
+}
+
+.menuInferior .ativo {
+  background: var(--cor-primaria-suave);
+  color: var(--cor-texto);
+}
+
+/* Telas maiores: menu no topo, sem barra inferior. */
+@media (min-width: 768px) {
   .textoSair {
     display: inline;
+  }
+
+  .menuInferior {
+    display: none;
+  }
+
+  .menuTopo {
+    display: flex;
+    gap: var(--esp-1);
+    margin-left: var(--esp-5);
+  }
+
+  .menuTopo .link {
+    min-height: 40px;
+    padding: 0 var(--esp-3);
+  }
+
+  .menuTopo .ativo {
+    background: var(--cor-primaria-suave);
+    color: var(--cor-texto);
   }
 }

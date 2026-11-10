@@ -1,0 +1,58 @@
+.regiao {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--altura-nav-inferior, 0px) + var(--esp-4) + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 100;
+  display: grid;
+  gap: var(--esp-2);
+  width: min(100% - 2 * var(--esp-4), 420px);
+  pointer-events: none;
+}
+
+.aviso {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  padding: var(--esp-3) var(--esp-2) var(--esp-3) var(--esp-4);
+  border-radius: var(--raio-md);
+  background: var(--cor-texto);
+  color: var(--cor-fundo);
+  box-shadow: var(--sombra-md);
+  font-size: var(--texto-sm);
+  font-weight: 500;
+  animation: entrar 0.2s ease-out;
+}
+
+.aviso span {
+  flex: 1;
+}
+
+.sucesso svg {
+  color: var(--cor-sucesso-suave);
+}
+
+.erro {
+  background: var(--cor-erro);
+  color: #fff;
+}
+
+.fechar {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 1.4rem;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

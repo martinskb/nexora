@@ -39,6 +39,20 @@
   padding-right: calc(var(--toque-min) + var(--esp-1));
 }
 
+.comPrefixo {
+  padding-left: 2.6rem;
+}
+
+.prefixo {
+  position: absolute;
+  left: var(--esp-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--cor-texto-suave);
+  font-weight: 600;
+  pointer-events: none;
+}
+
 .invalida {
   border-color: var(--cor-erro);
 }

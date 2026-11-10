@@ -45,6 +45,8 @@
   --sombra-sm: 0 1px 2px rgb(16 24 40 / 0.06), 0 1px 3px rgb(16 24 40 / 0.08);
   --sombra-md: 0 4px 12px rgb(16 24 40 / 0.08);
   --toque-min: 44px;
+  /* Altura do menu inferior (celular); usado também pelos avisos flutuantes */
+  --altura-nav-inferior: 64px;
 
   color-scheme: light;
   --cor-sobre-primaria: #ffffff;
@@ -147,6 +149,12 @@ svg {
 :focus-visible {
   outline: 3px solid var(--cor-primaria);
   outline-offset: 2px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --altura-nav-inferior: 0px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

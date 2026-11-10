@@ -1,11 +1,35 @@
 import { useState } from 'react'
-import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { Botao } from './Botao.jsx'
 import { BotaoTema } from './BotaoTema.jsx'
-import { IconeSair } from './Icones.jsx'
+import { IconeCaixa, IconeInicio, IconeSair } from './Icones.jsx'
 import { Logo } from './Logo.jsx'
 import estilos from './LayoutApp.module.css'
+
+// Itens do menu. Cada etapa nova acrescenta sua tela aqui.
+const MENU = [
+  { para: '/', rotulo: 'Início', Icone: IconeInicio, exato: true },
+  { para: '/produtos', rotulo: 'Produtos', Icone: IconeCaixa },
+]
+
+function Menu({ className }) {
+  return (
+    <nav className={className} aria-label="Menu principal">
+      {MENU.map(({ para, rotulo, Icone, exato }) => (
+        <NavLink
+          key={para}
+          to={para}
+          end={exato}
+          className={({ isActive }) => `${estilos.link} ${isActive ? estilos.ativo : ''}`}
+        >
+          <Icone />
+          <span>{rotulo}</span>
+        </NavLink>
+      ))}
+    </nav>
+  )
+}
 
 /** Moldura das telas internas (usuário logado). */
 export function LayoutApp() {
@@ -20,12 +44,13 @@ export function LayoutApp() {
   }
 
   return (
-    <>
+    <div className={estilos.app}>
       <header className={estilos.cabecalho}>
         <div className={estilos.barra}>
           <Link to="/" aria-label="Início">
             <Logo tamanho={30} />
           </Link>
+          <Menu className={estilos.menuTopo} />
           <span className={estilos.loja} title={loja?.nome}>
             {loja?.nome}
           </span>
@@ -41,6 +66,7 @@ export function LayoutApp() {
       <main className={estilos.conteudo}>
         <Outlet />
       </main>
-    </>
+      <Menu className={estilos.menuInferior} />
+    </div>
   )
 }
