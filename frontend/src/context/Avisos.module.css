@@ -1,7 +1,12 @@
+/*
+ * Avisos rápidos no topo, logo abaixo do cabeçalho.
+ * Eles NÃO bloqueiam cliques: o toque "atravessa" o aviso e chega ao botão
+ * que estiver embaixo. Só o × de fechar é clicável.
+ */
 .regiao {
   position: fixed;
   left: 50%;
-  bottom: calc(var(--altura-nav-inferior, 0px) + var(--esp-4) + env(safe-area-inset-bottom, 0px));
+  top: calc(60px + var(--esp-3) + env(safe-area-inset-top, 0px));
   transform: translateX(-50%);
   z-index: 100;
   display: grid;
@@ -11,7 +16,6 @@
 }
 
 .aviso {
-  pointer-events: auto;
   display: flex;
   align-items: center;
   gap: var(--esp-2);
@@ -39,6 +43,7 @@
 }
 
 .fechar {
+  pointer-events: auto;
   border: 0;
   background: transparent;
   color: inherit;
@@ -53,6 +58,6 @@
 @keyframes entrar {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(-8px);
   }
 }

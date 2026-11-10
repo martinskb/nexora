@@ -9,9 +9,11 @@ import { cadastroSchema, loginSchema } from '../validators/authSchemas.js';
 export const authRoutes = Router();
 
 // Limita tentativas para dificultar adivinhação de senha.
+// Só contam as tentativas que FALHAM: quem entra certo não gasta o limite.
 const limiteTentativas = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: env.limiteTentativasAuth,
+  skipSuccessfulRequests: true,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { erro: 'Muitas tentativas. Aguarde alguns minutos e tente de novo.' },

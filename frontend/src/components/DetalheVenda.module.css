@@ -1,0 +1,130 @@
+.detalhe {
+  display: grid;
+  gap: var(--esp-4);
+}
+
+.dados {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: space-between;
+  gap: var(--esp-3);
+  margin: 0;
+}
+
+.dados dt {
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-xs);
+}
+
+.dados dd {
+  margin: 0;
+  font-weight: 600;
+  font-size: var(--texto-sm);
+}
+
+.textoOk {
+  color: var(--cor-sucesso);
+}
+
+.textoCancelada {
+  color: var(--cor-erro);
+}
+
+.obs {
+  color: var(--cor-texto-suave);
+  font-style: italic;
+}
+
+.itens {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--cor-borda);
+}
+
+.itens li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  padding: var(--esp-3) 0;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.itens small {
+  color: var(--cor-texto-suave);
+}
+
+.valor {
+  font-weight: 600;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: var(--texto-lg);
+}
+
+.total strong {
+  font-size: var(--texto-xl);
+}
+
+.riscado strong {
+  text-decoration: line-through;
+  color: var(--cor-texto-suave);
+}
+
+.botaoCancelar {
+  justify-self: center;
+  min-height: var(--toque-min);
+  padding: 0 var(--esp-4);
+  border: 0;
+  border-radius: var(--raio-md);
+  background: transparent;
+  color: var(--cor-erro);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.botaoCancelar:hover {
+  background: var(--cor-erro-suave);
+}
+
+.formCancelar {
+  display: grid;
+  gap: var(--esp-3);
+  padding: var(--esp-4);
+  border-radius: var(--raio-md);
+  background: var(--cor-fundo);
+  border: 1px solid var(--cor-borda);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+}
+
+.chip {
+  min-height: 36px;
+  padding: 0 var(--esp-3);
+  border: 1px solid var(--cor-borda);
+  border-radius: 999px;
+  background: var(--cor-superficie);
+  font-size: var(--texto-sm);
+  cursor: pointer;
+}
+
+.chipAtivo {
+  border-color: var(--cor-primaria);
+  background: var(--cor-primaria-suave);
+  font-weight: 600;
+}
+
+.acoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--esp-3);
+}

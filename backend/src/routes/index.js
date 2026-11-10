@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { pool } from '../config/db.js';
 import { authRoutes } from './authRoutes.js';
 import { produtoRoutes } from './produtoRoutes.js';
+import { vendaRoutes } from './vendaRoutes.js';
 
 export const routes = Router();
 
@@ -17,3 +18,4 @@ routes.get('/health', async (req, res) => {
 
 routes.use('/auth', authRoutes);
 routes.use('/produtos', produtoRoutes);
+routes.use('/vendas', vendaRoutes);

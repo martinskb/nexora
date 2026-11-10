@@ -7,6 +7,8 @@ import Entrar from './pages/Entrar.jsx'
 import CriarConta from './pages/CriarConta.jsx'
 import Inicio from './pages/Inicio.jsx'
 import Produtos from './pages/Produtos.jsx'
+import Vender from './pages/Vender.jsx'
+import Vendas from './pages/Vendas.jsx'
 
 export default function App() {
   return (
@@ -21,6 +23,8 @@ export default function App() {
             <Route element={<RotaProtegida />}>
               <Route element={<LayoutApp />}>
                 <Route index element={<Inicio />} />
+                <Route path="/vender" element={<Vender />} />
+                <Route path="/vendas" element={<Vendas />} />
                 <Route path="/produtos" element={<Produtos />} />
               </Route>
             </Route>

@@ -15,7 +15,7 @@ export function AvisosProvider({ children }) {
   const avisar = useCallback(
     (mensagem, tipo = 'sucesso') => {
       const id = proximoId.current++
-      setAvisos((lista) => [...lista.slice(-2), { id, mensagem, tipo }])
+      setAvisos((lista) => [...lista.slice(-1), { id, mensagem, tipo }]) // no máximo 2 empilhados
       setTimeout(() => fechar(id), DURACAO_MS)
     },
     [fechar],

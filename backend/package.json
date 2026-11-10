@@ -14,7 +14,8 @@
     "db:setup": "node scripts/db-setup.js",
     "db:setup:test": "NODE_ENV=test node scripts/db-setup.js",
     "test": "NODE_ENV=test vitest run",
-    "test:watch": "NODE_ENV=test vitest"
+    "test:watch": "NODE_ENV=test vitest",
+    "pretest": "NODE_ENV=test node scripts/db-setup.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

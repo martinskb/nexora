@@ -3,13 +3,15 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { Botao } from './Botao.jsx'
 import { BotaoTema } from './BotaoTema.jsx'
-import { IconeCaixa, IconeInicio, IconeSair } from './Icones.jsx'
+import { IconeCaixa, IconeCarrinho, IconeInicio, IconeRecibo, IconeSair } from './Icones.jsx'
 import { Logo } from './Logo.jsx'
 import estilos from './LayoutApp.module.css'
 
 // Itens do menu. Cada etapa nova acrescenta sua tela aqui.
 const MENU = [
   { para: '/', rotulo: 'Início', Icone: IconeInicio, exato: true },
+  { para: '/vender', rotulo: 'Vender', Icone: IconeCarrinho },
+  { para: '/vendas', rotulo: 'Vendas', Icone: IconeRecibo },
   { para: '/produtos', rotulo: 'Produtos', Icone: IconeCaixa },
 ]
 

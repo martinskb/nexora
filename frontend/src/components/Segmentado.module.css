@@ -1,0 +1,71 @@
+.grupo {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  display: grid;
+  gap: var(--esp-1);
+}
+
+.legenda {
+  padding: 0;
+  margin-bottom: var(--esp-1);
+  font-weight: 600;
+  font-size: var(--texto-sm);
+}
+
+.opcoes {
+  display: flex;
+  padding: 3px;
+  gap: 3px;
+  background: var(--cor-fundo);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+}
+
+.opcao {
+  flex: 1;
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 38px;
+  padding: 0 var(--esp-3);
+  border-radius: calc(var(--raio-md) - 3px);
+  font-weight: 600;
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-suave);
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.opcao input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.opcao:has(input:focus-visible) {
+  outline: 3px solid var(--cor-primaria);
+  outline-offset: 1px;
+}
+
+.ativa {
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  box-shadow: var(--sombra-sm);
+}
+
+.compacto .legenda {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.compacto .opcao {
+  min-height: 34px;
+  padding: 0 var(--esp-2);
+  font-size: var(--texto-xs);
+}

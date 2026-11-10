@@ -77,6 +77,27 @@ export const IconeCaixa = (p) => (
   </Icone>
 )
 
+export const IconeCarrinho = (p) => (
+  <Icone {...p}>
+    <circle cx="9" cy="20" r="1.5" />
+    <circle cx="18" cy="20" r="1.5" />
+    <path d="M2 3h3l2.6 12.2a1 1 0 0 0 1 .8h9.7a1 1 0 0 0 1-.8L21 7H6" />
+  </Icone>
+)
+
+export const IconeRecibo = (p) => (
+  <Icone {...p}>
+    <path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z" />
+    <path d="M9 8h6M9 12h6M9 16h3" />
+  </Icone>
+)
+
+export const IconeLixeira = (p) => (
+  <Icone {...p}>
+    <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" />
+  </Icone>
+)
+
 export const IconeMais = (p) => (
   <Icone {...p}>
     <path d="M12 5v14M5 12h14" />

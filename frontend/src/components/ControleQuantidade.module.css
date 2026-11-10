@@ -1,0 +1,43 @@
+.controle {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie);
+  overflow: hidden;
+}
+
+.botao {
+  width: var(--toque-min);
+  height: var(--toque-min);
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--cor-primaria);
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.botao:hover {
+  background: var(--cor-primaria-suave);
+}
+
+.campo {
+  width: 3.2ch;
+  min-width: 2.5rem;
+  height: var(--toque-min);
+  border: 0;
+  border-inline: 1px solid var(--cor-borda);
+  background: transparent;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.campo:focus {
+  outline: none;
+  background: var(--cor-primaria-suave);
+}

@@ -1,0 +1,216 @@
+.pagina {
+  display: grid;
+  gap: var(--esp-5);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .pagina {
+    grid-template-columns: 1fr 360px;
+  }
+}
+
+.catalogo {
+  display: grid;
+  gap: var(--esp-4);
+  min-width: 0;
+  /* espaço para a barra de resumo fixa no celular */
+  padding-bottom: 72px;
+}
+
+@media (min-width: 900px) {
+  .catalogo {
+    padding-bottom: 0;
+  }
+}
+
+.titulo {
+  font-size: var(--texto-xl);
+}
+
+.subtitulo {
+  font-size: var(--texto-lg);
+  margin-bottom: var(--esp-2);
+}
+
+.info {
+  display: grid;
+  gap: var(--esp-3);
+  justify-items: start;
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-sm);
+}
+
+.busca {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.busca svg {
+  position: absolute;
+  left: var(--esp-3);
+  color: var(--cor-texto-suave);
+  pointer-events: none;
+}
+
+.busca input {
+  width: 100%;
+  min-height: var(--toque-min);
+  padding: 0 var(--esp-3) 0 2.5rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie);
+}
+
+.busca input:focus {
+  outline: none;
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 3px var(--cor-primaria-suave);
+}
+
+/* Grade de produtos: cartões grandes, fáceis de tocar. */
+.produtos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--esp-3);
+}
+
+.produto {
+  width: 100%;
+  height: 100%;
+  min-height: 112px;
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  gap: var(--esp-1);
+  padding: var(--esp-3);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  background: var(--cor-superficie);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.08s;
+}
+
+.produto:hover {
+  border-color: var(--cor-primaria);
+}
+
+.produto:active {
+  transform: scale(0.98);
+}
+
+.selecionado {
+  border-color: var(--cor-primaria);
+  box-shadow: inset 0 0 0 1px var(--cor-primaria);
+}
+
+.nomeProduto {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.precoProduto {
+  font-weight: 700;
+  font-size: var(--texto-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.rodapeProduto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-1);
+}
+
+.rodapeProduto > * {
+  flex-shrink: 0;
+}
+
+.naVenda {
+  font-size: var(--texto-xs);
+  font-weight: 700;
+  color: var(--cor-primaria);
+  white-space: nowrap;
+}
+
+.mais {
+  color: var(--cor-primaria);
+}
+
+.lateral {
+  position: sticky;
+  top: calc(60px + var(--esp-5));
+  max-height: calc(100dvh - 60px - 2 * var(--esp-5));
+  overflow: auto;
+  padding: var(--esp-5);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  box-shadow: var(--sombra-sm);
+}
+
+/* Celular: total sempre à vista, acima do menu inferior. */
+.barraResumo {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--altura-nav-inferior) + env(safe-area-inset-bottom, 0px));
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  padding: var(--esp-2) var(--esp-4);
+  background: var(--cor-superficie);
+  border-top: 1px solid var(--cor-borda);
+  box-shadow: 0 -4px 12px rgb(0 0 0 / 0.06);
+}
+
+.barraResumo span {
+  display: grid;
+  line-height: 1.2;
+}
+
+.barraResumo small {
+  color: var(--cor-texto-suave);
+}
+
+.barraResumo strong {
+  font-size: var(--texto-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.semProdutos {
+  display: grid;
+  justify-items: center;
+  gap: var(--esp-3);
+  text-align: center;
+  padding: var(--esp-7) var(--esp-4);
+  color: var(--cor-texto-suave);
+}
+
+.semProdutos h1 {
+  color: var(--cor-texto);
+  font-size: var(--texto-lg);
+}
+
+.semProdutos p {
+  max-width: 40ch;
+}
+
+.botaoLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--toque-min);
+  padding: 0 var(--esp-5);
+  border-radius: var(--raio-md);
+  background: var(--cor-primaria);
+  color: var(--cor-sobre-primaria);
+  font-weight: 600;
+  text-decoration: none;
+}

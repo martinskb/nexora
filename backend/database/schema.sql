@@ -1,6 +1,10 @@
 -- NEXORA — schema do banco (MySQL 8+ / MariaDB 10.6+)
 -- Modelo multi-loja: um único banco; toda tabela de dados tem loja_id,
 -- e o backend filtra cada consulta pela loja autenticada.
+--
+-- ESTRUTURA BASE: não altere este arquivo. Mudanças no banco devem ser feitas
+-- com novos arquivos em database/migracoes/ (aplicados por `npm run db:setup`).
+-- Datas são gravadas em UTC (a conexão da API usa time_zone = '+00:00').
 
 SET NAMES utf8mb4;
 

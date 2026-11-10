@@ -8,7 +8,13 @@ export const pool = mysql.createPool({
   // DECIMAL chega como número (valores monetários com 2 casas cabem com folga em double)
   decimalNumbers: true,
   dateStrings: false,
+  // Datas lidas/escritas como UTC; o navegador converte para o horário local.
   timezone: 'Z',
+});
+
+// Garante que CURRENT_TIMESTAMP/NOW() usem UTC, independente do fuso do servidor do banco.
+pool.pool.on('connection', (conexao) => {
+  conexao.query("SET time_zone = '+00:00'");
 });
 
 /**

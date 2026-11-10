@@ -1,0 +1,155 @@
+.pagina {
+  display: grid;
+  gap: var(--esp-4);
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+}
+
+.titulo {
+  font-size: var(--texto-xl);
+}
+
+.novaVenda {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--toque-min);
+  padding: 0 var(--esp-5);
+  border-radius: var(--raio-md);
+  background: var(--cor-primaria);
+  color: var(--cor-sobre-primaria);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.filtros {
+  display: grid;
+  gap: var(--esp-2);
+}
+
+@media (min-width: 768px) {
+  .filtros {
+    grid-template-columns: 1.3fr 1fr 1.1fr;
+    gap: var(--esp-3);
+  }
+}
+
+.info {
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-sm);
+}
+
+.vazio {
+  display: grid;
+  justify-items: center;
+  gap: var(--esp-2);
+  padding: var(--esp-7) var(--esp-4);
+  color: var(--cor-texto-suave);
+  text-align: center;
+  background: var(--cor-superficie);
+  border: 1px dashed var(--cor-borda);
+  border-radius: var(--raio-lg);
+}
+
+.grupo {
+  display: grid;
+  gap: var(--esp-2);
+}
+
+.dia {
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-suave);
+  font-weight: 700;
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  overflow: hidden;
+}
+
+.lista li + li {
+  border-top: 1px solid var(--cor-borda);
+}
+
+.item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: var(--esp-3);
+  min-height: 64px;
+  padding: var(--esp-3) var(--esp-4);
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: var(--cor-fundo);
+}
+
+.hora {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--cor-texto-suave);
+}
+
+.resumo {
+  display: grid;
+  min-width: 0;
+}
+
+.produtos {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--esp-1);
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-xs);
+}
+
+.canal_whatsapp {
+  color: var(--cor-sucesso);
+  font-weight: 600;
+}
+
+.seloCancelada {
+  margin-left: var(--esp-1);
+  padding: 0 0.5em;
+  border-radius: 999px;
+  background: var(--cor-erro-suave);
+  color: var(--cor-erro);
+  font-weight: 700;
+}
+
+.valor {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cancelada .valor {
+  text-decoration: line-through;
+  color: var(--cor-texto-suave);
+}
+
+.seta {
+  color: var(--cor-texto-suave);
+}

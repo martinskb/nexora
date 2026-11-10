@@ -45,7 +45,7 @@
   --sombra-sm: 0 1px 2px rgb(16 24 40 / 0.06), 0 1px 3px rgb(16 24 40 / 0.08);
   --sombra-md: 0 4px 12px rgb(16 24 40 / 0.08);
   --toque-min: 44px;
-  /* Altura do menu inferior (celular); usado também pelos avisos flutuantes */
+  /* Altura do menu inferior (celular) */
   --altura-nav-inferior: 64px;
 
   color-scheme: light;

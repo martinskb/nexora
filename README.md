@@ -32,8 +32,8 @@ GRANT ALL PRIVILEGES ON nexora_test.* TO 'nexora'@'localhost';
 cd backend
 cp .env.example .env      # preencha DB_PASSWORD e JWT_SECRET
 npm install
-npm run db:setup          # cria as tabelas
-npm run db:setup:test     # cria as tabelas no banco de testes
+npm run db:setup          # cria as tabelas e aplica as migrações pendentes
+npm run db:setup:test     # o mesmo no banco de testes (o npm test já faz isso)
 npm run dev               # http://localhost:3333/api/health
 npm test
 ```
@@ -44,3 +44,9 @@ cd frontend
 npm install
 npm run dev               # http://localhost:5173
 ```
+
+## Banco de dados: migrações
+A estrutura base está em `backend/database/schema.sql` e **não deve ser editada**.
+Para alterar o banco, crie um arquivo numerado em `backend/database/migracoes/`
+(ex.: `003_descricao.sql`) e rode `npm run db:setup`. Cada migração é aplicada uma única vez
+(controle na tabela `migracoes`).
