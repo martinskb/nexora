@@ -28,12 +28,23 @@
 .loja {
   flex: 1;
   min-width: 0;
+  min-height: var(--toque-min);
+  line-height: var(--toque-min);
   color: var(--cor-texto-suave);
   font-size: var(--texto-sm);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: right;
+  text-decoration: underline;
+  text-decoration-color: var(--cor-borda);
+  text-underline-offset: 4px;
+}
+
+.loja:hover,
+.loja.active {
+  color: var(--cor-texto);
+  text-decoration-color: currentColor;
 }
 
 .acoes {

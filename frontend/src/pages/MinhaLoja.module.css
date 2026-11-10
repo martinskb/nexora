@@ -1,0 +1,119 @@
+.pagina {
+  display: grid;
+  gap: var(--esp-5);
+  max-width: 640px;
+}
+
+.titulo {
+  font-size: var(--texto-2xl);
+  overflow-wrap: anywhere;
+}
+
+.subtitulo {
+  font-size: var(--texto-lg);
+}
+
+.info {
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-sm);
+}
+
+.secao {
+  display: grid;
+  gap: var(--esp-4);
+  padding: var(--esp-5) var(--esp-4);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+}
+
+/* Campo e botão lado a lado; o botão alinha com a caixa do campo. */
+.novo {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: var(--esp-2);
+}
+
+.novo > button {
+  margin-top: calc(1.5em + var(--esp-1));
+}
+
+.erro {
+  display: grid;
+  gap: var(--esp-3);
+  justify-items: start;
+}
+
+.vazio {
+  padding: var(--esp-4);
+  border: 1px dashed var(--cor-borda);
+  border-radius: var(--raio-md);
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-sm);
+  text-align: center;
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.linha {
+  display: grid;
+  gap: var(--esp-2);
+  padding: var(--esp-2) 0;
+}
+
+.linha + .linha {
+  border-top: 1px solid var(--cor-borda);
+}
+
+.resumoLinha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-1) var(--esp-3);
+  min-height: var(--toque-min);
+}
+
+.nome {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+}
+
+.edicao {
+  display: grid;
+  gap: var(--esp-3);
+  padding: var(--esp-2) 0;
+}
+
+.arquivados {
+  display: grid;
+  gap: var(--esp-2);
+  border-top: 1px solid var(--cor-borda);
+  padding-top: var(--esp-3);
+}
+
+.arquivados summary {
+  padding: var(--esp-2) 0;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.arquivados .nome {
+  color: var(--cor-texto-suave);
+}
+
+.confirmar {
+  display: grid;
+  gap: var(--esp-4);
+}

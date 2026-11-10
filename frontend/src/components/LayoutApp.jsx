@@ -56,9 +56,9 @@ export function LayoutApp() {
               <ItemMenu key={m.para} {...m} />
             ))}
           </nav>
-          <span className={estilos.loja} title={loja?.nome}>
+          <NavLink to="/minha-loja" className={estilos.loja} title={`${loja?.nome} — Minha loja`}>
             {loja?.nome}
-          </span>
+          </NavLink>
           <ItemMenu {...vender} className={estilos.venderTopo} />
           <div className={estilos.acoes}>
             <BotaoTema />

@@ -10,6 +10,7 @@ import Produtos from './pages/Produtos.jsx'
 import Vender from './pages/Vender.jsx'
 import Vendas from './pages/Vendas.jsx'
 import Estoque from './pages/Estoque.jsx'
+import MinhaLoja from './pages/MinhaLoja.jsx'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
                 <Route path="/vendas" element={<Vendas />} />
                 <Route path="/estoque" element={<Estoque />} />
                 <Route path="/produtos" element={<Produtos />} />
+                <Route path="/minha-loja" element={<MinhaLoja />} />
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
