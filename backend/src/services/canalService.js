@@ -1,4 +1,4 @@
-import { pool } from '../config/db.js';
+import { pool, withTransaction } from '../config/db.js';
 import { AppError } from '../utils/AppError.js';
 
 const NAO_ENCONTRADO = 'Canal não encontrado.';
@@ -64,9 +64,16 @@ export async function atualizar(lojaId, id, { nome, ativo }) {
 }
 
 export async function remover(lojaId, id) {
-  const canal = await buscar(lojaId, id);
-  if (canal.temVendas) throw new AppError('Este canal já tem vendas. Arquive em vez de apagar.', 409);
-  await pool.execute('DELETE FROM canais WHERE id = ? AND loja_id = ?', [id, lojaId]);
+  // Trava a linha do canal: uma venda sendo gravada nele (que lê o canal com trava
+  // compartilhada) termina antes, e a checagem abaixo a enxerga. Assim nenhuma venda
+  // perde a origem por causa de uma exclusão no mesmo instante.
+  await withTransaction(async (conn) => {
+    const [canal] = await conn.execute('SELECT id FROM canais WHERE id = ? AND loja_id = ? FOR UPDATE', [id, lojaId]);
+    if (!canal.length) throw new AppError(NAO_ENCONTRADO, 404);
+    const [vendas] = await conn.execute('SELECT 1 FROM vendas WHERE canal_id = ? LIMIT 1 LOCK IN SHARE MODE', [id]);
+    if (vendas.length) throw new AppError('Este canal já tem vendas. Arquive em vez de apagar.', 409);
+    await conn.execute('DELETE FROM canais WHERE id = ? AND loja_id = ?', [id, lojaId]);
+  });
 }
 
 /**
@@ -74,9 +81,10 @@ export async function remover(lojaId, id) {
  * @param {import('mysql2/promise').PoolConnection} conn
  */
 export async function buscarAtivo(conn, lojaId, id) {
-  const [rows] = await conn.execute('SELECT id, nome FROM canais WHERE id = ? AND loja_id = ? AND ativo = TRUE', [
-    id,
-    lojaId,
-  ]);
+  // Trava compartilhada: arquivar/apagar o canal espera esta venda terminar.
+  const [rows] = await conn.execute(
+    'SELECT id, nome FROM canais WHERE id = ? AND loja_id = ? AND ativo = TRUE LOCK IN SHARE MODE',
+    [id, lojaId],
+  );
   return rows[0] ?? null;
 }

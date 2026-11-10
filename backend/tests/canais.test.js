@@ -109,6 +109,31 @@ describe('Canais de venda da loja', () => {
     expect((await agente.get('/api/canais')).body.canais[0]).toMatchObject({ id: c.id, temVendas: true });
   });
 
+  it('não apaga canal com venda sendo gravada no mesmo instante (a venda não perde a origem)', async () => {
+    const { agente, loja } = await criarLojaLogada();
+    const c = await criarCanal(agente, 'Novo');
+
+    // Simula a transação de uma venda em andamento: a linha existe, mas ainda não foi confirmada.
+    const conn = await pool.getConnection();
+    let vendaId;
+    try {
+      await conn.beginTransaction();
+      const [r] = await conn.query('INSERT INTO vendas (loja_id, total, canal_id) VALUES (?, 10, ?)', [loja.id, c.id]);
+      vendaId = r.insertId;
+
+      const apagando = agente.delete(`/api/canais/${c.id}`).then((res) => res);
+      await new Promise((ok) => setTimeout(ok, 300));
+      await conn.commit();
+
+      const res = await apagando;
+      expect(res.status).toBe(409);
+    } finally {
+      conn.release();
+    }
+    const [[venda]] = await pool.query('SELECT canal_id FROM vendas WHERE id = ?', [vendaId]);
+    expect(venda.canal_id).toBe(c.id);
+  });
+
   it('isolamento entre lojas', async () => {
     const a = await criarLojaLogada();
     const b = await criarLojaLogada();
