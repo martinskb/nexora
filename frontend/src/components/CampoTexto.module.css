@@ -1,0 +1,72 @@
+.campo {
+  display: grid;
+  gap: var(--esp-1);
+}
+
+.rotulo {
+  font-weight: 600;
+  font-size: var(--texto-sm);
+}
+
+.dica {
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-xs);
+}
+
+.caixa {
+  position: relative;
+  display: flex;
+}
+
+.entrada {
+  width: 100%;
+  min-height: var(--toque-min);
+  padding: 0 var(--esp-3);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie);
+  font-size: var(--texto-md);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.entrada:focus {
+  outline: none;
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 3px var(--cor-primaria-suave);
+}
+
+.comBotao {
+  padding-right: calc(var(--toque-min) + var(--esp-1));
+}
+
+.invalida {
+  border-color: var(--cor-erro);
+}
+.invalida:focus {
+  border-color: var(--cor-erro);
+  box-shadow: 0 0 0 3px var(--cor-erro-suave);
+}
+
+.botaoVer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: var(--toque-min);
+  height: 100%;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--cor-texto-suave);
+  cursor: pointer;
+  border-radius: 0 var(--raio-md) var(--raio-md) 0;
+}
+.botaoVer:hover {
+  color: var(--cor-texto);
+}
+
+.erro {
+  color: var(--cor-erro);
+  font-size: var(--texto-xs);
+  font-weight: 500;
+}

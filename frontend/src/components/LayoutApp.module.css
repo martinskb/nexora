@@ -1,0 +1,51 @@
+.cabecalho {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--cor-superficie);
+  border-bottom: 1px solid var(--cor-borda);
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.barra {
+  max-width: 1080px;
+  margin: 0 auto;
+  min-height: 60px;
+  padding: 0 var(--esp-4);
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+}
+
+.loja {
+  flex: 1;
+  min-width: 0;
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-1);
+}
+
+.textoSair {
+  display: none;
+}
+
+.conteudo {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: var(--esp-5) var(--esp-4) var(--esp-7);
+}
+
+@media (min-width: 640px) {
+  .textoSair {
+    display: inline;
+  }
+}

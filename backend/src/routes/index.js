@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { pool } from '../config/db.js';
+import { authRoutes } from './authRoutes.js';
 
 export const routes = Router();
 
@@ -12,3 +13,5 @@ routes.get('/health', async (req, res) => {
     res.status(503).json({ status: 'erro', banco: 'indisponível' });
   }
 });
+
+routes.use('/auth', authRoutes);

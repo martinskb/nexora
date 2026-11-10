@@ -1,0 +1,68 @@
+.pagina {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  padding: var(--esp-3) var(--esp-4) var(--esp-6);
+}
+
+.topo {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.centro {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--esp-5);
+}
+
+.cabecalho {
+  display: grid;
+  justify-items: center;
+  gap: var(--esp-2);
+  text-align: center;
+}
+
+.slogan {
+  color: var(--cor-texto-suave);
+}
+
+.cartao {
+  width: 100%;
+  max-width: 420px;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  box-shadow: var(--sombra-md);
+  padding: var(--esp-5);
+  display: grid;
+  gap: var(--esp-4);
+}
+
+.titulo {
+  font-size: var(--texto-xl);
+}
+
+.subtitulo {
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-sm);
+  margin-top: var(--esp-1);
+}
+
+.rodape {
+  text-align: center;
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-suave);
+}
+
+.rodape a {
+  color: var(--cor-primaria);
+  font-weight: 600;
+}
+
+@media (min-width: 480px) {
+  .cartao {
+    padding: var(--esp-6);
+  }
+}

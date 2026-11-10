@@ -1,0 +1,71 @@
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--esp-2);
+  min-height: var(--toque-min);
+  padding: 0 var(--esp-5);
+  border: 1px solid transparent;
+  border-radius: var(--raio-md);
+  font-weight: 600;
+  font-size: var(--texto-md);
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.botao:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.larguraTotal {
+  width: 100%;
+}
+
+.primario {
+  background: var(--cor-primaria);
+  color: var(--cor-sobre-primaria);
+}
+.primario:hover:not(:disabled) {
+  background: var(--cor-primaria-hover);
+}
+
+.secundario {
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  border-color: var(--cor-borda);
+}
+.secundario:hover:not(:disabled) {
+  border-color: var(--cor-texto-suave);
+}
+
+.fantasma {
+  background: transparent;
+  color: var(--cor-texto-suave);
+  padding: 0 var(--esp-3);
+}
+.fantasma:hover:not(:disabled) {
+  background: var(--cor-primaria-suave);
+  color: var(--cor-texto);
+}
+
+.perigo {
+  background: var(--cor-erro);
+  color: #fff;
+}
+
+.spinner {
+  width: 1.1em;
+  height: 1.1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: girar 0.7s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}

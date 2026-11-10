@@ -1,6 +1,7 @@
 import 'dotenv/config';
 
 const isTest = process.env.NODE_ENV === 'test';
+const nodeEnv = process.env.NODE_ENV || 'development';
 
 function required(name) {
   const value = process.env[name];
@@ -10,9 +11,17 @@ function required(name) {
   return value;
 }
 
+const jwtSecret = required('JWT_SECRET');
+if (jwtSecret.length < 32) {
+  throw new Error('JWT_SECRET deve ter pelo menos 32 caracteres.');
+}
+
+const sessaoDias = Number(process.env.SESSAO_DIAS) || 7;
+
 export const env = Object.freeze({
-  nodeEnv: process.env.NODE_ENV || 'development',
+  nodeEnv,
   isTest,
+  isProduction: nodeEnv === 'production',
   port: Number(process.env.PORT) || 3333,
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   db: {
@@ -22,8 +31,11 @@ export const env = Object.freeze({
     password: process.env.DB_PASSWORD ?? '',
     database: isTest ? required('DB_NAME_TEST') : required('DB_NAME'),
   },
-  jwt: {
-    secret: process.env.JWT_SECRET || '',
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  sessao: {
+    segredo: jwtSecret,
+    dias: sessaoDias,
+    cookie: 'nexora_sessao',
   },
+  // Tentativas de login/cadastro por IP a cada 15 minutos
+  limiteTentativasAuth: isTest ? 1000 : 10,
 });
