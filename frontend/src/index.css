@@ -63,9 +63,16 @@
 
   color-scheme: light;
 
-  /* Séries de gráfico (contraste e daltonismo conferidos) */
-  --serie-1: #2a8a5c; /* Balcão / série única */
-  --serie-2: #d9622b; /* WhatsApp */
+  /* Séries de gráfico: paleta categórica validada (faixa de luminosidade,
+     daltonismo e contraste) nos dois temas. --serie-1 é a série única;
+     canais de venda usam 1..6 na ordem alfabética do nome. */
+  --serie-1: #2a8a5c;
+  --serie-2: #6250d6;
+  --serie-3: #d9622b;
+  --serie-4: #2a78d6;
+  --serie-5: #a87a00;
+  --serie-6: #d55181;
+  --cor-sem-canal: #7b8780; /* vendas sem canal: cinza neutro */
 
   font-family: var(--fonte);
   font-size: 16px;
@@ -99,8 +106,13 @@
     --cor-overlay: rgb(0 0 0 / 0.6);
     --sombra-sm: 0 1px 2px rgb(0 0 0 / 0.4);
     --sombra-md: 0 6px 20px rgb(0 0 0 / 0.5);
-    --serie-1: #3fae78;
-    --serie-2: #e0733f;
+    --serie-1: #319e6b;
+    --serie-2: #9085e9;
+    --serie-3: #d95926;
+    --serie-4: #3987e5;
+    --serie-5: #c98500;
+    --serie-6: #d55181;
+    --cor-sem-canal: #7d8b82;
     color-scheme: dark;
   }
 }
@@ -125,8 +137,13 @@
   --cor-overlay: rgb(0 0 0 / 0.6);
   --sombra-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --sombra-md: 0 6px 20px rgb(0 0 0 / 0.5);
-  --serie-1: #3fae78;
-  --serie-2: #e0733f;
+  --serie-1: #319e6b;
+  --serie-2: #9085e9;
+  --serie-3: #d95926;
+  --serie-4: #3987e5;
+  --serie-5: #c98500;
+  --serie-6: #d55181;
+  --cor-sem-canal: #7d8b82;
   color-scheme: dark;
 }
 

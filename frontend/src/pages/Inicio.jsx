@@ -8,6 +8,8 @@ import { IconeAlerta } from '../components/Icones.jsx'
 import { Preco } from '../components/Preco.jsx'
 import { Segmentado } from '../components/Segmentado.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useCanais } from '../hooks/useCanais.js'
+import { corDoCanal, nomeDoCanal } from '../utils/canais.js'
 import { intervaloDoPeriodo } from '../utils/datas.js'
 import { unidades } from '../utils/estoque.js'
 import { formatarMoeda } from '../utils/formato.js'
@@ -19,10 +21,6 @@ const PERIODOS = [
   { valor: '30d', rotulo: '30 dias' },
 ]
 const NOME_PERIODO = { hoje: 'hoje', '7d': 'nos últimos 7 dias', '30d': 'nos últimos 30 dias' }
-const CANAIS = [
-  { canal: 'balcao', nome: 'Balcão', cor: 'var(--serie-1)' },
-  { canal: 'whatsapp', nome: 'WhatsApp', cor: 'var(--serie-2)' },
-]
 
 const percentual = (parte, total) => (total > 0 ? Math.round((parte / total) * 100) : 0)
 const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`
@@ -38,6 +36,7 @@ async function carregar(periodo, signal) {
 
 export default function Inicio() {
   const { loja } = useAuth()
+  const { canais } = useCanais() // todos (inclusive arquivados): a cor segue a ordem alfabética
   const [periodo, setPeriodo] = useState('hoje')
   const [estado, setEstado] = useState({ dados: null, erro: '', carregando: true })
 
@@ -59,6 +58,13 @@ export default function Inicio() {
   const { dados } = estado
   const t = dados?.totais
   const alertas = dados?.alertasEstoque
+  // Origem só aparece se a loja usa canais e houve venda no período.
+  const mostrarOrigem = Boolean(dados?.temCanais) && t?.vendas > 0
+  const origens = (dados?.porCanal ?? []).map((c) => ({
+    ...c,
+    nome: nomeDoCanal(c.canalId == null ? null : { nome: c.nome }),
+    cor: corDoCanal(c.canalId, canais),
+  }))
 
   return (
     <div className={estilos.pagina}>
@@ -111,7 +117,7 @@ export default function Inicio() {
 
           <div className={estilos.grade}>
             <section
-              className={`${estilos.cartao} ${t.vendas > 0 ? estilos.colunaInteira : ''}`}
+              className={`${estilos.cartao} ${mostrarOrigem && dados.maisVendidos.length > 0 ? estilos.colunaInteira : ''}`}
               aria-labelledby="t-alertas"
             >
               <h2 id="t-alertas" className={estilos.tituloCartao}>
@@ -147,41 +153,37 @@ export default function Inicio() {
               )}
             </section>
 
-            {t.vendas > 0 && (
+            {mostrarOrigem && (
               <section className={estilos.cartao} aria-labelledby="t-origem">
                 <h2 id="t-origem" className={estilos.tituloCartao}>
                   Origem das vendas
                 </h2>
-                {/* barra fina dividida: o texto ao lado traz os números */}
+                {/* barra fina dividida: o texto abaixo traz os números */}
                 <div
                   className={estilos.barraDividida}
                   role="img"
-                  aria-label={dados.porCanal
-                    .map((c) => `${c.canal === 'balcao' ? 'Balcão' : 'WhatsApp'} ${percentual(c.valor, t.valor)}%`)
-                    .join(', ')}
+                  aria-label={origens.map((c) => `${c.nome} ${percentual(c.valor, t.valor)}%`).join(', ')}
                 >
-                  {CANAIS.map(({ canal, cor }) => {
-                    const c = dados.porCanal.find((x) => x.canal === canal)
-                    return c.valor > 0 ? <span key={canal} style={{ flexGrow: c.valor, background: cor }} /> : null
-                  })}
+                  {origens.map((c) =>
+                    c.valor > 0 ? (
+                      <span key={c.canalId ?? 'sem'} style={{ flexGrow: c.valor, background: c.cor }} />
+                    ) : null,
+                  )}
                 </div>
                 <ul className={estilos.origens}>
-                  {CANAIS.map(({ canal, nome, cor }) => {
-                    const c = dados.porCanal.find((x) => x.canal === canal)
-                    return (
-                      <li key={canal}>
-                        <span className={estilos.amostra} style={{ background: cor }} aria-hidden="true" />
-                        <span className={estilos.nomeOrigem}>
-                          {nome}
-                          <small>{plural(c.vendas, 'venda', 'vendas')}</small>
-                        </span>
-                        <span className={estilos.valorOrigem}>
-                          <strong>{formatarMoeda(c.valor)}</strong>
-                          <small>{percentual(c.valor, t.valor)}%</small>
-                        </span>
-                      </li>
-                    )
-                  })}
+                  {origens.map((c) => (
+                    <li key={c.canalId ?? 'sem'}>
+                      <span className={estilos.amostra} style={{ background: c.cor }} aria-hidden="true" />
+                      <span className={estilos.nomeOrigem}>
+                        {c.nome}
+                        <small>{plural(c.vendas, 'venda', 'vendas')}</small>
+                      </span>
+                      <span className={estilos.valorOrigem}>
+                        <strong>{formatarMoeda(c.valor)}</strong>
+                        <small>{percentual(c.valor, t.valor)}%</small>
+                      </span>
+                    </li>
+                  ))}
                 </ul>
               </section>
             )}

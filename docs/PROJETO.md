@@ -37,7 +37,7 @@ acessível e orientação inicial.
 | # | Funcionalidade | Descrição |
 |---|---|---|
 | F1 | Cadastro de produtos | Poucos campos: nome, preço e quantidade inicial |
-| F2 | Registro de vendas | Baixa automática no estoque a cada venda; pedidos do WhatsApp lançados manualmente |
+| F2 | Registro de vendas | Baixa automática no estoque a cada venda; origem opcional, com canais definidos pela loja (ex.: Instagram, encomenda), registrados manualmente |
 | F3 | Consulta de estoque | Ver rapidamente o saldo de cada produto, inclusive pelo celular |
 | F4 | Ajuste de estoque | Corrigir divergências encontradas na conferência |
 | F5 | Resumo de vendas | Visão simples do que foi vendido e dos mais vendidos |
