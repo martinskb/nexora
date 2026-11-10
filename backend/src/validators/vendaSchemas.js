@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-export const CANAIS = ['balcao', 'whatsapp'];
-
 const textoOpcional = (max) =>
   z
     .string()
@@ -25,7 +23,14 @@ export const criarVendaSchema = z.object({
     )
     .min(1, 'Adicione pelo menos um produto à venda.')
     .max(200, 'Muitos itens em uma única venda.'),
-  canal: z.enum(CANAIS, { error: 'Origem da venda inválida.' }).optional().default('balcao'),
+  // Origem opcional: id de um canal ativo da loja, ou null (venda sem canal).
+  canalId: z
+    .number({ error: 'Origem da venda inválida.' })
+    .int('Origem da venda inválida.')
+    .positive('Origem da venda inválida.')
+    .nullable()
+    .optional()
+    .transform((v) => v ?? null),
   observacao: textoOpcional(255),
 });
 
@@ -42,7 +47,7 @@ const dataIso = z.iso.datetime({ offset: true, error: 'Data inválida.' });
 export const filtroVendasSchema = z.object({
   de: dataIso.optional(),
   ate: dataIso.optional(),
-  canal: z.enum(CANAIS).optional(),
+  canalId: z.union([z.literal('sem'), z.coerce.number().int().positive()]).optional(), // 'sem' = vendas sem canal
   status: z.enum(['concluida', 'cancelada']).optional(),
   limite: z.coerce.number().int().min(1).max(100).optional().default(50),
   antesDe: z.coerce.number().int().positive().optional(), // paginação: id da última venda já carregada

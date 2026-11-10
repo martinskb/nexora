@@ -1,5 +1,6 @@
 import { pool, withTransaction } from '../config/db.js';
 import { AppError } from '../utils/AppError.js';
+import { buscarAtivo } from './canalService.js';
 
 const NAO_ENCONTRADA = 'Venda não encontrada.';
 const centavos = (v) => Math.round(v * 100);
@@ -25,11 +26,14 @@ function agruparItens(itens) {
  * Este é o ponto único de registro de vendas: tela de venda e futuras
  * integrações (WhatsApp, marketplaces) devem usar esta função.
  */
-export async function registrar(lojaId, { itens, canal, observacao }) {
+export async function registrar(lojaId, { itens, canalId = null, observacao }) {
   const pedidos = agruparItens(itens).sort((a, b) => a.produtoId - b.produtoId);
   const ids = pedidos.map((p) => p.produtoId);
 
   const vendaId = await withTransaction(async (conn) => {
+    if (canalId !== null && !(await buscarAtivo(conn, lojaId, canalId))) {
+      throw new AppError('Origem da venda inválida.', 400, { canalId: 'Origem da venda inválida.' });
+    }
     const [produtos] = await conn.query(
       `SELECT id, nome, preco, quantidade FROM produtos
        WHERE loja_id = ? AND ativo = TRUE AND id IN (?) ORDER BY id FOR UPDATE`,
@@ -68,8 +72,8 @@ export async function registrar(lojaId, { itens, canal, observacao }) {
     const total = linhas.reduce((s, l) => s + centavos(l.subtotal), 0) / 100;
 
     const [venda] = await conn.execute(
-      'INSERT INTO vendas (loja_id, total, canal, observacao) VALUES (?, ?, ?, ?)',
-      [lojaId, total, canal, observacao],
+      'INSERT INTO vendas (loja_id, total, canal_id, observacao) VALUES (?, ?, ?, ?)',
+      [lojaId, total, canalId, observacao],
     );
 
     for (const l of linhas) {
@@ -99,7 +103,7 @@ function paraVendaPublica(row) {
     id: row.id,
     total: Number(row.total),
     status: row.status,
-    canal: row.canal,
+    canal: row.canal_id ? { id: row.canal_id, nome: row.canal_nome } : null,
     observacao: row.observacao,
     motivoCancelamento: row.motivo_cancelamento,
     canceladaEm: row.cancelada_em,
@@ -108,7 +112,11 @@ function paraVendaPublica(row) {
 }
 
 export async function buscar(lojaId, id) {
-  const [rows] = await pool.execute('SELECT * FROM vendas WHERE id = ? AND loja_id = ?', [id, lojaId]);
+  const [rows] = await pool.execute(
+    `SELECT v.*, c.nome AS canal_nome FROM vendas v LEFT JOIN canais c ON c.id = v.canal_id
+     WHERE v.id = ? AND v.loja_id = ?`,
+    [id, lojaId],
+  );
   if (!rows[0]) throw new AppError(NAO_ENCONTRADA, 404);
 
   // O nome vem do produto mesmo que ele tenha sido removido depois (histórico preservado).
@@ -131,7 +139,7 @@ export async function buscar(lojaId, id) {
 }
 
 /** Lista vendas (mais recentes primeiro) com filtros e paginação por id. */
-export async function listar(lojaId, { de, ate, canal, status, limite, antesDe }) {
+export async function listar(lojaId, { de, ate, canalId, status, limite, antesDe }) {
   const condicoes = ['v.loja_id = ?'];
   const params = [lojaId];
   if (de) {
@@ -142,9 +150,11 @@ export async function listar(lojaId, { de, ate, canal, status, limite, antesDe }
     condicoes.push('v.criado_em < ?');
     params.push(new Date(ate));
   }
-  if (canal) {
-    condicoes.push('v.canal = ?');
-    params.push(canal);
+  if (canalId === 'sem') {
+    condicoes.push('v.canal_id IS NULL');
+  } else if (canalId) {
+    condicoes.push('v.canal_id = ?');
+    params.push(canalId);
   }
   if (status) {
     condicoes.push('v.status = ?');
@@ -157,11 +167,12 @@ export async function listar(lojaId, { de, ate, canal, status, limite, antesDe }
 
   // Busca um a mais que o limite para saber se existe próxima página.
   const [rows] = await pool.query(
-    `SELECT v.*,
+    `SELECT v.*, c.nome AS canal_nome,
             (SELECT COALESCE(SUM(i.quantidade), 0) FROM itens_venda i WHERE i.venda_id = v.id) AS qtd_itens,
             (SELECT GROUP_CONCAT(p.nome ORDER BY i.id SEPARATOR ', ')
                FROM itens_venda i JOIN produtos p ON p.id = i.produto_id WHERE i.venda_id = v.id) AS resumo
      FROM vendas v
+     LEFT JOIN canais c ON c.id = v.canal_id
      WHERE ${condicoes.join(' AND ')}
      ORDER BY v.id DESC
      LIMIT ?`,

@@ -12,6 +12,11 @@ async function criarProduto(agente, dados) {
   if (res.status !== 201) throw new Error(`falha ao criar produto: ${JSON.stringify(res.body)}`);
   return res.body.produto;
 }
+async function criarCanal(agente, nome) {
+  const res = await agente.post('/api/canais').send({ nome });
+  if (res.status !== 201) throw new Error(`falha ao criar canal: ${JSON.stringify(res.body)}`);
+  return res.body.canal;
+}
 const saldo = async (agente, id) => (await agente.get(`/api/produtos/${id}`)).body.produto.quantidade;
 const movimentacoes = async (produtoId) =>
   (await pool.query('SELECT tipo, quantidade, saldo_apos, venda_id, motivo FROM movimentacoes_estoque WHERE produto_id = ? ORDER BY id', [produtoId]))[0];
@@ -29,7 +34,7 @@ describe('Registrar venda com baixa automática (F2)', () => {
       ],
     });
     expect(res.status).toBe(201);
-    expect(res.body.venda).toMatchObject({ total: 37.48, status: 'concluida', canal: 'balcao' });
+    expect(res.body.venda).toMatchObject({ total: 37.48, status: 'concluida', canal: null });
     expect(res.body.venda.itens).toEqual([
       { produtoId: arroz.id, nome: 'Arroz', quantidade: 3, precoUnitario: 6.5, subtotal: 19.5 },
       { produtoId: feijao.id, nome: 'Feijão', quantidade: 2, precoUnitario: 8.99, subtotal: 17.98 },
@@ -46,13 +51,31 @@ describe('Registrar venda com baixa automática (F2)', () => {
     expect(movs[1]).toMatchObject({ tipo: 'venda', quantidade: -4, saldo_apos: 16, venda_id: body.venda.id });
   });
 
-  it('aceita o canal WhatsApp e uma observação', async () => {
+  it('registra a origem quando informada', async () => {
     const { agente } = await criarLojaLogada();
+    const canal = await criarCanal(agente, 'Instagram');
     const p = await criarProduto(agente, { nome: 'Batom' });
     const res = await agente
       .post('/api/vendas')
-      .send({ itens: [{ produtoId: p.id, quantidade: 1 }], canal: 'whatsapp', observacao: 'Cliente Maria' });
-    expect(res.body.venda).toMatchObject({ canal: 'whatsapp', observacao: 'Cliente Maria' });
+      .send({ itens: [{ produtoId: p.id, quantidade: 1 }], canalId: canal.id, observacao: 'Cliente Maria' });
+    expect(res.status).toBe(201);
+    expect(res.body.venda).toMatchObject({ canal: { id: canal.id, nome: 'Instagram' }, observacao: 'Cliente Maria' });
+  });
+
+  it('recusa canal arquivado, inexistente ou de outra loja (sem baixar estoque)', async () => {
+    const { agente } = await criarLojaLogada();
+    const outra = await criarLojaLogada();
+    const arquivado = await criarCanal(agente, 'Antigo');
+    await agente.put(`/api/canais/${arquivado.id}`).send({ ativo: false });
+    const alheio = await criarCanal(outra.agente, 'Da outra loja');
+    const p = await criarProduto(agente, { nome: 'Arroz', quantidade: 5 });
+
+    for (const canalId of [arquivado.id, 999999, alheio.id]) {
+      const res = await agente.post('/api/vendas').send({ itens: [{ produtoId: p.id, quantidade: 1 }], canalId });
+      expect(res.status).toBe(400);
+      expect(res.body.erro).toBe('Origem da venda inválida.');
+    }
+    expect(await saldo(agente, p.id)).toBe(5);
   });
 
   it('usa sempre o preço cadastrado (ignora preço enviado pelo navegador)', async () => {
@@ -100,7 +123,7 @@ describe('Registrar venda com baixa automática (F2)', () => {
     expect((await agente.post('/api/vendas').send({ itens: [{ produtoId: p.id, quantidade: 0 }] })).status).toBe(400);
     expect((await agente.post('/api/vendas').send({ itens: [{ produtoId: p.id, quantidade: 1.5 }] })).status).toBe(400);
     expect(
-      (await agente.post('/api/vendas').send({ itens: [{ produtoId: p.id, quantidade: 1 }], canal: 'telefone' })).status,
+      (await agente.post('/api/vendas').send({ itens: [{ produtoId: p.id, quantidade: 1 }], canalId: 'telefone' })).status,
     ).toBe(400);
   });
 });
@@ -228,15 +251,18 @@ describe('Listagem de vendas', () => {
     expect(res.body.temMais).toBe(false);
   });
 
-  it('filtra por canal, situação e período', async () => {
+  it('filtra por canal, sem canal, situação e período', async () => {
     const { agente } = await criarLojaLogada();
     const p = await criarProduto(agente, { nome: 'Arroz', quantidade: 50 });
-    const vender = (canal) => agente.post('/api/vendas').send({ itens: [{ produtoId: p.id, quantidade: 1 }], canal });
-    await vender('balcao');
-    const zap = (await vender('whatsapp')).body.venda;
+    const grupo = await criarCanal(agente, 'Grupo');
+    const vender = (canalId) => agente.post('/api/vendas').send({ itens: [{ produtoId: p.id, quantidade: 1 }], canalId });
+    const direta = (await vender(undefined)).body.venda;
+    const zap = (await vender(grupo.id)).body.venda;
     await agente.post(`/api/vendas/${zap.id}/cancelar`).send({ motivo: 'Teste' });
 
-    expect((await agente.get('/api/vendas?canal=whatsapp')).body.vendas).toHaveLength(1);
+    expect((await agente.get(`/api/vendas?canalId=${grupo.id}`)).body.vendas.map((v) => v.id)).toEqual([zap.id]);
+    expect((await agente.get('/api/vendas?canalId=sem')).body.vendas.map((v) => v.id)).toEqual([direta.id]);
+    expect((await agente.get('/api/vendas')).body.vendas).toHaveLength(2);
     expect((await agente.get('/api/vendas?status=concluida')).body.vendas).toHaveLength(1);
     expect((await agente.get('/api/vendas?status=cancelada')).body.vendas[0].id).toBe(zap.id);
 
@@ -244,6 +270,36 @@ describe('Listagem de vendas', () => {
     const ontem = new Date(Date.now() - 86_400_000).toISOString();
     expect((await agente.get(`/api/vendas?de=${ontem}&ate=${amanha}`)).body.vendas).toHaveLength(2);
     expect((await agente.get(`/api/vendas?de=${amanha}`)).body.vendas).toHaveLength(0);
+  });
+
+  it('filtro com canal de outra loja retorna vazio', async () => {
+    const a = await criarLojaLogada();
+    const b = await criarLojaLogada();
+    const canalA = await criarCanal(a.agente, 'Grupo');
+    const pa = await criarProduto(a.agente, { nome: 'Arroz' });
+    await a.agente.post('/api/vendas').send({ itens: [{ produtoId: pa.id, quantidade: 1 }], canalId: canalA.id });
+    const pb = await criarProduto(b.agente, { nome: 'Feijão' });
+    await b.agente.post('/api/vendas').send({ itens: [{ produtoId: pb.id, quantidade: 1 }] });
+
+    expect((await b.agente.get(`/api/vendas?canalId=${canalA.id}`)).body.vendas).toEqual([]);
+  });
+
+  it('filtro de canal inválido', async () => {
+    const { agente } = await criarLojaLogada();
+    const res = await agente.get('/api/vendas?canalId=abc');
+    expect(res.status).toBe(400);
+    expect(res.body.erro).toBe('Filtro de vendas inválido.');
+  });
+
+  it('canal arquivado continua aparecendo no histórico', async () => {
+    const { agente } = await criarLojaLogada();
+    const canal = await criarCanal(agente, 'Feira');
+    const p = await criarProduto(agente, { nome: 'Arroz' });
+    const { venda } = (await agente.post('/api/vendas').send({ itens: [{ produtoId: p.id, quantidade: 1 }], canalId: canal.id })).body;
+    await agente.put(`/api/canais/${canal.id}`).send({ ativo: false });
+
+    expect((await agente.get(`/api/vendas/${venda.id}`)).body.venda.canal).toEqual({ id: canal.id, nome: 'Feira' });
+    expect((await agente.get('/api/vendas')).body.vendas[0].canal).toEqual({ id: canal.id, nome: 'Feira' });
   });
 
   it('pagina os resultados', async () => {
