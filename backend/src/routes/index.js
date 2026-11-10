@@ -3,6 +3,7 @@ import { pool } from '../config/db.js';
 import { authRoutes } from './authRoutes.js';
 import { produtoRoutes } from './produtoRoutes.js';
 import { vendaRoutes } from './vendaRoutes.js';
+import { resumoRoutes } from './resumoRoutes.js';
 
 export const routes = Router();
 
@@ -19,3 +20,4 @@ routes.get('/health', async (req, res) => {
 routes.use('/auth', authRoutes);
 routes.use('/produtos', produtoRoutes);
 routes.use('/vendas', vendaRoutes);
+routes.use('/resumo', resumoRoutes);

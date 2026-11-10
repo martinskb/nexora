@@ -52,6 +52,10 @@
   --cor-sobre-primaria: #ffffff;
   --cor-overlay: rgb(15 23 42 / 0.45);
 
+  /* Séries de gráfico (validadas: contraste, daltonismo e separação) */
+  --serie-1: #0d9488; /* Balcão / série única */
+  --serie-2: #eb6834; /* WhatsApp */
+
   font-family: var(--fonte);
   font-size: 16px;
   line-height: 1.5;
@@ -83,6 +87,8 @@
     --cor-overlay: rgb(0 0 0 / 0.6);
     --sombra-sm: 0 1px 2px rgb(0 0 0 / 0.4);
     --sombra-md: 0 4px 16px rgb(0 0 0 / 0.45);
+    --serie-1: #12a594;
+    --serie-2: #d95926;
     color-scheme: dark;
   }
 }
@@ -106,6 +112,8 @@
   --cor-overlay: rgb(0 0 0 / 0.6);
   --sombra-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --sombra-md: 0 4px 16px rgb(0 0 0 / 0.45);
+  --serie-1: #12a594;
+  --serie-2: #d95926;
   color-scheme: dark;
 }
 
@@ -113,6 +121,13 @@
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+/* Ao rolar até um elemento (ex.: foco pelo teclado), não deixá-lo
+   escondido atrás do cabeçalho fixo nem do menu inferior. */
+html {
+  scroll-padding-top: calc(60px + var(--esp-4));
+  scroll-padding-bottom: calc(var(--altura-nav-inferior) + var(--esp-4));
 }
 
 body {

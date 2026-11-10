@@ -1,0 +1,134 @@
+.grafico {
+  display: grid;
+  gap: var(--esp-2);
+}
+
+.area {
+  position: relative;
+  width: 100%;
+  min-height: 200px;
+}
+
+.area svg {
+  display: block;
+  overflow: visible;
+}
+
+.grade {
+  stroke: var(--cor-borda);
+  stroke-width: 1;
+  opacity: 0.6;
+}
+
+.base {
+  stroke: var(--cor-borda);
+  stroke-width: 1;
+}
+
+.eixoY,
+.eixoX {
+  fill: var(--cor-texto-suave);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.eixoY {
+  text-anchor: end;
+}
+
+.rotuloValor {
+  fill: var(--cor-texto);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.coluna {
+  fill: var(--serie-1);
+  transition: opacity 0.12s;
+}
+
+.apagada {
+  opacity: 0.35;
+}
+
+.alvo {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.alvo:focus {
+  outline: none;
+}
+
+.alvo:focus-visible {
+  stroke: var(--cor-primaria);
+  stroke-width: 2;
+}
+
+/* Dica: valor em destaque, dia em segundo plano */
+.dica {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  width: max-content;
+  max-width: 220px;
+  display: grid;
+  gap: 2px;
+  padding: var(--esp-2) var(--esp-3);
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  box-shadow: var(--sombra-md);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.dica_direita {
+  transform: translate(-16px, -100%);
+}
+
+.dica_esquerda {
+  transform: translate(calc(-100% + 16px), -100%);
+}
+
+.dica strong {
+  font-size: var(--texto-md);
+}
+
+.dica span {
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-xs);
+}
+
+.tabela summary {
+  cursor: pointer;
+  color: var(--cor-primaria);
+  font-weight: 600;
+  font-size: var(--texto-sm);
+  width: fit-content;
+  padding: var(--esp-1) 0;
+}
+
+.tabela table {
+  width: 100%;
+  margin-top: var(--esp-2);
+  border-collapse: collapse;
+  font-size: var(--texto-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabela th,
+.tabela td {
+  padding: var(--esp-1) var(--esp-2);
+  border-bottom: 1px solid var(--cor-borda);
+  text-align: right;
+}
+
+.tabela th:first-child,
+.tabela td:first-child {
+  text-align: left;
+}
+
+.tabela th {
+  color: var(--cor-texto-suave);
+  font-weight: 600;
+}
