@@ -32,7 +32,7 @@ cadastrar, vender e consultar **sem ajuda**, depois de uma orientação curta.
 | | Funcionalidade | Como funciona |
 |---|---|---|
 | F1 | **Cadastro de produtos** | Só nome, preço e quantidade inicial. |
-| F2 | **Registro de vendas** | Carrinho com vários itens; o estoque baixa automaticamente. Não deixa vender além do que existe, mas oferece um ajuste rápido na hora (o caderno do balcão pode estar desatualizado). Origem da venda opcional. |
+| F2 | **Registro de vendas** | Carrinho com vários itens; o estoque baixa automaticamente. Não deixa vender além do que existe, mas oferece um ajuste rápido na hora (o caderno do balcão pode estar desatualizado). Origem da venda opcional, com canais que a própria loja define (ex.: Instagram, encomenda). |
 | F3 | **Consulta de estoque** | Saldo de cada produto, rápido e legível no celular. |
 | F4 | **Ajuste de estoque** | Corrige divergências da conferência, sempre com motivo registrado. |
 | F5 | **Resumo de vendas** | O que foi vendido no período e os mais vendidos. |
@@ -65,7 +65,7 @@ backend/
   database/       schema.sql (base) e migracoes/ (alterações numeradas)
   tests/          testes de integração da API
 frontend/
-  src/pages/      telas: Entrar, Criar conta, Início, Vender, Vendas, Produtos, Estoque
+  src/pages/      telas: Entrar, Criar conta, Início, Vender, Vendas, Produtos, Estoque, Minha loja
   src/components/ componentes reutilizáveis
 docs/
   PROJETO.md      documento do projeto (problema, escopo, riscos, equipe)
@@ -81,7 +81,8 @@ Tudo sob `/api`:
 | `/auth` | Criar conta da loja, entrar, sair, sessão atual |
 | `/produtos` | Cadastro, listagem, ajustes de estoque e histórico de movimentações |
 | `/vendas` | Registrar, listar e cancelar vendas |
-| `/resumo` | Números do Início (vendas do período, mais vendidos) |
+| `/resumo` | Números do Início (vendas do período, mais vendidos, origem por canal) |
+| `/canais` | Canais de venda definidos pela loja |
 
 ## Como rodar (desenvolvimento)
 
