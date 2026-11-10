@@ -1,0 +1,66 @@
+.form {
+  display: grid;
+  gap: var(--esp-4);
+}
+
+.motivos {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  display: grid;
+  gap: var(--esp-2);
+}
+
+.motivos legend {
+  padding: 0;
+  margin-bottom: var(--esp-1);
+  font-weight: 600;
+  font-size: var(--texto-sm);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+}
+
+.chip {
+  min-height: 38px;
+  padding: 0 var(--esp-3);
+  border: 1px solid var(--cor-borda);
+  border-radius: 999px;
+  background: var(--cor-superficie);
+  font-size: var(--texto-sm);
+  cursor: pointer;
+}
+
+.chipAtivo {
+  border-color: var(--cor-primaria);
+  background: var(--cor-primaria-suave);
+  font-weight: 600;
+}
+
+.previa {
+  padding: var(--esp-3);
+  border-radius: var(--raio-md);
+  background: var(--cor-fundo);
+  border: 1px solid var(--cor-borda);
+  font-size: var(--texto-sm);
+}
+
+.mais {
+  color: var(--cor-sucesso);
+  font-weight: 700;
+}
+
+.menos {
+  color: var(--cor-erro);
+  font-weight: 700;
+}
+
+.erro {
+  color: var(--cor-erro);
+  font-size: var(--texto-xs);
+  font-weight: 500;
+}

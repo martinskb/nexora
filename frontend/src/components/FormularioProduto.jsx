@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { produtosApi } from '../api/produtos.js'
 import { useFormulario } from '../hooks/useFormulario.js'
 import { formatarDecimal, lerValorMonetario } from '../utils/formato.js'
@@ -125,7 +126,10 @@ export function FormularioProduto({ produto, aoSalvar, aoRemover, aoCancelar }) 
           <span>
             Estoque atual: <strong>{unidades(produto.quantidade)}</strong>
           </span>
-          <span className={estilos.ajuda}>A quantidade muda sozinha a cada venda. Para corrigir, use o ajuste de estoque.</span>
+          <span className={estilos.ajuda}>A quantidade muda sozinha a cada venda.</span>
+          <Link to={`/estoque?produto=${produto.id}`} className={estilos.linkAjuste}>
+            Registrar entrada ou corrigir estoque →
+          </Link>
         </div>
       )}
 

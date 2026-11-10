@@ -51,3 +51,11 @@
 .remover:hover {
   background: var(--cor-erro-suave);
 }
+
+.linkAjuste {
+  justify-self: start;
+  padding: var(--esp-1) 0;
+  color: var(--cor-primaria);
+  font-weight: 600;
+  font-size: var(--texto-sm);
+}

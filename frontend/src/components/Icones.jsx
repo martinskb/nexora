@@ -98,6 +98,12 @@ export const IconeLixeira = (p) => (
   </Icone>
 )
 
+export const IconeEstoque = (p) => (
+  <Icone {...p}>
+    <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+  </Icone>
+)
+
 export const IconeMais = (p) => (
   <Icone {...p}>
     <path d="M12 5v14M5 12h14" />
