@@ -1,3 +1,11 @@
+/* Largura útil do app: usa a tela larga do computador sem deixar as linhas
+   longas demais; a margem lateral cresce junto com a tela. */
+.cabecalho,
+.conteudo {
+  --largura-app: 1600px;
+  --margem-app: clamp(var(--esp-4), 3vw, var(--esp-6));
+}
+
 .cabecalho {
   position: sticky;
   top: 0;
@@ -8,10 +16,10 @@
 }
 
 .barra {
-  max-width: 1080px;
+  max-width: var(--largura-app);
   margin: 0 auto;
   min-height: 60px;
-  padding: 0 var(--esp-4);
+  padding: 0 var(--margem-app);
   display: flex;
   align-items: center;
   gap: var(--esp-3);
@@ -58,9 +66,9 @@
 }
 
 .conteudo {
-  max-width: 1080px;
+  max-width: var(--largura-app);
   margin: 0 auto;
-  padding: var(--esp-5) var(--esp-4) calc(var(--altura-nav-inferior) + var(--esp-6) + env(safe-area-inset-bottom, 0px));
+  padding: var(--esp-5) var(--margem-app) calc(var(--altura-nav-inferior) + var(--esp-6) + env(safe-area-inset-bottom, 0px));
 }
 
 /* ---------- Menu ---------- */
