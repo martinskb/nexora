@@ -35,4 +35,3 @@ export function rotuloDoDia(iso, agora = new Date()) {
   return texto.charAt(0).toUpperCase() + texto.slice(1)
 }
 
-export const CANAL_ROTULO = { balcao: 'Balcão', whatsapp: 'WhatsApp' }

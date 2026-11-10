@@ -5,9 +5,12 @@ import { Botao } from '../components/Botao.jsx'
 import { DetalheVenda } from '../components/DetalheVenda.jsx'
 import { IconeRecibo, IconeSeta } from '../components/Icones.jsx'
 import { Modal } from '../components/Modal.jsx'
+import { EscolhaCanal } from '../components/EscolhaCanal.jsx'
 import { Segmentado } from '../components/Segmentado.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
-import { CANAL_ROTULO, formatarHora, intervaloDoPeriodo, rotuloDoDia } from '../utils/datas.js'
+import { useCanais } from '../hooks/useCanais.js'
+import { formatarHora, intervaloDoPeriodo, rotuloDoDia } from '../utils/datas.js'
+import { SEM_CANAL, usarListaDeCanais } from '../utils/canais.js'
 import { formatarMoeda } from '../utils/formato.js'
 import estilos from './Vendas.module.css'
 
@@ -17,19 +20,14 @@ const PERIODOS = [
   { valor: '30d', rotulo: '30 dias' },
   { valor: 'tudo', rotulo: 'Tudo' },
 ]
-const CANAIS = [
-  { valor: '', rotulo: 'Todas' },
-  { valor: 'balcao', rotulo: 'Balcão' },
-  { valor: 'whatsapp', rotulo: 'WhatsApp' },
-]
 const SITUACOES = [
   { valor: '', rotulo: 'Todas' },
   { valor: 'concluida', rotulo: 'Concluídas' },
   { valor: 'cancelada', rotulo: 'Canceladas' },
 ]
 
-function montarFiltros({ periodo, canal, status }) {
-  return { ...intervaloDoPeriodo(periodo), canal, status }
+function montarFiltros({ periodo, canalId, status }) {
+  return { ...intervaloDoPeriodo(periodo), canalId, status }
 }
 
 async function carregar(filtros, antesDe, signal) {
@@ -44,7 +42,8 @@ async function carregar(filtros, antesDe, signal) {
 
 export default function Vendas() {
   const { avisar } = useAvisos()
-  const [filtro, setFiltro] = useState({ periodo: 'hoje', canal: '', status: '' })
+  const { ativos: canais } = useCanais()
+  const [filtro, setFiltro] = useState({ periodo: 'hoje', canalId: '', status: '' }) // canalId: '' = todas, 'sem' = sem canal
   const [estado, setEstado] = useState({ vendas: [], temMais: false, carregando: true, erro: '' })
   const [carregandoMais, setCarregandoMais] = useState(false)
   const [detalhe, setDetalhe] = useState(null) // { carregando, venda, erro }
@@ -62,6 +61,20 @@ export default function Vendas() {
     })
     return () => ctrl.abort()
   }, [filtro])
+
+  // Opções de origem: só aparecem quando a loja tem canais ativos.
+  const opcoesCanal = useMemo(
+    () => [
+      { valor: '', rotulo: 'Vendas' },
+      { valor: 'sem', rotulo: SEM_CANAL },
+      ...canais.map((c) => ({ valor: String(c.id), rotulo: c.nome })),
+    ],
+    [canais],
+  )
+  // Se o canal filtrado foi arquivado/apagado (ou a loja ficou sem canais), volta para "Vendas".
+  const canalNoFiltro =
+    canais.length > 0 && opcoesCanal.some((o) => o.valor === filtro.canalId) ? filtro.canalId : ''
+  if (canalNoFiltro !== filtro.canalId) setFiltro((f) => ({ ...f, canalId: canalNoFiltro }))
 
   function mudarFiltro(campo, valor) {
     setEstado((e) => ({ ...e, carregando: true, erro: '' }))
@@ -122,13 +135,16 @@ export default function Vendas() {
           valor={filtro.periodo}
           aoMudar={(v) => mudarFiltro('periodo', v)}
         />
-        <Segmentado
-          rotulo="Origem"
-          tamanho="compacto"
-          opcoes={CANAIS}
-          valor={filtro.canal}
-          aoMudar={(v) => mudarFiltro('canal', v)}
-        />
+        {canais.length > 0 && (
+          <EscolhaCanal
+            rotulo="Origem"
+            tamanho="compacto"
+            opcoes={opcoesCanal}
+            valor={filtro.canalId}
+            aoMudar={(v) => mudarFiltro('canalId', v)}
+            usarLista={usarListaDeCanais(opcoesCanal, canais.length)}
+          />
+        )}
         <Segmentado
           rotulo="Situação"
           tamanho="compacto"
@@ -166,7 +182,7 @@ export default function Vendas() {
                       <span className={estilos.produtos}>{v.resumo}</span>
                       <span className={estilos.meta}>
                         <span>{v.quantidadeItens === 1 ? '1 item' : `${v.quantidadeItens} itens`}</span>
-                        <span className={`${estilos.canal} ${estilos[`canal_${v.canal}`]}`}>{CANAL_ROTULO[v.canal]}</span>
+                        {v.canal && <span className={estilos.canal}>{v.canal.nome}</span>}
                         {v.status === 'cancelada' && <span className={estilos.seloCancelada}>Cancelada</span>}
                       </span>
                     </span>

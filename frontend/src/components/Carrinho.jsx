@@ -1,23 +1,20 @@
 import { useState } from 'react'
+import { usarListaDeCanais } from '../utils/canais.js'
 import { formatarMoeda } from '../utils/formato.js'
 import { Alerta } from './Alerta.jsx'
 import { Botao } from './Botao.jsx'
 import { CampoTexto } from './CampoTexto.jsx'
 import { ControleQuantidade } from './ControleQuantidade.jsx'
 import { IconeCarrinho, IconeLixeira } from './Icones.jsx'
-import { Segmentado } from './Segmentado.jsx'
+import { EscolhaCanal } from './EscolhaCanal.jsx'
 import estilos from './Carrinho.module.css'
-
-const OPCOES_CANAL = [
-  { valor: 'balcao', rotulo: 'Balcão' },
-  { valor: 'whatsapp', rotulo: 'WhatsApp' },
-]
 
 /** Itens da venda em andamento, origem, observação e confirmação. */
 export function Carrinho({
   itens,
   total,
-  canal,
+  canais, // canais ativos da loja ([] = loja não usa canais: a origem não aparece)
+  canalId, // '' = nenhum
   aoMudarCanal,
   observacao,
   aoMudarObservacao,
@@ -27,6 +24,7 @@ export function Carrinho({
   erro,
 }) {
   const [mostrarObs, setMostrarObs] = useState(Boolean(observacao))
+  const opcoesCanal = [{ valor: '', rotulo: 'Nenhum' }, ...canais.map((c) => ({ valor: String(c.id), rotulo: c.nome }))]
   const totalUnidades = itens.reduce((s, i) => s + i.quantidade, 0)
 
   if (itens.length === 0) {
@@ -67,7 +65,15 @@ export function Carrinho({
         ))}
       </ul>
 
-      <Segmentado rotulo="Origem da venda" opcoes={OPCOES_CANAL} valor={canal} aoMudar={aoMudarCanal} />
+      {canais.length > 0 && (
+        <EscolhaCanal
+          rotulo="Origem da venda (opcional)"
+          opcoes={opcoesCanal}
+          valor={canalId}
+          aoMudar={aoMudarCanal}
+          usarLista={usarListaDeCanais(opcoesCanal, canais.length)}
+        />
+      )}
 
       {mostrarObs ? (
         <CampoTexto

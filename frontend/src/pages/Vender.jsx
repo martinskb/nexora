@@ -12,6 +12,7 @@ import { Modal } from '../components/Modal.jsx'
 import { Preco } from '../components/Preco.jsx'
 import { SeloEstoque } from '../components/SeloEstoque.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
+import { useCanais } from '../hooks/useCanais.js'
 import { useMediaQuery } from '../hooks/useMediaQuery.js'
 import { formatarMoeda, normalizarTexto } from '../utils/formato.js'
 import { unidades } from '../utils/estoque.js'
@@ -34,7 +35,8 @@ export default function Vender() {
   const [produtos, setProdutos] = useState({ lista: [], carregando: true, erro: '' })
   const [busca, setBusca] = useState('')
   const [carrinho, setCarrinho] = useState([]) // [{ produtoId, quantidade }]
-  const [canal, setCanal] = useState('balcao')
+  const { ativos: canais, recarregar: recarregarCanais } = useCanais()
+  const [canalId, setCanalId] = useState('') // '' = venda sem canal
   const [observacao, setObservacao] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [erroVenda, setErroVenda] = useState('')
@@ -106,11 +108,15 @@ export default function Vender() {
     setEnviando(true)
     setErroVenda('')
     try {
-      const { venda } = await vendasApi.registrar({ itens: carrinho, canal, observacao: observacao.trim() || undefined })
+      const { venda } = await vendasApi.registrar({
+        itens: carrinho,
+        canalId: canalId ? Number(canalId) : null,
+        observacao: observacao.trim() || undefined,
+      })
       avisar(`Venda de ${formatarMoeda(venda.total)} registrada.`)
       setCarrinho([])
       setObservacao('')
-      setCanal('balcao')
+      setCanalId('')
       setCarrinhoAberto(false)
       setBusca('')
       await recarregarProdutos() // saldos atualizados após a baixa
@@ -123,6 +129,11 @@ export default function Vender() {
         const produto = r?.lista.find((p) => p.id === faltando.produtoId)
         if (produto) setAjuste({ produto, necessario: faltando.solicitado })
         setErroVenda(err.message)
+      } else if (err instanceof ApiError && err.details?.canalId) {
+        // O canal foi arquivado/apagado em outro lugar: atualiza as opções e mantém o carrinho.
+        setCanalId('')
+        await recarregarCanais()
+        setErroVenda('A origem escolhida não está mais disponível. Escolha outra ou confirme sem origem.')
       } else if (err instanceof ApiError && err.details?.produtosNaoEncontrados) {
         const ausentes = new Set(err.details.produtosNaoEncontrados)
         setCarrinho((c) => c.filter((i) => !ausentes.has(i.produtoId)))
@@ -139,8 +150,9 @@ export default function Vender() {
   const carrinhoProps = {
     itens,
     total,
-    canal,
-    aoMudarCanal: setCanal,
+    canais,
+    canalId,
+    aoMudarCanal: setCanalId,
     observacao,
     aoMudarObservacao: setObservacao,
     aoMudarQuantidade: definirQuantidade,

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { vendasApi } from '../api/vendas.js'
-import { CANAL_ROTULO, formatarDataHora } from '../utils/datas.js'
+import { formatarDataHora } from '../utils/datas.js'
 import { formatarMoeda } from '../utils/formato.js'
 import { Alerta } from './Alerta.jsx'
 import { Botao } from './Botao.jsx'
@@ -38,10 +38,12 @@ export function DetalheVenda({ venda, aoCancelar }) {
           <dt>Data</dt>
           <dd>{formatarDataHora(venda.criadoEm)}</dd>
         </div>
-        <div>
-          <dt>Origem</dt>
-          <dd>{CANAL_ROTULO[venda.canal]}</dd>
-        </div>
+        {venda.canal && (
+          <div>
+            <dt>Origem</dt>
+            <dd>{venda.canal.nome}</dd>
+          </div>
+        )}
         <div>
           <dt>Situação</dt>
           <dd className={cancelada ? estilos.textoCancelada : estilos.textoOk}>{cancelada ? 'Cancelada' : 'Concluída'}</dd>

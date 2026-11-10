@@ -1,0 +1,39 @@
+.campo {
+  display: grid;
+  gap: var(--esp-1);
+  min-width: 0;
+}
+
+.rotulo {
+  font-weight: 600;
+  font-size: var(--texto-sm);
+}
+
+.lista {
+  width: 100%;
+  min-height: var(--toque-min);
+  padding: 0 var(--esp-3);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie);
+  font-weight: 600;
+}
+
+.lista:focus-visible {
+  outline: 3px solid var(--cor-primaria);
+  outline-offset: 1px;
+}
+
+/* Mesmo comportamento do Segmentado compacto: rótulo só para leitores de tela. */
+.compacto .rotulo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.compacto .lista {
+  min-height: 40px;
+  font-size: var(--texto-sm);
+}
