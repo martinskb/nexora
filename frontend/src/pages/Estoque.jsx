@@ -4,10 +4,10 @@ import { produtosApi } from '../api/produtos.js'
 import { AjusteEstoque } from '../components/AjusteEstoque.jsx'
 import { Alerta } from '../components/Alerta.jsx'
 import { Botao } from '../components/Botao.jsx'
+import { CartaoProduto } from '../components/CartaoProduto.jsx'
 import { HistoricoEstoque } from '../components/HistoricoEstoque.jsx'
-import { IconeBusca, IconeSeta } from '../components/Icones.jsx'
+import { IconeBusca } from '../components/Icones.jsx'
 import { Modal } from '../components/Modal.jsx'
-import { SeloEstoque } from '../components/SeloEstoque.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
 import { ROTULO_SITUACAO, situacaoEstoque, unidades } from '../utils/estoque.js'
 import { normalizarTexto } from '../utils/formato.js'
@@ -78,7 +78,7 @@ export default function Estoque() {
   const produtoAberto = estado.produtos.find((p) => p.id === selecionado)
 
   function aoAjustar(produto, { modo, diferenca }) {
-    setEstado((e) => ({ ...e, produtos: e.produtos.map((p) => (p.id === produto.id ? produto : p)) }))
+    setEstado((e) => ({ ...e, produtos: e.produtos.map((p) => (p.id === produto.id ? { ...p, ...produto } : p)) }))
     setVersaoHistorico((v) => v + 1)
     avisar(
       modo === 'entrada'
@@ -97,7 +97,7 @@ export default function Estoque() {
     <section className={estilos.pagina}>
       <header>
         <h1 className={estilos.titulo}>Estoque</h1>
-        <p className={estilos.subtitulo}>Confira os saldos e registre a mercadoria que chegou ou correções.</p>
+        <p className={estilos.subtitulo}>Confira os saldos. Toque num produto para registrar a mercadoria que chegou ou corrigir a quantidade.</p>
       </header>
 
       {estado.carregando && <p className={estilos.info}>Carregando estoque…</p>}
@@ -156,22 +156,15 @@ export default function Estoque() {
                   : 'Nenhum produto acabando.'}
             </p>
           ) : (
-            <ul className={estilos.lista}>
+            <ul className={estilos.grade}>
               {filtrados.map((p) => (
                 <li key={p.id}>
-                  <button
-                    type="button"
-                    className={estilos.item}
-                    onClick={() => setSelecionado(p.id)}
-                    aria-label={`Estoque de ${p.nome}`}
-                  >
-                    <span className={estilos.nome}>
-                      {p.nome}
-                      {p.estoqueMinimo > 0 && <small>Aviso em {p.estoqueMinimo} un.</small>}
-                    </span>
-                    <SeloEstoque produto={p} />
-                    <IconeSeta className={estilos.seta} />
-                  </button>
+                  <CartaoProduto
+                    produto={p}
+                    foco="estoque"
+                    aoAbrir={() => setSelecionado(p.id)}
+                    rotulo={`Estoque de ${p.nome}: ${unidades(p.quantidade)}`}
+                  />
                 </li>
               ))}
             </ul>

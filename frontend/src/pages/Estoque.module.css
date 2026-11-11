@@ -35,11 +35,18 @@
   font-weight: 600;
 }
 
-/* Filtros em cartões com a contagem de cada situação. */
+/* Filtros com a contagem de cada situação. Na tela larga, cada um
+   tem o tamanho do que mostra, em vez de esticar até a borda. */
 .filtros {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--esp-2);
+}
+
+@media (min-width: 900px) {
+  .filtros {
+    grid-template-columns: repeat(3, minmax(160px, 220px));
+  }
 }
 
 .filtro {
@@ -115,52 +122,14 @@
   box-shadow: 0 0 0 3px var(--cor-primaria-suave);
 }
 
-.lista {
+/* Grade de cartões (o mesmo cartão de Produtos, com a quantidade em destaque). */
+.grade {
   list-style: none;
   margin: 0;
   padding: 0;
-  background: var(--cor-superficie);
-  border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-lg);
-  overflow: hidden;
-}
-
-.lista li + li {
-  border-top: 1px solid var(--cor-borda);
-}
-
-.item {
-  width: 100%;
   display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: center;
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
   gap: var(--esp-3);
-  min-height: 60px;
-  padding: var(--esp-3) var(--esp-4);
-  border: 0;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-}
-
-.item:hover {
-  background: var(--cor-fundo);
-}
-
-.nome {
-  display: grid;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.nome small {
-  color: var(--cor-texto-suave);
-  font-weight: 500;
-  font-size: var(--texto-xs);
-}
-
-.seta {
-  color: var(--cor-texto-suave);
 }
 
 /* Janela do produto */
