@@ -214,14 +214,18 @@ export default function Vender() {
                   type="button"
                   className={`${estilos.produto} ${noCarrinho ? estilos.selecionado : ''}`}
                   onClick={() => definirQuantidade(p, noCarrinho + 1)}
-                  aria-label={`Adicionar ${p.nome}`}
                 >
-                  <span className={estilos.nomeProduto}>{p.nome}</span>
+                  {/* Sem aria-label: o leitor lê nome, preço, quantidade na venda e estoque. */}
+                  <span className={estilos.nomeProduto}>
+                    <span className="somente-leitor">Adicionar </span>
+                    {p.nome}
+                  </span>
                   <span className={estilos.linhaPreco}>
                     <Preco valor={p.preco} etiqueta />
                     {noCarrinho > 0 ? (
-                      <span className={estilos.naVenda} aria-label={`${noCarrinho} na venda`}>
+                      <span className={estilos.naVenda}>
                         {noCarrinho}
+                        <span className="somente-leitor"> na venda</span>
                       </span>
                     ) : (
                       <span className={estilos.mais} aria-hidden="true">

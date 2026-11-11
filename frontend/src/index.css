@@ -21,6 +21,8 @@
   --cor-fundo: #eef1ec;
   --cor-superficie: #ffffff;
   --cor-borda: #d3dbd4;
+  /* Borda de campos (busca, texto, lista): 3,75:1 sobre a superfície, para o campo não sumir. */
+  --cor-borda-campo: #7a877f;
   --cor-sucesso: #1d6b47;
   --cor-sucesso-suave: #dcede2;
   --cor-alerta: #9a4a00;
@@ -83,10 +85,9 @@
   text-rendering: optimizeLegibility;
 }
 
-/* Tema escuro: segue o sistema, a menos que o usuário escolha manualmente
-   (data-theme é definido pelo botão de tema e salvo no navegador). */
+/* Tema escuro: segue a preferência do sistema (sem botão próprio no app). */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='claro']) {
+  :root {
     --cor-primaria: #5fcb94;
     --cor-primaria-hover: #86dcae;
     --cor-primaria-suave: #1c3a2a;
@@ -96,6 +97,7 @@
     --cor-fundo: #0f1612;
     --cor-superficie: #18221c;
     --cor-borda: #2e3c33;
+    --cor-borda-campo: #6a7b70;
     --cor-sucesso: #5fcb94;
     --cor-sucesso-suave: #1c3a2a;
     --cor-alerta: #f5b544;
@@ -115,36 +117,6 @@
     --cor-sem-canal: #7d8b82;
     color-scheme: dark;
   }
-}
-
-:root[data-theme='escuro'] {
-  --cor-primaria: #5fcb94;
-  --cor-primaria-hover: #86dcae;
-  --cor-primaria-suave: #1c3a2a;
-  --cor-sobre-primaria: #0b2017;
-  --cor-texto: #e6ece7;
-  --cor-texto-suave: #9daea3;
-  --cor-fundo: #0f1612;
-  --cor-superficie: #18221c;
-  --cor-borda: #2e3c33;
-  --cor-sucesso: #5fcb94;
-  --cor-sucesso-suave: #1c3a2a;
-  --cor-alerta: #f5b544;
-  --cor-alerta-suave: #3a2a0c;
-  --cor-erro: #f4877b;
-  --cor-erro-suave: #3d1714;
-  --cor-sobre-erro: #2a0a07;
-  --cor-overlay: rgb(0 0 0 / 0.6);
-  --sombra-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-  --sombra-md: 0 6px 20px rgb(0 0 0 / 0.5);
-  --serie-1: #319e6b;
-  --serie-2: #9085e9;
-  --serie-3: #d95926;
-  --serie-4: #3987e5;
-  --serie-5: #c98500;
-  --serie-6: #d55181;
-  --cor-sem-canal: #7d8b82;
-  color-scheme: dark;
 }
 
 *,
@@ -220,4 +192,17 @@ svg {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Texto só para leitores de tela (some da tela, continua sendo lido). */
+.somente-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }

@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { Botao } from './Botao.jsx'
-import { BotaoTema } from './BotaoTema.jsx'
 import { IconeCaixa, IconeCarrinho, IconeEstoque, IconeInicio, IconeRecibo, IconeSair } from './Icones.jsx'
 import { Logo } from './Logo.jsx'
 import estilos from './LayoutApp.module.css'
@@ -61,7 +60,6 @@ export function LayoutApp() {
           </NavLink>
           <ItemMenu {...vender} className={estilos.venderTopo} />
           <div className={estilos.acoes}>
-            <BotaoTema />
             <Botao variante="fantasma" onClick={aoSair} carregando={saindo} aria-label="Sair da conta">
               {!saindo && <IconeSair />}
               <span className={estilos.textoSair}>Sair</span>

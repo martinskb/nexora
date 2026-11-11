@@ -175,10 +175,8 @@ export default function Vendas() {
                     type="button"
                     className={`${estilos.cupom} ${v.status === 'cancelada' ? estilos.cancelada : ''}`}
                     onClick={() => abrirDetalhe(v.id)}
-                    aria-label={`Ver venda das ${formatarHora(v.criadoEm)} de ${formatarMoeda(v.total)}${
-                      v.status === 'cancelada' ? ', cancelada' : ''
-                    }`}
                   >
+                    <span className="somente-leitor">Ver venda das </span>
                     <span className={estilos.topoCupom}>
                       <span className={estilos.hora}>{formatarHora(v.criadoEm)}</span>
                       <span className={estilos.valor}>{formatarMoeda(v.total)}</span>

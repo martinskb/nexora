@@ -1,4 +1,3 @@
-import { BotaoTema } from './BotaoTema.jsx'
 import { Logo } from './Logo.jsx'
 import { Preco } from './Preco.jsx'
 import estilos from './LayoutAuth.module.css'
@@ -24,9 +23,6 @@ export function LayoutAuth({ titulo, subtitulo, rodape, children }) {
       </aside>
 
       <div className={estilos.lado}>
-        <div className={estilos.topo}>
-          <BotaoTema />
-        </div>
         <main className={estilos.centro}>
           <header className={estilos.cabecalho}>
             <Logo tamanho={44} />

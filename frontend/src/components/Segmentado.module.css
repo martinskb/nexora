@@ -63,8 +63,12 @@
   clip: rect(0 0 0 0);
 }
 
-.compacto .opcao {
-  min-height: 34px;
-  padding: 0 var(--esp-2);
-  font-size: var(--texto-xs);
+/* Compacto só no computador; no celular as opções mantêm 44px de altura para o dedo. */
+@media (min-width: 768px) {
+  .compacto .opcao {
+    min-height: 34px;
+    padding: 0 var(--esp-2);
+    font-size: var(--texto-xs);
+  }
 }
+

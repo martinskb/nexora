@@ -58,7 +58,7 @@
   width: 100%;
   min-height: var(--toque-min);
   padding: 0 var(--esp-3) 0 2.5rem;
-  border: 1px solid var(--cor-borda);
+  border: 1px solid var(--cor-borda-campo);
   border-radius: var(--raio-md);
   background: var(--cor-superficie);
 }

@@ -11,12 +11,18 @@ const preenchimento = (p) => Math.min(100, Math.round((p.quantidade / (p.estoque
  * esquerda mostra a situação do estoque (em dia, acabando, sem estoque).
  *
  * foco: 'preco' (tela Produtos) | 'estoque' (tela Estoque: quantidade em destaque)
+ * acao: verbo lido por leitores de tela antes do nome (ex.: "Editar")
  */
-export function CartaoProduto({ produto: p, foco = 'preco', aoAbrir, rotulo }) {
+export function CartaoProduto({ produto: p, foco = 'preco', aoAbrir, acao }) {
   const situacao = situacaoEstoque(p)
   return (
-    <button type="button" className={`${estilos.cartao} ${estilos[situacao]}`} onClick={aoAbrir} aria-label={rotulo}>
-      <span className={estilos.nome}>{p.nome}</span>
+    // Sem aria-label: o leitor de tela lê o cartão inteiro (preço, estoque, situação),
+    // precedido da ação ("Editar", "Ajustar estoque de").
+    <button type="button" className={`${estilos.cartao} ${estilos[situacao]}`} onClick={aoAbrir}>
+      <span className={estilos.nome}>
+        {acao && <span className="somente-leitor">{acao} </span>}
+        {p.nome}
+      </span>
 
       {foco === 'preco' ? (
         <span className={estilos.linhaPreco}>

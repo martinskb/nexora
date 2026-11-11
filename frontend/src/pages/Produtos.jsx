@@ -124,7 +124,7 @@ export default function Produtos() {
             <ul className={estilos.grade}>
               {filtrados.map((p) => (
                 <li key={p.id}>
-                  <CartaoProduto produto={p} aoAbrir={() => setJanela({ produto: p })} rotulo={`Editar ${p.nome}`} />
+                  <CartaoProduto produto={p} aoAbrir={() => setJanela({ produto: p })} acao="Editar" />
                 </li>
               ))}
             </ul>

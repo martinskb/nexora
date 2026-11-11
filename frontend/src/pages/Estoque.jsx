@@ -163,7 +163,7 @@ export default function Estoque() {
                     produto={p}
                     foco="estoque"
                     aoAbrir={() => setSelecionado(p.id)}
-                    rotulo={`Estoque de ${p.nome}: ${unidades(p.quantidade)}`}
+                    acao="Ajustar estoque de"
                   />
                 </li>
               ))}

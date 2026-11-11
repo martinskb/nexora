@@ -8,11 +8,8 @@
     <!-- Declara suporte a claro/escuro: navegadores não forçam o "modo noturno" por cima. -->
     <meta name="color-scheme" content="light dark" />
     <script>
-      // Aplica o tema salvo antes de desenhar a página (evita "piscar" a cor errada).
-      try {
-        var t = localStorage.getItem('nexora-tema');
-        if (t === 'claro' || t === 'escuro') document.documentElement.dataset.theme = t;
-      } catch (e) {}
+      // O tema segue o do sistema. Apaga a escolha manual salva por versões antigas.
+      try { localStorage.removeItem('nexora-tema'); } catch (e) {}
     </script>
     <meta name="description" content="NEXORA — vendas e estoque juntos, de um jeito simples." />
     <title>NEXORA</title>

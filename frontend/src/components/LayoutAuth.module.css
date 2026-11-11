@@ -9,11 +9,6 @@
   padding: var(--esp-3) var(--esp-4) var(--esp-6);
 }
 
-.topo {
-  display: flex;
-  justify-content: flex-end;
-}
-
 .centro {
   display: grid;
   align-content: center;
