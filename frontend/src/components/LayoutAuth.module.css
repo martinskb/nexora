@@ -5,8 +5,8 @@
 
 .lado {
   display: grid;
-  grid-template-rows: auto 1fr;
-  padding: var(--esp-3) var(--esp-4) var(--esp-6);
+  grid-template-rows: 1fr; /* o formulário fica centralizado na altura toda */
+  padding: var(--esp-6) var(--esp-4);
 }
 
 .centro {
