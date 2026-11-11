@@ -52,6 +52,11 @@
   opacity: 0.35;
 }
 
+/* Com um dia em destaque, os outros ficam em segundo plano. */
+.secundaria {
+  opacity: 0.5;
+}
+
 .alvo {
   fill: transparent;
   cursor: pointer;

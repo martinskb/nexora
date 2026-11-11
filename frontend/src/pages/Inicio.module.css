@@ -21,7 +21,7 @@
 
 .conteudo {
   display: grid;
-  gap: var(--esp-6);
+  gap: var(--esp-3);
   transition: opacity 0.15s;
 }
 
@@ -29,11 +29,35 @@
   opacity: 0.5;
 }
 
-/* ---------- Abertura: o número do período, sem moldura ---------- */
-.abertura {
+/* ---------- Cabeçalho: saudação e período lado a lado ---------- */
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3) var(--esp-5);
+}
+
+.periodo {
+  flex: 1 1 260px;
+  max-width: 360px;
+}
+
+/* ---------- Faixa de números ----------
+   Uma só superfície, como o letreiro de preços do caixa: o valor vendido
+   à esquerda e os números de apoio separados por fios verticais. */
+.faixa {
+  display: grid;
+  gap: var(--esp-4);
+  padding: var(--esp-5);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+}
+
+.principal {
   display: grid;
   gap: var(--esp-1);
-  padding-top: var(--esp-2);
 }
 
 .rotulo {
@@ -46,23 +70,41 @@
   line-height: 1;
 }
 
-/* Números de apoio lado a lado, separados por um fio vertical. */
 .apoio {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--esp-3) 0;
-  margin: var(--esp-3) 0 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--esp-4) 0;
+  margin: 0;
 }
 
 .apoio > div {
   display: grid;
+  align-content: start;
   gap: 2px;
-  padding-right: var(--esp-5);
+  padding: 0 var(--esp-4);
+  border-left: 1px solid var(--cor-borda);
 }
 
-.apoio > div + div {
-  padding-left: var(--esp-5);
-  border-left: 1px solid var(--cor-borda);
+.apoio > div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+/* Celular: o aviso de reposição ocupa a linha inteira, embaixo de um fio. */
+.apoio > div:nth-child(3) {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--esp-2);
+  padding: var(--esp-3) 0 0;
+  border-left: 0;
+  border-top: 1px solid var(--cor-borda);
+}
+
+.apoio dd {
+  white-space: nowrap;
 }
 
 .apoio dt {
@@ -79,6 +121,45 @@
   font-variant-numeric: tabular-nums;
 }
 
+.apoio dd a {
+  color: inherit;
+  text-decoration-color: var(--cor-borda);
+  text-underline-offset: 4px;
+}
+
+/* Há produto acabando: o número vira aviso. */
+.atencao dd {
+  color: var(--cor-alerta);
+}
+
+.atencao dd a {
+  text-decoration-color: currentColor;
+}
+
+.faixa .nota {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+@media (min-width: 900px) {
+  .faixa {
+    grid-template-columns: minmax(280px, 1.2fr) 3fr;
+    align-items: end;
+  }
+  .apoio {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .apoio > div,
+  .apoio > div:first-child,
+  .apoio > div:nth-child(3) {
+    grid-column: auto;
+    display: grid;
+    padding: 0 var(--esp-5);
+    border-top: 0;
+    border-left: 1px solid var(--cor-borda);
+  }
+}
+
 .nota {
   margin-top: var(--esp-2);
   color: var(--cor-texto-suave);
@@ -90,23 +171,20 @@
   font-weight: 700;
 }
 
-/* ---------- Seções de detalhe ---------- */
-.grade {
+/* ---------- Linhas de quadros ----------
+   1ª linha: gráfico (2/3) + estoque (1/3). 2ª: mais vendidos + origem. */
+.linha {
   display: grid;
   align-items: start;
   gap: var(--esp-3);
 }
 
 @media (min-width: 900px) {
-  .grade {
-    grid-template-columns: 1fr 1fr;
+  .linha {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   }
-  .largo {
-    grid-column: 1 / -1;
-  }
-  /* Estoque ocupa a coluna da esquerda; origem e mais vendidos empilham à direita. */
-  .colunaInteira {
-    grid-row: span 2;
+  .comGrafico {
+    grid-template-columns: 2fr 1fr;
   }
 }
 

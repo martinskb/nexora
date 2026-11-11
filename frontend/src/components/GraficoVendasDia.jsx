@@ -6,7 +6,7 @@ import estilos from './GraficoVendasDia.module.css'
 
 const ALTURA = 200
 const MARGEM = { topo: 20, direita: 4, baixo: 26, esquerda: 44 }
-const BARRA_MAX = 24
+const BARRA_MAX = 40
 const RAIO = 4
 
 const fmtDiaCurto = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit' })
@@ -24,8 +24,9 @@ function caminhoColuna(x, y, largura, altura) {
  * Colunas de valor vendido por dia (série única: sem legenda, o título nomeia).
  * Passar o mouse ou focar com o teclado mostra o dia, o valor e o nº de vendas.
  * A mesma informação fica disponível em tabela logo abaixo.
+ * destaque: dia ("YYYY-MM-DD") em cor cheia, com os demais mais claros (ex.: hoje).
  */
-export function GraficoVendasDia({ dias }) {
+export function GraficoVendasDia({ dias, destaque = null }) {
   const [ref, largura] = useLargura()
   const [ativo, setAtivo] = useState(null)
 
@@ -80,7 +81,9 @@ export function GraficoVendasDia({ dias }) {
                 <g key={d.dia}>
                   <path
                     d={caminhoColuna(xBarra, yBarra, larguraBarra, MARGEM.topo + alturaPlot - yBarra)}
-                    className={`${estilos.coluna} ${ativo !== null && ativo !== i ? estilos.apagada : ''}`}
+                    className={`${estilos.coluna} ${
+                      ativo !== null ? (ativo !== i ? estilos.apagada : '') : destaque && d.dia !== destaque ? estilos.secundaria : ''
+                    }`}
                   />
                   {/* rótulo direto só no maior dia */}
                   {i === indiceMaior && d.valor > 0 && (
@@ -90,7 +93,7 @@ export function GraficoVendasDia({ dias }) {
                   )}
                   {i % passoRotulo === 0 && (
                     <text x={xBanda + banda / 2} y={ALTURA - 8} className={estilos.eixoX} textAnchor="middle">
-                      {curto ? fmtSemana.format(data).replace('.', '') : fmtDiaCurto.format(data)}
+                      {d.dia === destaque ? 'hoje' : curto ? fmtSemana.format(data).replace('.', '') : fmtDiaCurto.format(data)}
                     </text>
                   )}
                   {/* área de toque: a faixa inteira do dia, maior que a coluna */}

@@ -21,6 +21,24 @@ function diasDoPeriodo(de, ate, fuso) {
   return dias;
 }
 
+/** Valor e nº de vendas concluídas por dia local, incluindo os dias sem venda. */
+async function vendasPorDia(lojaId, de, ate, fuso) {
+  const [rows] = await pool.query(
+    `SELECT DATE_FORMAT(DATE_ADD(v.criado_em, INTERVAL ? MINUTE), '%Y-%m-%d') AS dia,
+            COUNT(*) AS vendas, SUM(v.total) AS valor
+     FROM vendas v
+     WHERE v.loja_id = ? AND v.criado_em >= ? AND v.criado_em < ? AND v.status = 'concluida'
+     GROUP BY dia`,
+    [fuso, lojaId, de, ate],
+  );
+  const mapa = new Map(rows.map((d) => [d.dia, d]));
+  return diasDoPeriodo(de, ate, fuso).map((dia) => ({
+    dia,
+    vendas: Number(mapa.get(dia)?.vendas ?? 0),
+    valor: dinheiro(mapa.get(dia)?.valor ?? 0),
+  }));
+}
+
 /**
  * Resumo de vendas (F5) de um período: totais, origem, vendas por dia,
  * mais vendidos e alertas de estoque. Vendas canceladas não entram nos totais.
@@ -31,7 +49,7 @@ export async function gerar(lojaId, { de: deIso, ate: ateIso, fuso }) {
   const periodo = [lojaId, de, ate];
   const noPeriodo = 'v.loja_id = ? AND v.criado_em >= ? AND v.criado_em < ?';
 
-  const [[totais], [porCanal], [porDia], [maisVendidos], [alertas], [[contagemAlertas]], [[canaisAtivos]]] =
+  const [[totais], [porCanal], porDia, ultimos7Dias, [maisVendidos], [alertas], [[contagemAlertas]], [[canaisAtivos]]] =
     await Promise.all([
     pool.query(
       `SELECT
@@ -50,13 +68,9 @@ export async function gerar(lojaId, { de: deIso, ate: ateIso, fuso }) {
        ORDER BY valor DESC, c.nome`,
       periodo,
     ),
-    pool.query(
-      `SELECT DATE_FORMAT(DATE_ADD(v.criado_em, INTERVAL ? MINUTE), '%Y-%m-%d') AS dia,
-              COUNT(*) AS vendas, SUM(v.total) AS valor
-       FROM vendas v WHERE ${noPeriodo} AND v.status = 'concluida'
-       GROUP BY dia`,
-      [fuso, ...periodo],
-    ),
+    vendasPorDia(lojaId, de, ate, fuso),
+    // O gráfico do Início mostra sempre a última semana, qualquer que seja o período.
+    vendasPorDia(lojaId, new Date(ate.getTime() - 7 * UM_DIA), ate, fuso),
     pool.query(
       `SELECT i.produto_id, p.nome, SUM(i.quantidade) AS quantidade, SUM(i.subtotal) AS valor
        FROM itens_venda i
@@ -90,7 +104,6 @@ export async function gerar(lojaId, { de: deIso, ate: ateIso, fuso }) {
   const vendas = Number(t.vendas ?? 0);
   const valor = dinheiro(t.valor);
 
-  const porDiaMapa = new Map(porDia.map((d) => [d.dia, d]));
 
   return {
     totais: {
@@ -109,11 +122,8 @@ export async function gerar(lojaId, { de: deIso, ate: ateIso, fuso }) {
     })),
     // A loja usa canais? (decide se a tela mostra a origem)
     temCanais: Boolean(canaisAtivos.tem),
-    porDia: diasDoPeriodo(de, ate, fuso).map((dia) => ({
-      dia,
-      vendas: Number(porDiaMapa.get(dia)?.vendas ?? 0),
-      valor: dinheiro(porDiaMapa.get(dia)?.valor ?? 0),
-    })),
+    porDia,
+    ultimos7Dias,
     maisVendidos: maisVendidos.map((m) => ({
       produtoId: m.produto_id,
       nome: m.nome,

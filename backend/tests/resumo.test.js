@@ -84,6 +84,17 @@ describe('Resumo de vendas (F5)', () => {
     ]);
   });
 
+  it('traz sempre os últimos 7 dias (terminando no fim do período) para o gráfico, mesmo num período de 1 dia', async () => {
+    const { agente } = await cenario(); // 2 vendas concluídas em 01/11 (Belém), R$ 39
+    const umDia = 'de=2026-11-04T03:00:00.000Z&ate=2026-11-05T03:00:00.000Z&fuso=-180'; // só 04/11
+    const { body } = await agente.get(`/api/resumo?${umDia}`);
+    expect(body.porDia).toHaveLength(1);
+    expect(body.ultimos7Dias.map((d) => d.dia)).toEqual([
+      '2026-10-29', '2026-10-30', '2026-10-31', '2026-11-01', '2026-11-02', '2026-11-03', '2026-11-04',
+    ]);
+    expect(body.ultimos7Dias[3]).toEqual({ dia: '2026-11-01', vendas: 2, valor: 39 });
+  });
+
   it('lista os mais vendidos por quantidade, sem contar canceladas', async () => {
     const { agente } = await cenario();
     const { body } = await agente.get(`/api/resumo?${PERIODO}`);

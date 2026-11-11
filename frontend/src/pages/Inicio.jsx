@@ -60,6 +60,10 @@ export default function Inicio() {
   const alertas = dados?.alertasEstoque
   // Origem só aparece se a loja usa canais e houve venda no período.
   const mostrarOrigem = Boolean(dados?.temCanais) && t?.vendas > 0
+  const reposicao = (alertas?.zerados ?? 0) + (alertas?.acabando ?? 0)
+  // Em "Hoje" o gráfico mostra a última semana, com hoje em destaque.
+  const diasGrafico = (periodo === 'hoje' ? dados?.ultimos7Dias : dados?.porDia) ?? []
+  const mostrarGrafico = diasGrafico.some((d) => d.valor > 0)
   const origens = (dados?.porCanal ?? []).map((c) => ({
     ...c,
     nome: nomeDoCanal(c.canalId == null ? null : { nome: c.nome }),
@@ -68,9 +72,12 @@ export default function Inicio() {
 
   return (
     <div className={estilos.pagina}>
-      <h1 className={estilos.titulo}>Olá, {loja.nome}!</h1>
-
-      <Segmentado rotulo="Período" tamanho="compacto" opcoes={PERIODOS} valor={periodo} aoMudar={mudarPeriodo} />
+      <header className={estilos.topo}>
+        <h1 className={estilos.titulo}>Olá, {loja.nome}!</h1>
+        <div className={estilos.periodo}>
+          <Segmentado rotulo="Período" tamanho="compacto" opcoes={PERIODOS} valor={periodo} aoMudar={mudarPeriodo} />
+        </div>
+      </header>
 
       {estado.erro && (
         <div className={estilos.erro}>
@@ -86,12 +93,14 @@ export default function Inicio() {
       {dados && (
         // Ao trocar o período, o painel anterior fica esmaecido até chegar o novo (sem "pulo").
         <div className={`${estilos.conteudo} ${estado.carregando ? estilos.atualizando : ''}`} aria-busy={estado.carregando}>
-          {/* Abertura: o número que importa, sem moldura; os de apoio em linha logo abaixo. */}
-          <section className={estilos.abertura} aria-label="Resumo do período">
-            <p className={estilos.rotulo}>Vendido {NOME_PERIODO[periodo]}</p>
-            <p className={estilos.heroi}>
-              <Preco valor={t.valor} tamanho="xl" />
-            </p>
+          {/* Faixa de números: o valor vendido em destaque; os de apoio ao lado, separados por fios. */}
+          <section className={estilos.faixa} aria-label="Resumo do período">
+            <div className={estilos.principal}>
+              <p className={estilos.rotulo}>Vendido {NOME_PERIODO[periodo]}</p>
+              <p className={estilos.heroi}>
+                <Preco valor={t.valor} tamanho="xl" />
+              </p>
+            </div>
             <dl className={estilos.apoio}>
               <div>
                 <dt>Vendas</dt>
@@ -100,6 +109,12 @@ export default function Inicio() {
               <div>
                 <dt>Valor médio por venda</dt>
                 <dd>{formatarMoeda(t.ticketMedio)}</dd>
+              </div>
+              <div className={reposicao > 0 ? estilos.atencao : ''}>
+                <dt>Precisam de reposição</dt>
+                <dd>
+                  <Link to="/estoque">{plural(reposicao, 'produto', 'produtos')}</Link>
+                </dd>
               </div>
             </dl>
             {t.canceladas > 0 && (
@@ -115,11 +130,17 @@ export default function Inicio() {
             )}
           </section>
 
-          <div className={estilos.grade}>
-            <section
-              className={`${estilos.cartao} ${mostrarOrigem && dados.maisVendidos.length > 0 ? estilos.colunaInteira : ''}`}
-              aria-labelledby="t-alertas"
-            >
+          <div className={`${estilos.linha} ${mostrarGrafico ? estilos.comGrafico : ''}`}>
+            {mostrarGrafico && (
+              <section className={estilos.cartao} aria-labelledby="t-grafico">
+                <h2 id="t-grafico" className={estilos.tituloCartao}>
+                  Vendas por dia <small>{periodo === 'hoje' ? '(R$, últimos 7 dias)' : '(R$)'}</small>
+                </h2>
+                <GraficoVendasDia dias={diasGrafico} destaque={periodo === 'hoje' ? diasGrafico.at(-1).dia : null} />
+              </section>
+            )}
+
+            <section className={estilos.cartao} aria-labelledby="t-alertas">
               <h2 id="t-alertas" className={estilos.tituloCartao}>
                 Estoque
               </h2>
@@ -152,6 +173,33 @@ export default function Inicio() {
                 </>
               )}
             </section>
+          </div>
+
+          {(dados.maisVendidos.length > 0 || mostrarOrigem) && (
+          <div className={estilos.linha}>
+            {dados.maisVendidos.length > 0 && (
+              <section className={estilos.cartao} aria-labelledby="t-mais">
+                <h2 id="t-mais" className={estilos.tituloCartao}>
+                  Mais vendidos
+                </h2>
+                <ol className={estilos.ranking}>
+                  {dados.maisVendidos.map((p) => (
+                    <li key={p.produtoId}>
+                      <div className={estilos.linhaRanking}>
+                        <span className={estilos.nomeRanking}>{p.nome}</span>
+                        <span className={estilos.qtdRanking}>
+                          <strong>{p.quantidade} un.</strong>
+                          <span>{formatarMoeda(p.valor)}</span>
+                        </span>
+                      </div>
+                      <div className={estilos.medidor} aria-hidden="true">
+                        <span style={{ width: `${(p.quantidade / dados.maisVendidos[0].quantidade) * 100}%` }} />
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            )}
 
             {mostrarOrigem && (
               <section className={estilos.cartao} aria-labelledby="t-origem">
@@ -187,40 +235,8 @@ export default function Inicio() {
                 </ul>
               </section>
             )}
-
-            {dados.maisVendidos.length > 0 && (
-              <section className={estilos.cartao} aria-labelledby="t-mais">
-                <h2 id="t-mais" className={estilos.tituloCartao}>
-                  Mais vendidos
-                </h2>
-                <ol className={estilos.ranking}>
-                  {dados.maisVendidos.map((p) => (
-                    <li key={p.produtoId}>
-                      <div className={estilos.linhaRanking}>
-                        <span className={estilos.nomeRanking}>{p.nome}</span>
-                        <span className={estilos.qtdRanking}>
-                          <strong>{p.quantidade} un.</strong>
-                          <span>{formatarMoeda(p.valor)}</span>
-                        </span>
-                      </div>
-                      <div className={estilos.medidor} aria-hidden="true">
-                        <span style={{ width: `${(p.quantidade / dados.maisVendidos[0].quantidade) * 100}%` }} />
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              </section>
-            )}
-
-            {periodo !== 'hoje' && t.vendas > 0 && (
-              <section className={`${estilos.cartao} ${estilos.largo}`} aria-labelledby="t-grafico">
-                <h2 id="t-grafico" className={estilos.tituloCartao}>
-                  Vendas por dia <small>(R$)</small>
-                </h2>
-                <GraficoVendasDia dias={dados.porDia} />
-              </section>
-            )}
           </div>
+          )}
         </div>
       )}
     </div>
