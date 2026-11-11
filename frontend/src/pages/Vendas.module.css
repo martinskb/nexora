@@ -13,11 +13,13 @@
 }
 
 @media (min-width: 768px) {
-  /* 2 ou 3 filtros lado a lado (a origem só aparece se a loja usa canais). */
+  /* 2 ou 3 filtros lado a lado (a origem só aparece se a loja usa canais),
+     cada um com a largura das próprias opções. */
   .filtros {
     grid-auto-flow: column;
-    grid-auto-columns: minmax(0, 1fr);
-    gap: var(--esp-3);
+    grid-auto-columns: minmax(0, max-content);
+    justify-content: start;
+    gap: var(--esp-3) var(--esp-5);
   }
 }
 
@@ -49,36 +51,50 @@
   font-weight: 700;
 }
 
-.lista {
+/* Vendas do dia em cupons: 1 coluna no celular, 2–3 na tela larga. */
+.cupons {
   list-style: none;
   margin: 0;
   padding: 0;
-  background: var(--cor-superficie);
-  border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-lg);
-  overflow: hidden;
-}
-
-.lista li + li {
-  border-top: 1px solid var(--cor-borda);
-}
-
-.item {
-  width: 100%;
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
-  align-items: center;
+  grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr));
   gap: var(--esp-3);
-  min-height: 64px;
+}
+
+/*
+ * Cupom: hora e total no topo; o picote tracejado separa o que foi vendido,
+ * como no cupom que sai do caixa.
+ */
+.cupom {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--esp-2);
   padding: var(--esp-3) var(--esp-4);
-  border: 0;
-  background: transparent;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  background: var(--cor-superficie);
   text-align: left;
   cursor: pointer;
 }
 
-.item:hover {
-  background: var(--cor-fundo);
+.cupom:hover {
+  border-color: var(--cor-primaria);
+}
+
+.cupom:focus-visible {
+  outline: 3px solid var(--cor-primaria);
+  outline-offset: 2px;
+}
+
+.topoCupom {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  padding-bottom: var(--esp-2);
+  border-bottom: 2px dashed var(--cor-borda);
 }
 
 .hora {
@@ -88,23 +104,39 @@
   color: var(--cor-texto-suave);
 }
 
-.resumo {
-  display: grid;
-  min-width: 0;
+.valor {
+  font-family: var(--fonte-num);
+  font-stretch: 85%;
+  font-weight: 800;
+  font-size: var(--texto-lg);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
+.cancelada .valor {
+  text-decoration: line-through;
+  color: var(--cor-texto-suave);
+}
+
+/* Até duas linhas com os produtos; o detalhe completo abre no clique. */
 .produtos {
   font-weight: 600;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.cancelada .produtos {
+  color: var(--cor-texto-suave);
 }
 
 .meta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0 var(--esp-3);
+  gap: var(--esp-1) var(--esp-3);
   color: var(--cor-texto-suave);
   font-size: var(--texto-xs);
 }
@@ -119,20 +151,4 @@
   background: var(--cor-erro-suave);
   color: var(--cor-erro);
   font-weight: 700;
-}
-
-.valor {
-  font-weight: 700;
-  font-family: var(--fonte-num);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.cancelada .valor {
-  text-decoration: line-through;
-  color: var(--cor-texto-suave);
-}
-
-.seta {
-  color: var(--cor-texto-suave);
 }

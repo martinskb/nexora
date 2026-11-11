@@ -3,7 +3,7 @@ import { vendasApi } from '../api/vendas.js'
 import { Alerta } from '../components/Alerta.jsx'
 import { Botao } from '../components/Botao.jsx'
 import { DetalheVenda } from '../components/DetalheVenda.jsx'
-import { IconeRecibo, IconeSeta } from '../components/Icones.jsx'
+import { IconeRecibo } from '../components/Icones.jsx'
 import { Modal } from '../components/Modal.jsx'
 import { EscolhaCanal } from '../components/EscolhaCanal.jsx'
 import { Segmentado } from '../components/Segmentado.jsx'
@@ -168,26 +168,27 @@ export default function Vendas() {
         grupos.map(([dia, vendas]) => (
           <div key={dia} className={estilos.grupo}>
             <h2 className={estilos.dia}>{dia}</h2>
-            <ul className={estilos.lista}>
+            <ul className={estilos.cupons}>
               {vendas.map((v) => (
                 <li key={v.id}>
                   <button
                     type="button"
-                    className={`${estilos.item} ${v.status === 'cancelada' ? estilos.cancelada : ''}`}
+                    className={`${estilos.cupom} ${v.status === 'cancelada' ? estilos.cancelada : ''}`}
                     onClick={() => abrirDetalhe(v.id)}
-                    aria-label={`Ver venda das ${formatarHora(v.criadoEm)} de ${formatarMoeda(v.total)}`}
+                    aria-label={`Ver venda das ${formatarHora(v.criadoEm)} de ${formatarMoeda(v.total)}${
+                      v.status === 'cancelada' ? ', cancelada' : ''
+                    }`}
                   >
-                    <span className={estilos.hora}>{formatarHora(v.criadoEm)}</span>
-                    <span className={estilos.resumo}>
-                      <span className={estilos.produtos}>{v.resumo}</span>
-                      <span className={estilos.meta}>
-                        <span>{v.quantidadeItens === 1 ? '1 item' : `${v.quantidadeItens} itens`}</span>
-                        {v.canal && <span className={estilos.canal}>{v.canal.nome}</span>}
-                        {v.status === 'cancelada' && <span className={estilos.seloCancelada}>Cancelada</span>}
-                      </span>
+                    <span className={estilos.topoCupom}>
+                      <span className={estilos.hora}>{formatarHora(v.criadoEm)}</span>
+                      <span className={estilos.valor}>{formatarMoeda(v.total)}</span>
                     </span>
-                    <span className={estilos.valor}>{formatarMoeda(v.total)}</span>
-                    <IconeSeta className={estilos.seta} />
+                    <span className={estilos.produtos}>{v.resumo}</span>
+                    <span className={estilos.meta}>
+                      <span>{v.quantidadeItens === 1 ? '1 item' : `${v.quantidadeItens} itens`}</span>
+                      {v.canal && <span className={estilos.canal}>{v.canal.nome}</span>}
+                      {v.status === 'cancelada' && <span className={estilos.seloCancelada}>Cancelada</span>}
+                    </span>
                   </button>
                 </li>
               ))}
