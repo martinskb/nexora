@@ -126,6 +126,27 @@ Para alterar o banco, crie um arquivo numerado em `backend/database/migracoes/`
 (ex.: `00N_descricao.sql`) e rode `npm run db:setup`. Cada migração é aplicada uma única vez
 (o controle fica na tabela `migracoes`).
 
+## Loja de demonstração
+
+Para apresentar o sistema com dados de um mês de uso (produtos, vendas, reposições e avisos de estoque):
+
+```bash
+cd backend
+npm run seed:demo                 # cria o "Mercadinho da Esquina" no banco do .env
+npm run seed:demo -- --recriar    # apaga e cria de novo (vendas até hoje)
+```
+
+O e-mail e a senha aparecem no fim. Para outro banco, aponte o arquivo de configuração:
+`DOTENV_CONFIG_PATH=.env.producao npm run seed:demo`.
+
+## Versão de teste publicada
+
+| Parte | Onde |
+|---|---|
+| Frontend | Vercel (`frontend/vercel.json` repassa `/api` ao backend, mantendo o login por cookie) |
+| Backend | Render, plano gratuito (dorme sem uso; o primeiro acesso leva ~50 s) |
+| Banco | MySQL no Aiven, com SSL (`DB_SSL_CA`) |
+
 ## Equipe
 
 | Integrante | Papel |
