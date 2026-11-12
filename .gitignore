@@ -26,3 +26,7 @@ backups/
 
 # Esboços temporários de brainstorming
 .superpowers/
+
+# Fora do repositório (ficam só no computador)
+docs/superpowers/
+frontend/README.md
