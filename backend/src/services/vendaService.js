@@ -229,6 +229,24 @@ export async function listar(lojaId, { de, ate, canalId, status, forma, limite, 
   return { vendas, temMais };
 }
 
+/** Quanto saiu de cada produto no período (vendas concluídas), do mais vendido para o menos. */
+export async function produtosVendidos(lojaId, { de, ate }) {
+  const [rows] = await pool.query(
+    `SELECT i.produto_id, p.nome, SUM(i.quantidade) AS quantidade, SUM(i.subtotal) AS valor
+       FROM itens_venda i JOIN vendas v ON v.id = i.venda_id JOIN produtos p ON p.id = i.produto_id
+      WHERE v.loja_id = ? AND v.status = 'concluida' AND v.criado_em >= ? AND v.criado_em < ?
+      GROUP BY i.produto_id, p.nome
+      ORDER BY quantidade DESC, p.nome`,
+    [lojaId, new Date(de), new Date(ate)],
+  );
+  return rows.map((r) => ({
+    produtoId: r.produto_id,
+    nome: r.nome,
+    quantidade: Number(r.quantidade),
+    valor: Math.round(Number(r.valor) * 100) / 100,
+  }));
+}
+
 /** Cancela a venda e devolve as quantidades ao estoque (tudo ou nada). */
 export async function cancelar(lojaId, id, { motivo }) {
   await withTransaction(async (conn) => {
