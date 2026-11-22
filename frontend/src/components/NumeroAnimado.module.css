@@ -1,0 +1,13 @@
+.simbolo {
+  font-size: 0.55em;
+  font-weight: 500;
+  margin-right: 0.15em;
+  vertical-align: 0.5em;
+  letter-spacing: 0;
+}
+
+.centavos {
+  font-size: 0.55em;
+  vertical-align: 0.7em;
+  margin-left: 0.02em;
+}

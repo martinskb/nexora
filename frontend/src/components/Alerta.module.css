@@ -3,8 +3,8 @@
   align-items: flex-start;
   gap: var(--esp-2);
   padding: var(--esp-3);
-  border-radius: var(--raio-md);
-  font-size: var(--texto-sm);
+  border-radius: 10px;
+  font-size: var(--t-15);
   border: 1px solid transparent;
 }
 
