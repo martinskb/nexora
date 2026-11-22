@@ -159,3 +159,15 @@ describe('Entrada com custo (fechamento do dia)', () => {
     expect(res.body.produto.custo).toBe(4.5);
   });
 });
+
+describe('Teto do custo igual ao do cadastro', () => {
+  it('entrada cujo custo por unidade passaria do teto do produto é recusada', async () => {
+    const { agente } = await criarLojaLogada();
+    const { body } = await agente.post('/api/produtos').send({ nome: 'Caro', preco: 7, quantidade: 0 });
+    const res = await agente
+      .post(`/api/produtos/${body.produto.id}/ajustes`)
+      .send({ modo: 'entrada', quantidade: 1, custoTotal: 50_000_000 });
+    expect(res.status).toBe(400);
+    expect(res.body.detalhes.custo).toBe('Custo muito alto.');
+  });
+});

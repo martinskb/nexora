@@ -95,7 +95,7 @@ export default function Vendas() {
   const [filtro, setFiltro] = useEstadoDaAba('vendas.filtro', FILTRO_VENDAS_PADRAO)
   const [visao, setVisao] = useEstadoDaAba('vendas.visao', 'vendas')
   const intervalo = filtrosDeVendas(filtro)
-  const produtosVendidos = useProdutosVendidos({ de: intervalo.de, ate: intervalo.ate })
+  const produtosVendidos = useProdutosVendidos({ de: intervalo.de, ate: intervalo.ate }, { ativo: visao === 'produtos' })
   const consulta = useVendas(filtrosDeVendas(filtro))
   const { vendas, isPending: carregando, isPlaceholderData: trocandoFiltro, error, hasNextPage, fetchNextPage, isFetchingNextPage } =
     consulta

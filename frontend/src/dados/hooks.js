@@ -96,18 +96,21 @@ export function useHistoricoProduto(produtoId) {
   return { ...q, itens }
 }
 
-/** Relatório do dia local "AAAA-MM-DD". */
-export const useRelatorio = (dia) =>
-  useQuery({
-    queryKey: chaves.relatorio(dia),
-    queryFn: ({ signal }) => relatorioApi.obter(dia, signal),
-    staleTime: VALIDADE_MS.relatorio,
-    placeholderData: keepPreviousData,
-  })
+/**
+ * Relatório do dia local "AAAA-MM-DD". Sem reaproveitar os dados de outro dia
+ * enquanto carrega: o rótulo "Ontem" nunca aparece com os números de hoje.
+ */
+export const opcoesRelatorio = (dia) => ({
+  queryKey: chaves.relatorio(dia),
+  queryFn: ({ signal }) => relatorioApi.obter(dia, signal),
+  staleTime: VALIDADE_MS.relatorio,
+})
+export const useRelatorio = (dia) => useQuery(opcoesRelatorio(dia))
 
 /** Produtos vendidos no período { de, ate }: `data` é a lista. */
-export const useProdutosVendidos = (filtros) =>
+export const useProdutosVendidos = (filtros, { ativo = true } = {}) =>
   useQuery({
+    enabled: ativo,
     queryKey: chaves.vendasProdutos(filtros),
     queryFn: ({ signal }) => vendasApi.produtos(filtros, signal),
     select: (d) => d.produtos,

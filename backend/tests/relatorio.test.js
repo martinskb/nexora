@@ -107,3 +107,14 @@ describe('Produtos vendidos no período', () => {
     ]);
   });
 });
+
+describe('Produtos vendidos sem período (Tudo)', () => {
+  it('sem de/ate traz tudo o que foi vendido', async () => {
+    const { agente } = await criarLojaLogada();
+    const a = await produto(agente, { nome: 'Arroz', preco: 10 });
+    await vender(agente, [{ produtoId: a.id, quantidade: 2 }]);
+    const res = await agente.get('/api/vendas/produtos');
+    expect(res.status).toBe(200);
+    expect(res.body.produtos).toEqual([{ produtoId: a.id, nome: 'Arroz', quantidade: 2, valor: 20 }]);
+  });
+});

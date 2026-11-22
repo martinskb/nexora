@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Alerta } from '../components/Alerta.jsx'
 import { Botao } from '../components/Botao.jsx'
@@ -10,11 +9,13 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
 import { useRelatorio } from '../dados/hooks.js'
 import { useEstadoDaAba } from '../hooks/useEstadoDaAba.js'
+import { useHoje } from '../hooks/useHoje.js'
 import { useMediaQuery } from '../hooks/useMediaQuery.js'
 import { useSkeleton } from '../hooks/useSkeleton.js'
 import { useTitulo } from '../hooks/useTitulo.js'
 import { compartilharTexto, textoRelatorio } from '../utils/compartilhar.js'
 import { formatarMoeda } from '../utils/formato.js'
+import { textoSemCusto } from '../utils/relatorio.js'
 import estilos from './Relatorio.module.css'
 
 const FORMAS = [
@@ -47,7 +48,7 @@ export default function Relatorio() {
   const navigate = useNavigate()
   const location = useLocation()
   const telaGrande = useMediaQuery('(min-width: 960px)')
-  const [base] = useState(() => new Date())
+  const base = useHoje()
   const [deslocamento, setDeslocamento] = useEstadoDaAba('relatorio.dia', 0)
   const dia = diaLocal(deslocamento, base)
   const { data: r, isPending, error, refetch } = useRelatorio(dia)
@@ -157,16 +158,12 @@ export default function Relatorio() {
             )}
             {r.lucro.parcial && r.lucro.receitaComCusto === 0 && (
               <p className={estilos.parcial}>
-                <LinkApp to="/estoque">Completar custos</LinkApp>
+                {textoSemCusto(r.lucro.produtosSemCusto)} <LinkApp to="/estoque">Cadastrar custos</LinkApp>
               </p>
             )}
             {r.lucro.parcial && r.lucro.receitaComCusto > 0 && (
               <p className={estilos.parcial}>
-                Parcial:{' '}
-                {r.lucro.produtosSemCusto.length === 1
-                  ? '1 produto vendido sem custo'
-                  : `${r.lucro.produtosSemCusto.length} produtos vendidos sem custo`}
-                . <LinkApp to="/estoque">Completar custos</LinkApp>
+                Parcial. {textoSemCusto(r.lucro.produtosSemCusto)} <LinkApp to="/estoque">Cadastrar custos</LinkApp>
               </p>
             )}
           </section>

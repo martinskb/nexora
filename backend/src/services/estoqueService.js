@@ -4,6 +4,7 @@ import { custoMedio, custoPorUnidade } from '../utils/custo.js';
 import { buscar as buscarProduto } from './produtoService.js';
 
 const LIMITE_ESTOQUE = 1_000_000;
+const CUSTO_MAXIMO = 9_999_999.99; // igual ao do cadastro (produtoSchemas)
 
 /**
  * Ajuste de estoque (F4), registrado no histórico com o motivo.
@@ -38,6 +39,10 @@ export async function ajustar(lojaId, produtoId, { modo, quantidade, motivo, cus
     }
 
     const custoEntrada = modo === 'entrada' ? custoPorUnidade({ custoUnitario, custoTotal, quantidade }) : null;
+    // Mesmo teto do cadastro do produto: senão a próxima edição do produto seria recusada.
+    if (custoEntrada !== null && custoEntrada > CUSTO_MAXIMO) {
+      throw new AppError('Custo muito alto.', 400, { custo: 'Custo muito alto.' });
+    }
     const custoAtual = rows[0].custo === null ? null : Number(rows[0].custo);
     const novoCusto =
       custoEntrada === null ? custoAtual : custoMedio({ saldoAntes: atual, custoAtual, quantidade, custoEntrada });

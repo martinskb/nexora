@@ -13,7 +13,8 @@ function recusar(mensagem) {
  * - 2 formas: formas diferentes, cada valor > 0 e a soma exatamente o total.
  */
 export function normalizarPagamentos(pagamentos, totalCentavos) {
-  if (!pagamentos || pagamentos.length === 0) return [];
+  // Venda de R$ 0,00 não tem o que pagar: não grava forma (e não trava a venda).
+  if (!pagamentos || pagamentos.length === 0 || totalCentavos === 0) return [];
   if (pagamentos.length > 2) recusar('Use no máximo duas formas de pagamento.');
   if (new Set(pagamentos.map((p) => p.forma)).size !== pagamentos.length) {
     recusar('As duas formas de pagamento precisam ser diferentes.');

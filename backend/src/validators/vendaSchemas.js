@@ -56,7 +56,7 @@ export const cancelarVendaSchema = z.object({
 const dataIso = z.iso.datetime({ offset: true, error: 'Data inválida.' });
 
 /** Produtos vendidos no período (concluídas). */
-export const filtroProdutosVendidosSchema = z.object({ de: dataIso, ate: dataIso });
+export const filtroProdutosVendidosSchema = z.object({ de: dataIso.optional(), ate: dataIso.optional() });
 
 export const filtroVendasSchema = z.object({
   de: dataIso.optional(),

@@ -1,3 +1,4 @@
+import { parametros } from '../utils/url.js'
 import { api } from './client.js'
 
 export const vendasApi = {
@@ -12,6 +13,6 @@ export const vendasApi = {
   },
   buscar: (id) => api(`/vendas/${id}`),
   /** Quanto saiu de cada produto no período { de, ate }. */
-  produtos: ({ de, ate }, signal) => api(`/vendas/produtos?${new URLSearchParams({ de, ate })}`, { signal }),
+  produtos: ({ de, ate }, signal) => api(`/vendas/produtos?${parametros({ de, ate })}`, { signal }),
   cancelar: (id, motivo) => api(`/vendas/${id}/cancelar`, { method: 'POST', body: { motivo } }),
 }

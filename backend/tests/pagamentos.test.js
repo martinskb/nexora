@@ -72,3 +72,9 @@ describe('normalizarPagamentos', () => {
     ).toThrow();
   });
 });
+
+describe('venda de R$ 0,00', () => {
+  it('forma escolhida numa venda zerada não grava pagamento (não trava a venda)', () => {
+    expect(normalizarPagamentos([{ forma: 'pix' }], 0)).toEqual([]);
+  });
+});

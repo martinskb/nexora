@@ -230,14 +230,25 @@ export async function listar(lojaId, { de, ate, canalId, status, forma, limite, 
 }
 
 /** Quanto saiu de cada produto no período (vendas concluídas), do mais vendido para o menos. */
-export async function produtosVendidos(lojaId, { de, ate }) {
+export async function produtosVendidos(lojaId, { de, ate } = {}) {
+  // Sem de/ate (período "Tudo"): todas as vendas concluídas.
+  const condicoes = ["v.loja_id = ?", "v.status = 'concluida'"];
+  const params = [lojaId];
+  if (de) {
+    condicoes.push('v.criado_em >= ?');
+    params.push(new Date(de));
+  }
+  if (ate) {
+    condicoes.push('v.criado_em < ?');
+    params.push(new Date(ate));
+  }
   const [rows] = await pool.query(
     `SELECT i.produto_id, p.nome, SUM(i.quantidade) AS quantidade, SUM(i.subtotal) AS valor
        FROM itens_venda i JOIN vendas v ON v.id = i.venda_id JOIN produtos p ON p.id = i.produto_id
-      WHERE v.loja_id = ? AND v.status = 'concluida' AND v.criado_em >= ? AND v.criado_em < ?
+      WHERE ${condicoes.join(' AND ')}
       GROUP BY i.produto_id, p.nome
       ORDER BY quantidade DESC, p.nome`,
-    [lojaId, new Date(de), new Date(ate)],
+    params,
   );
   return rows.map((r) => ({
     produtoId: r.produto_id,
