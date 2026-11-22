@@ -1,0 +1,31 @@
+.convite {
+  display: grid;
+  gap: var(--esp-4);
+  color: var(--cor-texto-suave);
+}
+
+.icone {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(160deg, #1c3172, #14245c 60%, #0e1a45);
+}
+
+.passos {
+  display: grid;
+  gap: var(--esp-2);
+  margin: 0;
+  padding-left: var(--esp-5);
+  color: var(--cor-texto);
+}
+
+.nota {
+  font-size: var(--t-15);
+}
+
+.acoes {
+  display: grid;
+  gap: var(--esp-2);
+}

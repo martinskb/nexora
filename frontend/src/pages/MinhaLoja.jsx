@@ -11,6 +11,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { IconeSair, IconeVoltar } from '../components/Icones.jsx'
 import { Skeleton } from '../components/Skeleton.jsx'
 import { useMediaQuery } from '../hooks/useMediaQuery.js'
+import { useInstalarApp } from '../hooks/useInstalarApp.js'
+import { ConviteInstalar } from '../components/ConviteInstalar.jsx'
 import estilos from './MinhaLoja.module.css'
 import { useTitulo } from '../hooks/useTitulo.js'
 
@@ -127,6 +129,8 @@ export default function MinhaLoja() {
   const invalidar = useInvalidar()
   const aoMudarCanal = () => invalidar('canal')
   const [saindo, setSaindo] = useState(false)
+  const app = useInstalarApp()
+  const [convite, setConvite] = useState(false)
 
   // Voltar: para a aba de onde a pessoa veio (Minha loja empilha no histórico).
   const voltar = () => (location.state?.origem ? navigate(-1) : navigate('/', { replace: true }))
@@ -258,6 +262,21 @@ export default function MinhaLoja() {
           </details>
         )}
       </section>
+
+      {!app.instalado && (
+        <section className={estilos.secao} aria-labelledby="t-instalar">
+          <div>
+            <h2 id="t-instalar" className={estilos.subtitulo}>
+              Instalar o app
+            </h2>
+            <p className={estilos.info}>Coloque o Nexora na tela inicial: ele abre direto, como um aplicativo.</p>
+          </div>
+          <Botao variante="secundario" className={estilos.sair} onClick={() => setConvite(true)}>
+            Instalar o Nexora
+          </Botao>
+          <ConviteInstalar aberto={convite} aoFechar={() => setConvite(false)} />
+        </section>
+      )}
 
       <section className={estilos.secao} aria-labelledby="t-conta">
         <h2 id="t-conta" className={estilos.subtitulo}>

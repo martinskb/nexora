@@ -4,7 +4,13 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { FILTRO_VENDAS_PADRAO, filtrosDeVendas, useAntecipar } from '../dados/hooks.js'
 import { useNavegarApp } from '../hooks/useNavegarApp.js'
 import { ehAba } from '../utils/navegacao.js'
+import { useRegisterSW } from 'virtual:pwa-register/react'
+import { useEstadoDaAba } from '../hooks/useEstadoDaAba.js'
+import { useInstalarApp } from '../hooks/useInstalarApp.js'
+import { useMediaQuery } from '../hooks/useMediaQuery.js'
+import { deveConvidar } from '../utils/instalacao.js'
 import { BuscaRapida } from './BuscaRapida.jsx'
+import { ConviteInstalar } from './ConviteInstalar.jsx'
 import { IconeCaixa, IconeEstoque, IconeInicio, IconeLoja, IconeMais, IconeRecibo } from './Icones.jsx'
 import { Marca } from './Marca.jsx'
 import estilos from './LayoutApp.module.css'
@@ -50,6 +56,29 @@ export function LayoutApp() {
   const antecipar = useAntecipar()
   const [buscaAberta, setBuscaAberta] = useState(false)
   const modoVender = location.pathname === '/vender'
+
+  // Convite para instalar: no celular, uma vez por sessão, se não foi instalado nem dispensado.
+  const ehCelular = !useMediaQuery('(min-width: 960px)')
+  const app = useInstalarApp()
+  const [jaConvidou, setJaConvidou] = useEstadoDaAba('instalar.convidou', false)
+  const [convite, setConvite] = useState(false)
+  const convidar =
+    app.plataforma !== 'indisponivel' &&
+    deveConvidar({ ehCelular, instalado: app.instalado, dispensado: app.dispensado, jaConvidou, logado: Boolean(loja) })
+  useEffect(() => {
+    if (!convidar) return undefined
+    const t = setTimeout(() => {
+      setJaConvidou(true)
+      setConvite(true)
+    }, 2500)
+    return () => clearTimeout(t)
+  }, [convidar, setJaConvidou])
+
+  // Nova versão publicada: avisa e atualiza quando a pessoa quiser.
+  const {
+    needRefresh: [novaVersao],
+    updateServiceWorker,
+  } = useRegisterSW()
 
   // Tocar na aba que já está aberta rola para o topo.
   const aoIr = useCallback(
@@ -152,6 +181,15 @@ export function LayoutApp() {
       )}
 
       <BuscaRapida aberta={buscaAberta} aoFechar={() => setBuscaAberta(false)} />
+      <ConviteInstalar aberto={convite} aoFechar={() => setConvite(false)} aoDispensar={app.dispensar} />
+      {novaVersao && (
+        <div className={estilos.novaVersao} role="status">
+          <span>Nova versão disponível.</span>
+          <button type="button" onClick={() => updateServiceWorker(true)}>
+            Atualizar
+          </button>
+        </div>
+      )}
     </div>
   )
 }
