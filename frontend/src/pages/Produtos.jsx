@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Alerta } from '../components/Alerta.jsx'
 import { Botao } from '../components/Botao.jsx'
@@ -41,16 +41,16 @@ export default function Produtos() {
   const mostrarSkeleton = useSkeleton(produtos.length > 0, carregando)
   const [busca, setBusca] = useEstadoDaAba('produtos.busca', '')
   // null = fechado; { produto: null } = novo; { produto } = edição
-  const [janela, setJanela] = useState(null)
+  const [janelaAberta, setJanelaAberta] = useState(null)
 
-  // Vindo da busca rápida (Ctrl K): abre direto a edição do produto escolhido.
+  // Vindo da busca rápida (Ctrl K): a edição do produto escolhido já abre aberta.
   const idEditar = location.state?.editar
-  useEffect(() => {
-    if (!idEditar || produtos.length === 0) return
-    const produto = produtos.find((p) => p.id === idEditar)
-    navigate(location.pathname, { replace: true, state: { ...location.state, editar: undefined } })
-    if (produto) setJanela({ produto })
-  }, [idEditar, produtos, navigate, location.pathname, location.state])
+  const produtoPedido = idEditar ? produtos.find((p) => p.id === idEditar) : null
+  const janela = janelaAberta ?? (produtoPedido ? { produto: produtoPedido } : null)
+  function setJanela(valor) {
+    if (idEditar) navigate(location.pathname, { replace: true, state: { ...location.state, editar: undefined } })
+    setJanelaAberta(valor)
+  }
 
   const ordenados = useMemo(() => [...produtos].sort(porNome), [produtos])
   const filtrados = useMemo(() => {

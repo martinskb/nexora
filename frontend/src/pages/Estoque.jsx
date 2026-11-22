@@ -34,7 +34,7 @@ export default function Estoque() {
   const mostrarSkeleton = useSkeleton(produtos.length > 0, carregando)
   const [filtro, setFiltro] = useEstadoDaAba('estoque.filtro', 'todos')
   const [busca, setBusca] = useEstadoDaAba('estoque.busca', '')
-  const [selecionado, setSelecionado] = useState(null) // id do produto aberto
+  const [selecionadoEstado, setSelecionado] = useState(null) // id do produto aberto
   const [versaoHistorico, setVersaoHistorico] = useState(0)
 
   // Vindo do Início: "Acabando" abre com o filtro; um produto da lista abre direto (?produto=id).
@@ -45,10 +45,9 @@ export default function Estoque() {
     navigate(location.pathname + location.search, { replace: true, state: { ...location.state, filtro: undefined } })
   }, [filtroPedido, setFiltro, navigate, location.pathname, location.search, location.state])
 
+  // ?produto=id (vindo do Início) abre direto o produto pedido.
   const idPedido = Number(params.get('produto')) || null
-  useEffect(() => {
-    if (idPedido && produtos.some((p) => p.id === idPedido)) setSelecionado(idPedido)
-  }, [idPedido, produtos])
+  const selecionado = selecionadoEstado ?? idPedido
 
   function fechar() {
     setSelecionado(null)
