@@ -31,3 +31,17 @@ describe('textoRelatorio', () => {
     expect(t).toContain('Lucro: R$ 3,00 (10%) (parcial)')
   })
 })
+
+describe('textoRelatorio sem nenhum custo', () => {
+  it('não mostra "Lucro: R$ 0,00" quando nada vendido tem custo', () => {
+    const r = {
+      dia: '2026-11-22',
+      vendido: 10,
+      vendas: 1,
+      porForma: { dinheiro: 0, pix: 10, cartao: 0, naoInformado: 0 },
+      lucro: { valor: 0, receitaComCusto: 0, margem: null, parcial: true },
+    }
+    expect(textoRelatorio('Loja', r)).toContain('Lucro: sem custo cadastrado')
+    expect(textoRelatorio('Loja', r)).not.toContain('R$ 0,00')
+  })
+})

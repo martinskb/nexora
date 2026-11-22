@@ -29,8 +29,12 @@ export function textoRelatorio(loja, r) {
     `Vendido: ${reais(r.vendido)} (${r.vendas} ${r.vendas === 1 ? 'venda' : 'vendas'})`,
   ]
   if (formas.length) linhas.push(formas.join(' · '))
-  const margem = r.lucro.margem != null ? ` (${r.lucro.margem}%)` : ''
-  linhas.push(`Lucro: ${reais(r.lucro.valor)}${margem}${r.lucro.parcial ? ' (parcial)' : ''}`)
+  if (r.lucro.parcial && r.lucro.receitaComCusto === 0) {
+    linhas.push('Lucro: sem custo cadastrado')
+  } else {
+    const margem = r.lucro.margem != null ? ` (${r.lucro.margem}%)` : ''
+    linhas.push(`Lucro: ${reais(r.lucro.valor)}${margem}${r.lucro.parcial ? ' (parcial)' : ''}`)
+  }
   return linhas.join('\n')
 }
 
