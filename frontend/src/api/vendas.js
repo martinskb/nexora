@@ -11,5 +11,7 @@ export const vendasApi = {
     return api(`/vendas${qs ? `?${qs}` : ''}`, { signal })
   },
   buscar: (id) => api(`/vendas/${id}`),
+  /** Quanto saiu de cada produto no período { de, ate }. */
+  produtos: ({ de, ate }, signal) => api(`/vendas/produtos?${new URLSearchParams({ de, ate })}`, { signal }),
   cancelar: (id, motivo) => api(`/vendas/${id}/cancelar`, { method: 'POST', body: { motivo } }),
 }

@@ -46,3 +46,15 @@ describe('lojaParaLimpar (#5)', () => {
   it('nada guardado', () => expect(lojaParaLimpar(null, null)).toBe(null))
   it('a chave da última loja é a mesma do cache gravado', () => expect(chavePersistencia('7')).toBe(chavePersistencia(7)))
 })
+
+describe('fechamento do dia: cache', () => {
+  it('venda, cancelamento, produto e ajuste atualizam o relatório e os produtos vendidos', () => {
+    for (const e of ['venda', 'cancelamento', 'produto', 'ajuste']) {
+      expect(invalidacoesApos(e, { produtoId: 1 })).toEqual(expect.arrayContaining([['relatorio'], ['vendasProdutos']]))
+    }
+  })
+  it('chaves novas', () => {
+    expect(chaves.relatorio('2026-11-22')).toEqual(['relatorio', '2026-11-22'])
+    expect(chaves.vendasProdutos({ de: 'a' })[0]).toBe('vendasProdutos')
+  })
+})

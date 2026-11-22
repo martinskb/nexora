@@ -7,6 +7,8 @@ export const chaves = {
   venda: (id) => ['venda', id],
   canais: () => ['canais'],
   historico: (produtoId) => ['historico', produtoId],
+  relatorio: (dia) => ['relatorio', dia],
+  vendasProdutos: (filtros) => ['vendasProdutos', filtros],
 }
 
 export const VALIDADE_MS = {
@@ -15,6 +17,7 @@ export const VALIDADE_MS = {
   vendas: 30_000,
   canais: 60_000,
   historico: 60_000,
+  relatorio: 30_000,
 }
 
 /** Prefixos de chave a atualizar depois de cada tipo de mudança. */
@@ -22,11 +25,11 @@ export function invalidacoesApos(evento, extra = {}) {
   switch (evento) {
     case 'venda':
     case 'cancelamento':
-      return [['resumo'], ['vendas'], ['venda'], ['produtos']]
+      return [['resumo'], ['vendas'], ['venda'], ['produtos'], ['relatorio'], ['vendasProdutos']]
     case 'produto':
-      return [['produtos'], ['resumo']]
+      return [['produtos'], ['resumo'], ['relatorio'], ['vendasProdutos']]
     case 'ajuste':
-      return [['produtos'], ['resumo'], ['historico', extra.produtoId]]
+      return [['produtos'], ['resumo'], ['historico', extra.produtoId], ['relatorio'], ['vendasProdutos']]
     case 'canal':
       return [['canais'], ['vendas'], ['resumo']]
     default:

@@ -2,6 +2,7 @@ import { keepPreviousData, useInfiniteQuery, useQuery, useQueryClient } from '@t
 import { useCallback, useMemo } from 'react'
 import { canaisApi } from '../api/canais.js'
 import { produtosApi } from '../api/produtos.js'
+import { relatorioApi } from '../api/relatorio.js'
 import { resumoApi } from '../api/resumo.js'
 import { vendasApi } from '../api/vendas.js'
 import { intervaloAnterior } from '../utils/comparacao.js'
@@ -95,6 +96,25 @@ export function useHistoricoProduto(produtoId) {
   return { ...q, itens }
 }
 
+/** Relatório do dia local "AAAA-MM-DD". */
+export const useRelatorio = (dia) =>
+  useQuery({
+    queryKey: chaves.relatorio(dia),
+    queryFn: ({ signal }) => relatorioApi.obter(dia, signal),
+    staleTime: VALIDADE_MS.relatorio,
+    placeholderData: keepPreviousData,
+  })
+
+/** Produtos vendidos no período { de, ate }: `data` é a lista. */
+export const useProdutosVendidos = (filtros) =>
+  useQuery({
+    queryKey: chaves.vendasProdutos(filtros),
+    queryFn: ({ signal }) => vendasApi.produtos(filtros, signal),
+    select: (d) => d.produtos,
+    staleTime: VALIDADE_MS.vendas,
+    placeholderData: keepPreviousData,
+  })
+
 /** Atualiza o que depende de uma mudança (venda, cancelamento, produto, ajuste, canal). */
 export function useInvalidar() {
   const cliente = useQueryClient()
@@ -120,6 +140,6 @@ export function useAntecipar() {
 }
 
 /** Filtros da lista de Vendas na forma da API (a mesma chave usada pela tela e pela busca antecipada). */
-export const filtrosDeVendas = ({ periodo, canalId, status }) => ({ ...intervaloDoPeriodo(periodo), canalId, status })
+export const filtrosDeVendas = ({ periodo, canalId, status, forma = '' }) => ({ ...intervaloDoPeriodo(periodo), canalId, status, forma })
 
-export const FILTRO_VENDAS_PADRAO = { periodo: 'hoje', canalId: '', status: '' }
+export const FILTRO_VENDAS_PADRAO = { periodo: 'hoje', canalId: '', status: '', forma: '' }
