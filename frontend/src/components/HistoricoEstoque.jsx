@@ -3,6 +3,7 @@ import { produtosApi } from '../api/produtos.js'
 import { formatarDataHora } from '../utils/datas.js'
 import { Alerta } from './Alerta.jsx'
 import { Botao } from './Botao.jsx'
+import { SkeletonLista } from './Skeleton.jsx'
 import estilos from './HistoricoEstoque.module.css'
 
 const ROTULO_TIPO = {
@@ -57,7 +58,7 @@ export function HistoricoEstoque({ produtoId }) {
     else if (r) setEstado((e) => ({ ...e, erro: r.erro }))
   }
 
-  if (estado.carregando) return <p className={estilos.info}>Carregando histórico…</p>
+  if (estado.carregando) return <SkeletonLista linhas={3} />
 
   return (
     <div className={estilos.historico}>

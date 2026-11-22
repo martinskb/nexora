@@ -1,43 +1,47 @@
 .pagina {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--esp-4);
 }
 
 .titulo {
-  font-size: var(--texto-2xl);
+  font-size: var(--t-30);
+  margin-bottom: var(--esp-2);
 }
 
 .filtros {
-  display: grid;
-  gap: var(--esp-2);
-}
-
-@media (min-width: 768px) {
-  /* 2 ou 3 filtros lado a lado (a origem só aparece se a loja usa canais),
-     cada um com a largura das próprias opções. */
-  .filtros {
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(0, max-content);
-    justify-content: start;
-    gap: var(--esp-3) var(--esp-5);
-  }
-}
-
-.info {
-  color: var(--cor-texto-suave);
-  font-size: var(--texto-sm);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-3);
+  align-items: end;
 }
 
 .vazio {
   display: grid;
   justify-items: center;
-  gap: var(--esp-2);
+  gap: var(--esp-3);
   padding: var(--esp-7) var(--esp-4);
-  color: var(--cor-texto-suave);
   text-align: center;
-  background: var(--cor-superficie);
-  border: 1px dashed var(--cor-borda);
-  border-radius: var(--raio-lg);
+  color: var(--cor-texto-suave);
+}
+
+.vazio svg {
+  opacity: 0.6;
+}
+
+.vazio h2 {
+  font-size: var(--t-19);
+  color: var(--cor-texto);
+}
+
+.grupos {
+  display: grid;
+  gap: var(--esp-5);
+  transition: opacity 0.2s;
+}
+
+.trocando {
+  opacity: 0.55;
 }
 
 .grupo {
@@ -45,110 +49,100 @@
   gap: var(--esp-2);
 }
 
-.dia {
-  font-size: var(--texto-sm);
-  color: var(--cor-texto-suave);
-  font-weight: 700;
+.cabecalhoDia {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0 var(--esp-1);
 }
 
-/* Vendas do dia em cupons: 1 coluna no celular, 2–3 na tela larga. */
-.cupons {
+.cabecalhoDia strong {
+  font-size: var(--t-19);
+  font-weight: 600;
+}
+
+.totalHoje {
+  color: var(--cor-dinheiro);
+}
+
+.lista {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr));
-  gap: var(--esp-3);
+  border-radius: var(--raio-16);
+  background: var(--cor-superficie);
+  box-shadow: inset 0 0 0 1px var(--cor-contorno);
+  overflow: hidden;
 }
 
-/*
- * Cupom: hora e total no topo; o picote tracejado separa o que foi vendido,
- * como no cupom que sai do caixa.
- */
-.cupom {
+.lista li + li {
+  border-top: 1px solid var(--cor-linha);
+}
+
+.linha {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
   width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: var(--esp-2);
+  min-height: 64px;
   padding: var(--esp-3) var(--esp-4);
-  border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-md);
-  background: var(--cor-superficie);
+  border: 0;
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
   text-align: left;
   cursor: pointer;
 }
 
-.cupom:hover {
-  border-color: var(--cor-primaria);
+.linha:hover {
+  background: var(--cor-superficie-2);
 }
 
-.cupom:focus-visible {
-  outline: 3px solid var(--cor-primaria);
-  outline-offset: 2px;
+.linha:focus-visible {
+  outline-offset: -2px;
 }
 
-.topoCupom {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--esp-3);
-  padding-bottom: var(--esp-2);
-  border-bottom: 2px dashed var(--cor-borda);
+.texto {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
 }
 
-.hora {
-  font-weight: 700;
-  font-family: var(--fonte-num);
-  font-variant-numeric: tabular-nums;
+.principal {
+  font-size: var(--t-15);
+  font-weight: 500;
+}
+
+.texto small {
+  font-size: var(--t-12);
   color: var(--cor-texto-suave);
-}
-
-.valor {
-  font-family: var(--fonte-num);
-  font-stretch: 85%;
-  font-weight: 800;
-  font-size: var(--texto-lg);
-  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.valor {
+  flex: none;
+  font-size: var(--t-15);
+  font-weight: 600;
+}
+
+/* Cancelada: riscada e suave, mas visível. */
+.cancelada .principal,
 .cancelada .valor {
+  color: var(--cor-texto-suave);
   text-decoration: line-through;
-  color: var(--cor-texto-suave);
 }
 
-/* Até duas linhas com os produtos; o detalhe completo abre no clique. */
-.produtos {
-  font-weight: 600;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  overflow: hidden;
+.skDetalhe {
+  display: grid;
+  gap: var(--esp-3);
 }
 
-.cancelada .produtos {
-  color: var(--cor-texto-suave);
-}
-
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--esp-1) var(--esp-3);
-  color: var(--cor-texto-suave);
-  font-size: var(--texto-xs);
-}
-
-.canal {
-  font-weight: 600;
-}
-
-.seloCancelada {
-  padding: 0 0.5em;
-  border-radius: 999px;
-  background: var(--cor-erro-suave);
-  color: var(--cor-erro);
-  font-weight: 700;
+@media (min-width: 960px) {
+  .titulo {
+    font-size: var(--t-37);
+    letter-spacing: -0.03em;
+  }
 }

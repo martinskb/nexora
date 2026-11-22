@@ -5,7 +5,7 @@
 
 .info {
   color: var(--cor-texto-suave);
-  font-size: var(--texto-sm);
+  font-size: var(--t-15);
 }
 
 .lista {
@@ -21,7 +21,7 @@
 }
 
 .item + .item {
-  border-top: 1px solid var(--cor-borda);
+  border-top: 1px solid var(--cor-contorno);
 }
 
 .linha {
@@ -33,7 +33,7 @@
 
 .tipo {
   font-weight: 600;
-  font-size: var(--texto-sm);
+  font-size: var(--t-15);
 }
 
 .tipo small {
@@ -43,7 +43,7 @@
 
 .meta {
   color: var(--cor-texto-suave);
-  font-size: var(--texto-xs);
+  font-size: var(--t-12);
 }
 
 .meta:last-child {
@@ -53,20 +53,20 @@
 .entrada,
 .saida {
   font-weight: 700;
-  font-family: var(--fonte-num);
+  font-family: var(--fonte);
   font-variant-numeric: tabular-nums;
 }
 
 .entrada {
-  color: var(--cor-sucesso);
+  color: var(--cor-dinheiro);
 }
 
 .saida {
-  color: var(--cor-erro);
+  color: var(--cor-critico);
 }
 
 .motivo {
   color: var(--cor-texto-suave);
-  font-size: var(--texto-xs);
+  font-size: var(--t-12);
   font-style: italic;
 }

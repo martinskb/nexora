@@ -1,16 +1,21 @@
-import { useEffect, useMemo, useState } from 'react'
-import { vendasApi } from '../api/vendas.js'
+import { useQueryClient } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
 import { Alerta } from '../components/Alerta.jsx'
 import { Botao } from '../components/Botao.jsx'
 import { DetalheVenda } from '../components/DetalheVenda.jsx'
-import { IconeRecibo } from '../components/Icones.jsx'
-import { Modal } from '../components/Modal.jsx'
 import { EscolhaCanal } from '../components/EscolhaCanal.jsx'
+import { Folha } from '../components/Folha.jsx'
+import { IconeRecibo } from '../components/Icones.jsx'
 import { Segmentado } from '../components/Segmentado.jsx'
+import { Skeleton, SkeletonLista } from '../components/Skeleton.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
-import { useCanais } from '../hooks/useCanais.js'
-import { formatarHora, intervaloDoPeriodo, rotuloDoDia } from '../utils/datas.js'
+import { chaves } from '../dados/consultas.js'
+import { FILTRO_VENDAS_PADRAO, filtrosDeVendas, useCanais, useInvalidar, useVenda, useVendas } from '../dados/hooks.js'
+import { useEstadoDaAba, useRolagemDaAba } from '../hooks/useEstadoDaAba.js'
+import { useSkeleton } from '../hooks/useSkeleton.js'
+import { useTitulo } from '../hooks/useTitulo.js'
 import { SEM_CANAL, usarListaDeCanais } from '../utils/canais.js'
+import { formatarHora, rotuloDoDia } from '../utils/datas.js'
 import { formatarMoeda } from '../utils/formato.js'
 import estilos from './Vendas.module.css'
 
@@ -26,41 +31,24 @@ const SITUACOES = [
   { valor: 'cancelada', rotulo: 'Canceladas' },
 ]
 
-function montarFiltros({ periodo, canalId, status }) {
-  return { ...intervaloDoPeriodo(periodo), canalId, status }
-}
-
-async function carregar(filtros, antesDe, signal) {
-  try {
-    const r = await vendasApi.listar({ ...filtros, antesDe }, signal)
-    return { ok: true, ...r }
-  } catch (err) {
-    if (err.name === 'AbortError') return null
-    return { ok: false, erro: err.message }
-  }
-}
+const somaConcluidas = (vendas) =>
+  vendas.reduce((s, v) => s + (v.status === 'cancelada' ? 0 : Math.round(v.total * 100)), 0) / 100
 
 export default function Vendas() {
+  useTitulo('Vendas')
+  useRolagemDaAba('vendas')
   const { avisar } = useAvisos()
+  const cliente = useQueryClient()
+  const invalidar = useInvalidar()
   const { ativos: canais } = useCanais()
-  const [filtro, setFiltro] = useState({ periodo: 'hoje', canalId: '', status: '' }) // canalId: '' = todas, 'sem' = sem canal
-  const [estado, setEstado] = useState({ vendas: [], temMais: false, carregando: true, erro: '' })
-  const [carregandoMais, setCarregandoMais] = useState(false)
-  const [detalhe, setDetalhe] = useState(null) // { carregando, venda, erro }
-
-  // Recarrega a lista quando um filtro muda.
-  useEffect(() => {
-    const ctrl = new AbortController()
-    carregar(montarFiltros(filtro), undefined, ctrl.signal).then((r) => {
-      if (!r) return
-      setEstado(
-        r.ok
-          ? { vendas: r.vendas, temMais: r.temMais, carregando: false, erro: '' }
-          : { vendas: [], temMais: false, carregando: false, erro: r.erro },
-      )
-    })
-    return () => ctrl.abort()
-  }, [filtro])
+  // canalId: '' = todas, 'sem' = sem canal
+  const [filtro, setFiltro] = useEstadoDaAba('vendas.filtro', FILTRO_VENDAS_PADRAO)
+  const consulta = useVendas(filtrosDeVendas(filtro))
+  const { vendas, isPending: carregando, isPlaceholderData: trocandoFiltro, error, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    consulta
+  const mostrarSkeleton = useSkeleton(vendas.length > 0, carregando)
+  const [detalheId, setDetalheId] = useState(null)
+  const detalhe = useVenda(detalheId)
 
   // Opções de origem: só aparecem quando a loja tem canais ativos.
   const opcoesCanal = useMemo(
@@ -72,69 +60,43 @@ export default function Vendas() {
     [canais],
   )
   // Se o canal filtrado foi arquivado/apagado (ou a loja ficou sem canais), volta para "Vendas".
-  const canalNoFiltro =
-    canais.length > 0 && opcoesCanal.some((o) => o.valor === filtro.canalId) ? filtro.canalId : ''
+  const canalNoFiltro = canais.length > 0 && opcoesCanal.some((o) => o.valor === filtro.canalId) ? filtro.canalId : ''
   if (canalNoFiltro !== filtro.canalId) setFiltro((f) => ({ ...f, canalId: canalNoFiltro }))
 
-  function mudarFiltro(campo, valor) {
-    setEstado((e) => ({ ...e, carregando: true, erro: '' }))
-    setFiltro((f) => ({ ...f, [campo]: valor }))
-  }
+  const mudarFiltro = (campo, valor) => setFiltro((f) => ({ ...f, [campo]: valor }))
 
   async function carregarMais() {
-    setCarregandoMais(true)
-    const r = await carregar(montarFiltros(filtro), estado.vendas.at(-1)?.id)
-    setCarregandoMais(false)
-    if (r?.ok) setEstado((e) => ({ ...e, vendas: [...e.vendas, ...r.vendas], temMais: r.temMais }))
-    else if (r) avisar(r.erro, 'erro')
-  }
-
-  async function abrirDetalhe(id) {
-    setDetalhe({ carregando: true })
-    try {
-      const r = await vendasApi.buscar(id)
-      setDetalhe({ venda: r.venda })
-    } catch (err) {
-      setDetalhe({ erro: err.message })
-    }
+    const r = await fetchNextPage()
+    if (r.error) avisar(r.error.message, 'erro')
   }
 
   function aoCancelar(venda) {
-    setDetalhe({ venda })
-    setEstado((e) => ({
-      ...e,
-      // Se o filtro mostra só concluídas, a venda cancelada sai da lista.
-      vendas:
-        filtro.status === 'concluida'
-          ? e.vendas.filter((v) => v.id !== venda.id)
-          : e.vendas.map((v) => (v.id === venda.id ? { ...v, ...venda, itens: undefined } : v)),
-    }))
+    cliente.setQueryData(chaves.venda(venda.id), (d) => ({ ...d, venda }))
+    invalidar('cancelamento')
     avisar('Venda cancelada. Os itens voltaram ao estoque.')
   }
 
-  // Agrupa por dia ("Hoje", "Ontem", ...).
+  // Agrupa por dia ("Hoje", "Ontem", ...). O total do dia só aparece se o dia veio inteiro.
   const grupos = useMemo(() => {
     const mapa = new Map()
-    for (const v of estado.vendas) {
+    for (const v of vendas) {
       const dia = rotuloDoDia(v.criadoEm)
       if (!mapa.has(dia)) mapa.set(dia, [])
       mapa.get(dia).push(v)
     }
-    return [...mapa]
-  }, [estado.vendas])
+    return [...mapa].map(([dia, lista], i, todos) => ({
+      dia,
+      vendas: lista,
+      total: hasNextPage && i === todos.length - 1 ? null : somaConcluidas(lista),
+    }))
+  }, [vendas, hasNextPage])
 
   return (
     <section className={estilos.pagina}>
       <h1 className={estilos.titulo}>Vendas</h1>
 
       <div className={estilos.filtros}>
-        <Segmentado
-          rotulo="Período"
-          tamanho="compacto"
-          opcoes={PERIODOS}
-          valor={filtro.periodo}
-          aoMudar={(v) => mudarFiltro('periodo', v)}
-        />
+        <Segmentado rotulo="Período" tamanho="compacto" opcoes={PERIODOS} valor={filtro.periodo} aoMudar={(v) => mudarFiltro('periodo', v)} />
         {canais.length > 0 && (
           <EscolhaCanal
             rotulo="Origem"
@@ -145,66 +107,72 @@ export default function Vendas() {
             usarLista={usarListaDeCanais(opcoesCanal, canais.length)}
           />
         )}
-        <Segmentado
-          rotulo="Situação"
-          tamanho="compacto"
-          opcoes={SITUACOES}
-          valor={filtro.status}
-          aoMudar={(v) => mudarFiltro('status', v)}
-        />
+        <Segmentado rotulo="Situação" tamanho="compacto" opcoes={SITUACOES} valor={filtro.status} aoMudar={(v) => mudarFiltro('status', v)} />
       </div>
 
-      {estado.carregando && <p className={estilos.info}>Carregando vendas…</p>}
-      {estado.erro && <Alerta>{estado.erro}</Alerta>}
+      {mostrarSkeleton && <SkeletonLista linhas={6} />}
+      {error && <Alerta>{error.message}</Alerta>}
 
-      {!estado.carregando && !estado.erro && estado.vendas.length === 0 && (
+      {!carregando && !error && vendas.length === 0 && (
         <div className={estilos.vazio}>
-          <IconeRecibo tamanho={36} />
-          <p>Nenhuma venda encontrada com esses filtros.</p>
+          <IconeRecibo tamanho={40} />
+          <h2>Nenhuma venda aqui</h2>
+          <p>Não há vendas com esses filtros. Tente outro período ou situação.</p>
         </div>
       )}
 
-      {!estado.carregando &&
-        grupos.map(([dia, vendas]) => (
-          <div key={dia} className={estilos.grupo}>
-            <h2 className={estilos.dia}>{dia}</h2>
-            <ul className={estilos.cupons}>
-              {vendas.map((v) => (
-                <li key={v.id}>
-                  <button
-                    type="button"
-                    className={`${estilos.cupom} ${v.status === 'cancelada' ? estilos.cancelada : ''}`}
-                    onClick={() => abrirDetalhe(v.id)}
-                  >
-                    <span className="somente-leitor">Ver venda das </span>
-                    <span className={estilos.topoCupom}>
-                      <span className={estilos.hora}>{formatarHora(v.criadoEm)}</span>
-                      <span className={estilos.valor}>{formatarMoeda(v.total)}</span>
-                    </span>
-                    <span className={estilos.produtos}>{v.resumo}</span>
-                    <span className={estilos.meta}>
-                      <span>{v.quantidadeItens === 1 ? '1 item' : `${v.quantidadeItens} itens`}</span>
-                      {v.canal && <span className={estilos.canal}>{v.canal.nome}</span>}
-                      {v.status === 'cancelada' && <span className={estilos.seloCancelada}>Cancelada</span>}
-                    </span>
-                  </button>
-                </li>
-              ))}
+      <div className={`${estilos.grupos} ${trocandoFiltro ? estilos.trocando : ''}`} aria-busy={trocandoFiltro}>
+        {grupos.map((g) => (
+          <section key={g.dia} className={estilos.grupo} aria-label={g.dia}>
+            <header className={estilos.cabecalhoDia}>
+              <h2 className="cap">{g.dia}</h2>
+              {g.total !== null && (
+                <strong className={`num ${g.dia === 'Hoje' ? estilos.totalHoje : ''}`}>{formatarMoeda(g.total)}</strong>
+              )}
+            </header>
+            <ul className={estilos.lista}>
+              {g.vendas.map((v) => {
+                const cancelada = v.status === 'cancelada'
+                return (
+                  <li key={v.id}>
+                    <button type="button" className={`${estilos.linha} ${cancelada ? estilos.cancelada : ''}`} onClick={() => setDetalheId(v.id)}>
+                      <span className="somente-leitor">Ver venda das </span>
+                      <span className={estilos.texto}>
+                        <span className={estilos.principal}>
+                          {formatarHora(v.criadoEm)} · {v.quantidadeItens === 1 ? '1 item' : `${v.quantidadeItens} itens`}
+                        </span>
+                        <small>
+                          {cancelada ? 'Cancelada · ' : v.canal ? `${v.canal.nome} · ` : ''}
+                          {v.resumo}
+                        </small>
+                      </span>
+                      <span className={`${estilos.valor} num`}>{formatarMoeda(v.total)}</span>
+                    </button>
+                  </li>
+                )
+              })}
             </ul>
-          </div>
+          </section>
         ))}
+      </div>
 
-      {estado.temMais && !estado.carregando && (
-        <Botao variante="secundario" onClick={carregarMais} carregando={carregandoMais}>
+      {hasNextPage && !carregando && (
+        <Botao variante="secundario" onClick={carregarMais} carregando={isFetchingNextPage}>
           Carregar mais vendas
         </Botao>
       )}
 
-      <Modal aberto={detalhe !== null} aoFechar={() => setDetalhe(null)} titulo="Detalhes da venda">
-        {detalhe?.carregando && <p className={estilos.info}>Carregando…</p>}
-        {detalhe?.erro && <Alerta>{detalhe.erro}</Alerta>}
-        {detalhe?.venda && <DetalheVenda key={detalhe.venda.status} venda={detalhe.venda} aoCancelar={aoCancelar} />}
-      </Modal>
+      <Folha aberto={detalheId !== null} aoFechar={() => setDetalheId(null)} titulo="Detalhes da venda">
+        {detalhe.isPending && (
+          <div className={estilos.skDetalhe} aria-busy="true">
+            <Skeleton altura={20} largura="60%" />
+            <Skeleton altura={120} forma="cartao" />
+            <Skeleton altura={48} />
+          </div>
+        )}
+        {detalhe.error && <Alerta>{detalhe.error.message}</Alerta>}
+        {detalhe.data?.venda && <DetalheVenda key={detalhe.data.venda.status} venda={detalhe.data.venda} aoCancelar={aoCancelar} />}
+      </Folha>
     </section>
   )
 }

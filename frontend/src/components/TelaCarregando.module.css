@@ -1,0 +1,39 @@
+.simples {
+  min-height: 100dvh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--esp-4);
+  padding: var(--esp-5);
+  text-align: center;
+}
+
+.inicio {
+  display: grid;
+  gap: var(--esp-3);
+  max-width: 720px;
+}
+
+.anel {
+  justify-self: center;
+  margin: var(--esp-4) 0;
+}
+
+.menu {
+  display: grid;
+  gap: var(--esp-5);
+  padding: var(--esp-3);
+  align-content: start;
+}
+
+.aviso {
+  min-height: 1.5em;
+  font-size: var(--t-15);
+  color: var(--cor-texto-suave);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.visivel {
+  opacity: 1;
+}

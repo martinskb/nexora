@@ -72,8 +72,7 @@ export function AjusteEstoque({ produto, aoAjustar }) {
       <CampoTexto
         key={modo}
         rotulo={modo === 'entrada' ? 'Quantas unidades chegaram?' : 'Quantas unidades você tem agora?'}
-        inputMode="numeric"
-        placeholder={modo === 'entrada' ? 'Ex.: 24' : `Ex.: ${produto.quantidade}`}
+        formato="inteiro"
         value={valor}
         onChange={(e) => {
           setValor(e.target.value)

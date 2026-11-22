@@ -7,7 +7,7 @@ function Icone({ children, tamanho = 20, ...props }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -113,6 +113,20 @@ export const IconeFechar = (p) => (
 export const IconeSeta = (p) => (
   <Icone {...p}>
     <path d="M9 18l6-6-6-6" />
+  </Icone>
+)
+
+export const IconeLoja = (p) => (
+  <Icone {...p}>
+    <path d="M4 9h16l-1.2-5H5.2z" />
+    <path d="M5 9v11h14V9" />
+    <path d="M10 20v-5h4v5" />
+  </Icone>
+)
+
+export const IconeVoltar = (p) => (
+  <Icone {...p}>
+    <path d="M15 18l-6-6 6-6" />
   </Icone>
 )
 

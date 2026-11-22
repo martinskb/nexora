@@ -1,40 +1,56 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api/client.js'
-import { produtosApi } from '../api/produtos.js'
 import { vendasApi } from '../api/vendas.js'
 import { AjusteRapido } from '../components/AjusteRapido.jsx'
 import { Alerta } from '../components/Alerta.jsx'
 import { Botao } from '../components/Botao.jsx'
 import { Carrinho } from '../components/Carrinho.jsx'
-import { IconeBusca, IconeCaixa, IconeMais } from '../components/Icones.jsx'
-import { Modal } from '../components/Modal.jsx'
-import { Preco } from '../components/Preco.jsx'
-import { SeloEstoque } from '../components/SeloEstoque.jsx'
+import { Etiqueta } from '../components/Etiqueta.jsx'
+import { Folha } from '../components/Folha.jsx'
+import { CampoBusca } from '../components/CampoBusca.jsx'
+import { IconeCaixa, IconeFechar, IconeSeta } from '../components/Icones.jsx'
+import { LinkApp } from '../components/LinkApp.jsx'
+import { Carregando, Skeleton } from '../components/Skeleton.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
-import { useCanais } from '../hooks/useCanais.js'
+import { chaves } from '../dados/consultas.js'
+import { useCanais, useInvalidar, useProdutos } from '../dados/hooks.js'
 import { useMediaQuery } from '../hooks/useMediaQuery.js'
+import { useSkeleton } from '../hooks/useSkeleton.js'
+import { useTitulo } from '../hooks/useTitulo.js'
+import { situacaoEstoque, unidades } from '../utils/estoque.js'
 import { formatarMoeda, normalizarTexto } from '../utils/formato.js'
-import { unidades } from '../utils/estoque.js'
+import { definirGuardaSaida } from '../utils/guardaSaida.js'
+import { esperarVolta, estadoComGuarda } from '../utils/historico.js'
+import { precisaConfirmarSaidaVenda } from '../utils/navegacao.js'
 import estilos from './Vender.module.css'
 
-async function carregarProdutos(signal) {
-  try {
-    const r = await produtosApi.listar(signal)
-    return { lista: r.produtos, carregando: false, erro: '' }
-  } catch (err) {
-    if (err.name === 'AbortError') return null
-    return { lista: [], carregando: false, erro: err.message }
-  }
-}
+const NOME_DA_TELA = { '/': 'Início', '/produtos': 'Produtos', '/estoque': 'Estoque', '/vendas': 'Vendas', '/minha-loja': 'Minha loja' }
+
+
+const ehCampoDeTexto = (el) => el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable)
 
 export default function Vender() {
+  useTitulo('Nova venda')
   const { avisar } = useAvisos()
-  const telaGrande = useMediaQuery('(min-width: 900px)')
+  const navigate = useNavigate()
+  const location = useLocation()
+  const origem = location.state?.origem
+  const telaGrande = useMediaQuery('(min-width: 960px)')
+  const cliente = useQueryClient()
+  const invalidar = useInvalidar()
 
-  const [produtos, setProdutos] = useState({ lista: [], carregando: true, erro: '' })
+  const { data: lista = [], isPending: carregando, error: erroProdutos, refetch } = useProdutos()
+  const mostrarSkeleton = useSkeleton(lista.length > 0, carregando)
   const [busca, setBusca] = useState('')
-  const [carrinho, setCarrinho] = useState([]) // [{ produtoId, quantidade }]
+  const [carrinho, setCarrinhoEstado] = useState([]) // [{ produtoId, quantidade }]
+  // Espelho síncrono: toques rápidos seguidos sempre partem da quantidade mais recente.
+  const carrinhoAtual = useRef([])
+  const setCarrinho = (fn) => {
+    carrinhoAtual.current = typeof fn === 'function' ? fn(carrinhoAtual.current) : fn
+    setCarrinhoEstado(carrinhoAtual.current)
+  }
   const { ativos: canais, recarregar: recarregarCanais } = useCanais()
   const [canalId, setCanalId] = useState('') // '' = venda sem canal
   const [observacao, setObservacao] = useState('')
@@ -42,33 +58,122 @@ export default function Vender() {
   const [erroVenda, setErroVenda] = useState('')
   const [ajuste, setAjuste] = useState(null) // { produto, necessario }
   const [carrinhoAberto, setCarrinhoAberto] = useState(false) // celular
+  const [confirmarSaida, setConfirmarSaida] = useState(false)
+  const campoBusca = useRef(null)
 
-  useEffect(() => {
-    const ctrl = new AbortController()
-    carregarProdutos(ctrl.signal).then((r) => r && setProdutos(r))
-    return () => ctrl.abort()
-  }, [])
-
-  const recarregarProdutos = () => carregarProdutos().then((r) => r && setProdutos(r))
-
-  const porId = useMemo(() => new Map(produtos.lista.map((p) => [p.id, p])), [produtos.lista])
-
+  const porId = useMemo(() => new Map(lista.map((p) => [p.id, p])), [lista])
   const itens = useMemo(
-    () =>
-      carrinho
-        .map(({ produtoId, quantidade }) => ({ produto: porId.get(produtoId), quantidade }))
-        .filter((i) => i.produto),
+    () => carrinho.map(({ produtoId, quantidade }) => ({ produto: porId.get(produtoId), quantidade })).filter((i) => i.produto),
     [carrinho, porId],
   )
   const total = itens.reduce((s, i) => s + Math.round(i.produto.preco * 100) * i.quantidade, 0) / 100
   const totalUnidades = itens.reduce((s, i) => s + i.quantidade, 0)
+  const temItens = precisaConfirmarSaidaVenda(totalUnidades)
 
   const filtrados = useMemo(() => {
     const termo = normalizarTexto(busca)
-    return termo ? produtos.lista.filter((p) => normalizarTexto(p.nome).includes(termo)) : produtos.lista
-  }, [produtos.lista, busca])
+    return termo ? lista.filter((p) => normalizarTexto(p.nome).includes(termo)) : lista
+  }, [lista, busca])
 
   const qtdNoCarrinho = (id) => carrinho.find((i) => i.produtoId === id)?.quantidade ?? 0
+  const qtdAtual = (id) => carrinhoAtual.current.find((i) => i.produtoId === id)?.quantidade ?? 0
+
+  // ---------- Saída protegida: com itens, o "voltar" pergunta antes de descartar ----------
+  const guardaAtiva = useRef(false)
+
+  useEffect(() => {
+    if (temItens && !guardaAtiva.current) {
+      window.history.pushState(estadoComGuarda(window.history.state), '')
+      guardaAtiva.current = true
+    } else if (!temItens && guardaAtiva.current) {
+      guardaAtiva.current = false
+      if (window.history.state?.guardaVenda && !window.history.state?.folha) window.history.back()
+    }
+  }, [temItens])
+
+  useEffect(() => {
+    const aoVoltar = () => {
+      if (!guardaAtiva.current || window.history.state?.guardaVenda) return
+      // Saiu da entrada de guarda: recoloca e pergunta.
+      window.history.pushState(estadoComGuarda(window.history.state), '')
+      setConfirmarSaida(true)
+    }
+    window.addEventListener('popstate', aoVoltar)
+    return () => window.removeEventListener('popstate', aoVoltar)
+  }, [])
+
+  // Qualquer outra navegação do app (menu lateral, trilha, busca Ctrl K) também pergunta antes.
+  const temItensAgora = useRef(false)
+  const continuacao = useRef(null) // para onde ir depois de descartar
+  useEffect(() => {
+    temItensAgora.current = temItens
+  })
+  useEffect(() => {
+    definirGuardaSaida({
+      temItens: () => guardaAtiva.current && temItensAgora.current,
+      pedir: (continuar) => {
+        continuacao.current = continuar
+        setConfirmarSaida(true)
+      },
+    })
+    return () => definirGuardaSaida(null)
+  }, [])
+
+  /** Desfaz as entradas de folhas e da guarda, deixando o histórico na entrada de Vender. */
+  async function limparEntradas() {
+    guardaAtiva.current = false
+    setConfirmarSaida(false)
+    setCarrinhoAberto(false)
+    // Folhas desfazem a própria entrada: espera esse voltar terminar antes de seguir.
+    if (window.history.state?.folha) await esperarVolta()
+    for (let i = 0; i < 3 && window.history.state?.folha; i++) {
+      window.history.back()
+      await esperarVolta()
+    }
+    if (window.history.state?.guardaVenda) {
+      window.history.back()
+      await esperarVolta()
+    }
+  }
+
+  /** Volta para a tela de onde a pessoa veio. */
+  async function sairDaVenda() {
+    await limparEntradas()
+    if (origem) navigate(-1)
+    else navigate('/', { replace: true })
+  }
+
+  /** "Descartar venda": segue para onde a pessoa pediu, ou volta para a origem. */
+  async function descartar() {
+    const continuar = continuacao.current
+    continuacao.current = null
+    if (!continuar) return sairDaVenda()
+    await limparEntradas()
+    continuar()
+  }
+
+  function continuarVendendo() {
+    continuacao.current = null
+    setConfirmarSaida(false)
+  }
+
+  const aoFecharTela = () => (temItens ? setConfirmarSaida(true) : sairDaVenda())
+
+  // ---------- Atalhos (PC): "/" vai para a busca; Enter confirma ----------
+  const confirmarRef = useRef(null)
+  useEffect(() => {
+    const aoTeclar = (e) => {
+      if (document.querySelector('dialog[open]')) return
+      if (e.key === '/' && !ehCampoDeTexto(document.activeElement)) {
+        e.preventDefault()
+        campoBusca.current?.focus()
+      } else if (e.key === 'Enter' && telaGrande && !ehCampoDeTexto(document.activeElement) && document.activeElement?.tagName !== 'BUTTON') {
+        confirmarRef.current?.()
+      }
+    }
+    window.addEventListener('keydown', aoTeclar)
+    return () => window.removeEventListener('keydown', aoTeclar)
+  }, [telaGrande])
 
   function definirQuantidade(produto, quantidade) {
     setErroVenda('')
@@ -78,6 +183,7 @@ export default function Vender() {
     }
     // Pediu mais do que o sistema mostra: oferece o ajuste rápido em vez de travar.
     if (quantidade > produto.quantidade) {
+      setCarrinhoAberto(false)
       setAjuste({ produto, necessario: quantidade })
       return
     }
@@ -90,7 +196,10 @@ export default function Vender() {
 
   function aoAjustar(produtoAtualizado) {
     const { necessario } = ajuste
-    setProdutos((p) => ({ ...p, lista: p.lista.map((x) => (x.id === produtoAtualizado.id ? produtoAtualizado : x)) }))
+    cliente.setQueryData(chaves.produtos(), (d) =>
+      d ? { ...d, produtos: d.produtos.map((x) => (x.id === produtoAtualizado.id ? produtoAtualizado : x)) } : d,
+    )
+    invalidar('ajuste', { produtoId: produtoAtualizado.id })
     setAjuste(null)
     const possivel = Math.min(necessario, produtoAtualizado.quantidade)
     setCarrinho((c) => {
@@ -105,6 +214,7 @@ export default function Vender() {
   }
 
   async function confirmarVenda() {
+    if (!temItens || enviando) return
     setEnviando(true)
     setErroVenda('')
     try {
@@ -114,19 +224,14 @@ export default function Vender() {
         observacao: observacao.trim() || undefined,
       })
       avisar(`Venda de ${formatarMoeda(venda.total)} registrada.`)
-      setCarrinho([])
-      setObservacao('')
-      setCanalId('')
-      setCarrinhoAberto(false)
-      setBusca('')
-      await recarregarProdutos() // saldos atualizados após a baixa
+      invalidar('venda')
+      await sairDaVenda()
     } catch (err) {
       const faltando = err instanceof ApiError ? err.details?.estoqueInsuficiente?.[0] : null
       if (faltando) {
         // Outro atendimento pode ter vendido antes: atualiza e oferece o ajuste.
-        const r = await carregarProdutos()
-        if (r) setProdutos(r)
-        const produto = r?.lista.find((p) => p.id === faltando.produtoId)
+        const r = await refetch()
+        const produto = r.data?.find((p) => p.id === faltando.produtoId)
         if (produto) setAjuste({ produto, necessario: faltando.solicitado })
         setErroVenda(err.message)
       } else if (err instanceof ApiError && err.details?.canalId) {
@@ -137,7 +242,7 @@ export default function Vender() {
       } else if (err instanceof ApiError && err.details?.produtosNaoEncontrados) {
         const ausentes = new Set(err.details.produtosNaoEncontrados)
         setCarrinho((c) => c.filter((i) => !ausentes.has(i.produtoId)))
-        await recarregarProdutos()
+        await refetch()
         setErroVenda('Um produto da venda foi removido do cadastro e saiu da lista. Confira e confirme de novo.')
       } else {
         setErroVenda(err.message)
@@ -146,6 +251,9 @@ export default function Vender() {
       setEnviando(false)
     }
   }
+  useEffect(() => {
+    confirmarRef.current = confirmarVenda
+  })
 
   const carrinhoProps = {
     itens,
@@ -161,79 +269,97 @@ export default function Vender() {
     erro: erroVenda,
   }
 
-  if (!produtos.carregando && !produtos.erro && produtos.lista.length === 0) {
+  const topo = (
+    <header className={estilos.topo}>
+      {telaGrande ? (
+        <nav className={estilos.trilha} aria-label="Você está em">
+          {origem && NOME_DA_TELA[origem] ? (
+            <button type="button" onClick={aoFecharTela}>
+              {NOME_DA_TELA[origem]}
+            </button>
+          ) : (
+            <LinkApp to="/">Início</LinkApp>
+          )}
+          <IconeSeta tamanho={14} />
+          <span aria-current="page">Nova venda</span>
+        </nav>
+      ) : (
+        <button type="button" className={estilos.fechar} onClick={aoFecharTela} aria-label="Fechar a venda">
+          <IconeFechar />
+        </button>
+      )}
+      <h1 className={estilos.titulo}>Nova venda</h1>
+    </header>
+  )
+
+  if (!carregando && !erroProdutos && lista.length === 0) {
     return (
-      <section className={estilos.semProdutos}>
-        <IconeCaixa tamanho={40} />
-        <h1>Cadastre produtos para começar a vender</h1>
-        <p>Cada venda desconta o estoque automaticamente. Primeiro, cadastre o que você vende.</p>
-        <Link to="/produtos" className={estilos.botaoLink}>
-          Ir para Produtos
-        </Link>
-      </section>
+      <div className={estilos.pagina}>
+        {topo}
+        <section className={estilos.semProdutos}>
+          <IconeCaixa tamanho={40} />
+          <h2>Cadastre produtos para começar a vender</h2>
+          <p>Cada venda desconta o estoque automaticamente. Primeiro, cadastre o que você vende.</p>
+          <LinkApp to="/produtos" className={estilos.botaoLink}>
+            Ir para Produtos
+          </LinkApp>
+        </section>
+      </div>
     )
   }
 
   return (
-    <div className={estilos.pagina}>
+    <div className={`${estilos.pagina} ${telaGrande ? estilos.comPainel : ''}`}>
       <section className={estilos.catalogo} aria-labelledby="titulo-vender">
-        <h1 id="titulo-vender" className={estilos.titulo}>
-          Nova venda
-        </h1>
+        {topo}
 
-        <div className={estilos.busca}>
-          <IconeBusca />
-          <input
-            type="search"
-            placeholder="Buscar produto"
-            aria-label="Buscar produto"
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-          />
-        </div>
+        <CampoBusca ref={campoBusca} valor={busca} aoMudar={setBusca} atalho={telaGrande ? '/' : undefined} />
 
-        {produtos.carregando && <p className={estilos.info}>Carregando produtos…</p>}
-        {produtos.erro && (
+        {erroProdutos && (
           <div className={estilos.info}>
-            <Alerta>{produtos.erro}</Alerta>
-            <Botao variante="secundario" onClick={recarregarProdutos}>
+            <Alerta>{erroProdutos.message}</Alerta>
+            <Botao variante="secundario" onClick={() => refetch()}>
               Tentar de novo
             </Botao>
           </div>
         )}
-        {!produtos.carregando && filtrados.length === 0 && busca && (
+        {mostrarSkeleton && (
+          <Carregando className={estilos.produtos}>
+            {Array.from({ length: 6 }, (_, i) => (
+              <Skeleton key={i} forma="cartao" altura={124} />
+            ))}
+          </Carregando>
+        )}
+        {!carregando && filtrados.length === 0 && busca && (
           <p className={estilos.info}>Nenhum produto encontrado para “{busca}”.</p>
         )}
 
         <ul className={estilos.produtos}>
           {filtrados.map((p) => {
             const noCarrinho = qtdNoCarrinho(p.id)
+            const situacao = situacaoEstoque(p)
             return (
               <li key={p.id}>
                 <button
                   type="button"
-                  className={`${estilos.produto} ${noCarrinho ? estilos.selecionado : ''}`}
-                  onClick={() => definirQuantidade(p, noCarrinho + 1)}
+                  className={`${estilos.produto} ${noCarrinho ? estilos.selecionado : ''} ${situacao === 'zerado' ? estilos.zerado : ''}`}
+                  onClick={() => definirQuantidade(p, qtdAtual(p.id) + 1)}
                 >
-                  {/* Sem aria-label: o leitor lê nome, preço, quantidade na venda e estoque. */}
+                  {/* Sem aria-label: o leitor lê nome, estoque, preço e quantidade na venda. */}
                   <span className={estilos.nomeProduto}>
                     <span className="somente-leitor">Adicionar </span>
                     {p.nome}
                   </span>
-                  <span className={estilos.linhaPreco}>
-                    <Preco valor={p.preco} etiqueta />
-                    {noCarrinho > 0 ? (
-                      <span className={estilos.naVenda}>
-                        {noCarrinho}
-                        <span className="somente-leitor"> na venda</span>
-                      </span>
-                    ) : (
-                      <span className={estilos.mais} aria-hidden="true">
-                        <IconeMais />
-                      </span>
-                    )}
+                  <span className={`${estilos.estoque} ${estilos[situacao]}`}>
+                    {situacao === 'zerado' ? 'Zerado' : `${p.quantidade} em estoque`}
                   </span>
-                  <SeloEstoque produto={p} />
+                  <Etiqueta variante="preco" valor={formatarMoeda(p.preco)} className={estilos.preco} />
+                  {noCarrinho > 0 && (
+                    <span key={noCarrinho} className={estilos.contador}>
+                      {noCarrinho}
+                      <span className="somente-leitor"> na venda</span>
+                    </span>
+                  )}
                 </button>
               </li>
             )
@@ -242,38 +368,49 @@ export default function Vender() {
       </section>
 
       {telaGrande ? (
-        <aside className={estilos.lateral} aria-label="Venda atual">
-          <h2 className={estilos.subtitulo}>Venda atual</h2>
-          <Carrinho {...carrinhoProps} />
+        <aside className={estilos.painel} aria-label="Venda atual">
+          <h2 className="cap">Venda atual</h2>
+          <Carrinho {...carrinhoProps} atalhoConfirmar="Enter" />
         </aside>
       ) : (
-        itens.length > 0 && (
-          <div className={estilos.barraResumo}>
+        temItens && (
+          <button type="button" className={estilos.barraVenda} onClick={() => setCarrinhoAberto(true)}>
             <span>
-              <small>{totalUnidades === 1 ? '1 item' : `${totalUnidades} itens`}</small>
-              <Preco valor={total} />
+              <small>Venda atual · {totalUnidades === 1 ? '1 item' : `${totalUnidades} itens`}</small>
+              <strong className="num">{formatarMoeda(total)}</strong>
             </span>
-            <Botao onClick={() => setCarrinhoAberto(true)}>Revisar e confirmar</Botao>
-          </div>
+            <span className={estilos.revisar}>
+              Revisar <IconeSeta />
+            </span>
+          </button>
         )
       )}
 
       {!telaGrande && (
-        <Modal aberto={carrinhoAberto && !ajuste} aoFechar={() => setCarrinhoAberto(false)} titulo="Venda atual">
+        <Folha aberto={carrinhoAberto} aoFechar={() => setCarrinhoAberto(false)} titulo="Venda atual">
           <Carrinho {...carrinhoProps} />
-        </Modal>
+        </Folha>
       )}
 
-      <Modal aberto={ajuste !== null} aoFechar={() => setAjuste(null)} titulo="Corrigir estoque">
+      <Folha aberto={ajuste !== null} aoFechar={() => setAjuste(null)} titulo="Corrigir estoque">
         {ajuste && (
-          <AjusteRapido
-            produto={ajuste.produto}
-            necessario={ajuste.necessario}
-            aoAjustar={aoAjustar}
-            aoCancelar={() => setAjuste(null)}
-          />
+          <AjusteRapido produto={ajuste.produto} necessario={ajuste.necessario} aoAjustar={aoAjustar} aoCancelar={() => setAjuste(null)} />
         )}
-      </Modal>
+      </Folha>
+
+      <Folha aberto={confirmarSaida} aoFechar={continuarVendendo} titulo="Descartar esta venda?">
+        <div className={estilos.confirmar}>
+          <p>
+            {totalUnidades === 1 ? 'O item escolhido vai' : `Os ${totalUnidades} itens escolhidos vão`} sair da venda. Nada é registrado.
+          </p>
+          <Botao variante="perigo" larguraTotal onClick={descartar}>
+            Descartar venda
+          </Botao>
+          <Botao variante="secundario" larguraTotal onClick={continuarVendendo}>
+            Continuar vendendo
+          </Botao>
+        </div>
+      </Folha>
     </div>
   )
 }

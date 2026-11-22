@@ -13,21 +13,21 @@
 
 .dados dt {
   color: var(--cor-texto-suave);
-  font-size: var(--texto-xs);
+  font-size: var(--t-12);
 }
 
 .dados dd {
   margin: 0;
   font-weight: 600;
-  font-size: var(--texto-sm);
+  font-size: var(--t-15);
 }
 
 .textoOk {
-  color: var(--cor-sucesso);
+  color: var(--cor-dinheiro);
 }
 
 .textoCancelada {
-  color: var(--cor-erro);
+  color: var(--cor-critico);
 }
 
 .obs {
@@ -39,7 +39,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 1px solid var(--cor-borda);
+  border-top: 1px solid var(--cor-contorno);
 }
 
 .itens li {
@@ -47,7 +47,7 @@
   justify-content: space-between;
   gap: var(--esp-3);
   padding: var(--esp-3) 0;
-  border-bottom: 1px solid var(--cor-borda);
+  border-bottom: 1px solid var(--cor-contorno);
 }
 
 .item {
@@ -61,7 +61,7 @@
 .valor {
   font-weight: 600;
   white-space: nowrap;
-  font-family: var(--fonte-num);
+  font-family: var(--fonte);
   font-variant-numeric: tabular-nums;
 }
 
@@ -69,11 +69,11 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: var(--texto-lg);
+  font-size: var(--t-19);
 }
 
 .total strong {
-  font-size: var(--texto-xl);
+  font-size: var(--t-24);
 }
 
 .riscado strong {
@@ -86,24 +86,24 @@
   min-height: var(--toque-min);
   padding: 0 var(--esp-4);
   border: 0;
-  border-radius: var(--raio-md);
+  border-radius: var(--raio-8);
   background: transparent;
-  color: var(--cor-erro);
+  color: var(--cor-critico);
   font-weight: 600;
   cursor: pointer;
 }
 
 .botaoCancelar:hover {
-  background: var(--cor-erro-suave);
+  background: color-mix(in srgb, var(--cor-critico) 14%, transparent);
 }
 
 .formCancelar {
   display: grid;
   gap: var(--esp-3);
   padding: var(--esp-4);
-  border-radius: var(--raio-md);
+  border-radius: var(--raio-8);
   background: var(--cor-fundo);
-  border: 1px solid var(--cor-borda);
+  border: 1px solid var(--cor-contorno);
 }
 
 .chips {
@@ -115,16 +115,16 @@
 .chip {
   min-height: 36px;
   padding: 0 var(--esp-3);
-  border: 1px solid var(--cor-borda);
+  border: 1px solid var(--cor-contorno);
   border-radius: 999px;
   background: var(--cor-superficie);
-  font-size: var(--texto-sm);
+  font-size: var(--t-15);
   cursor: pointer;
 }
 
 .chipAtivo {
-  border-color: var(--cor-primaria);
-  background: var(--cor-primaria-suave);
+  border-color: var(--cor-marca);
+  background: var(--cor-marca-suave);
   font-weight: 600;
 }
 

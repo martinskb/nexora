@@ -4,9 +4,9 @@ import { TelaCarregando } from './TelaCarregando.jsx'
 
 /** Só deixa passar quem está logado; os demais vão para /entrar. */
 export function RotaProtegida() {
-  const { loja, verificando } = useAuth()
+  const { loja, verificando, ultimaLojaId } = useAuth()
   const location = useLocation()
-  if (verificando) return <TelaCarregando />
+  if (verificando) return <TelaCarregando moldura={Boolean(ultimaLojaId)} />
   if (!loja) return <Navigate to="/entrar" replace state={{ de: location.pathname }} />
   return <Outlet />
 }

@@ -1,0 +1,52 @@
+.anel {
+  position: relative;
+  display: grid;
+  place-items: center;
+  max-width: 100%;
+}
+
+.anel svg {
+  transform: rotate(-90deg);
+  max-width: 100%;
+  height: auto;
+}
+
+.trilho,
+.arco {
+  fill: none;
+}
+
+.trilho {
+  stroke: var(--cor-superficie-2);
+}
+
+.arco {
+  stroke: var(--cor-marca);
+  stroke-linecap: round;
+  stroke-dasharray: var(--volta);
+  stroke-dashoffset: var(--alvo);
+  transition: stroke-dashoffset 1s var(--curva);
+}
+
+.anima {
+  animation: enche 1.4s var(--curva) 0.25s both;
+}
+
+@keyframes enche {
+  from {
+    stroke-dashoffset: var(--volta);
+  }
+  to {
+    stroke-dashoffset: var(--alvo);
+  }
+}
+
+.centro {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--esp-1);
+  text-align: center;
+}

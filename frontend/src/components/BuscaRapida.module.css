@@ -1,0 +1,100 @@
+.campo {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  width: 300px;
+  height: 40px;
+  padding: 0 var(--esp-3);
+  border: 0;
+  border-radius: var(--raio-8);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--cor-contorno);
+  color: var(--cor-texto-suave);
+  font-size: var(--t-15);
+  cursor: pointer;
+}
+
+.campo:hover {
+  background: var(--cor-superficie-2);
+}
+
+.atalho {
+  margin-left: auto;
+  padding: 2px 6px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--cor-contorno);
+  font: inherit;
+  font-size: 11px;
+  color: var(--cor-texto-suave);
+}
+
+.dialogo {
+  width: min(100% - 2 * var(--esp-4), 560px);
+  margin: 12vh auto auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--raio-16);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  box-shadow: inset 0 0 0 1px var(--cor-contorno), var(--sombra-flutuante);
+}
+
+.dialogo[open] {
+  animation: surgir 0.2s var(--curva);
+}
+
+.dialogo::backdrop {
+  background: var(--cor-overlay);
+}
+
+.entrada {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  padding: 0 var(--esp-4);
+  height: 56px;
+  border-bottom: 1px solid var(--cor-linha);
+  color: var(--cor-texto-suave);
+}
+
+.entrada input {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  font-size: var(--t-19);
+  color: var(--cor-texto);
+  outline: none;
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: var(--esp-2);
+  max-height: 50vh;
+  overflow: auto;
+}
+
+.lista li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--esp-4);
+  padding: var(--esp-3);
+  border-radius: var(--raio-8);
+  cursor: pointer;
+}
+
+.lista .selecionado {
+  background: var(--cor-superficie-2);
+}
+
+.lista .vazio {
+  color: var(--cor-texto-suave);
+  cursor: default;
+}
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
