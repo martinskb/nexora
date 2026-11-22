@@ -45,8 +45,7 @@ export function AjusteRapido({ produto, necessario, aoAjustar, aoCancelar }) {
       </p>
       <CampoTexto
         rotulo="Quantas unidades você tem agora?"
-        inputMode="numeric"
-        placeholder={`Ex.: ${Math.max(necessario, 1)}`}
+        formato="inteiro"
         value={valor}
         onChange={(e) => {
           setValor(e.target.value)

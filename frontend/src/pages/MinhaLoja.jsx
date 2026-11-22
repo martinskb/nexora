@@ -206,13 +206,12 @@ export default function MinhaLoja() {
           <h2 id="t-canais" className={estilos.subtitulo}>
             Canais de venda
           </h2>
-          <p className={estilos.info}>Marque de onde veio cada venda, se quiser. Ex.: Instagram, encomenda.</p>
+          <p className={estilos.info}>Marque de onde veio cada venda, se quiser.</p>
         </div>
 
         <form className={estilos.novo} onSubmit={adicionar}>
           <CampoTexto
             rotulo="Novo canal"
-            placeholder="Ex.: Instagram"
             value={novo}
             maxLength={40}
             onChange={(e) => setNovo(e.target.value)}

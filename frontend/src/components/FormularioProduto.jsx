@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { produtosApi } from '../api/produtos.js'
 import { useFormulario } from '../hooks/useFormulario.js'
-import { formatarDecimal, lerValorMonetario } from '../utils/formato.js'
+import { formatarDecimal } from '../utils/formato.js'
 import { unidades } from '../utils/estoque.js'
 import { validarProduto } from '../utils/validacaoProduto.js'
 import { Alerta } from './Alerta.jsx'
@@ -16,7 +16,7 @@ import estilos from './FormularioProduto.module.css'
  */
 export function FormularioProduto({ produto, aoSalvar, aoRemover, aoCancelar }) {
   const novo = !produto
-  const { valores, setValores, erros, erroGeral, enviando, alterar, enviar } = useFormulario({
+  const { valores, erros, erroGeral, enviando, alterar, enviar } = useFormulario({
     nome: produto?.nome ?? '',
     preco: produto ? formatarDecimal(produto.preco) : '',
     quantidade: '',
@@ -41,11 +41,6 @@ export function FormularioProduto({ produto, aoSalvar, aoRemover, aoCancelar }) 
   }
 
   // Ao sair do campo de preço, mostra no formato "6,50".
-  function formatarPreco() {
-    const valor = lerValorMonetario(valores.preco)
-    if (valor !== null) setValores((v) => ({ ...v, preco: formatarDecimal(valor) }))
-  }
-
   async function remover() {
     setRemovendo(true)
     setErroRemocao('')
@@ -85,7 +80,6 @@ export function FormularioProduto({ produto, aoSalvar, aoRemover, aoCancelar }) 
       <CampoTexto
         rotulo="Nome do produto"
         name="nome"
-        placeholder="Ex.: Arroz 1kg"
         value={valores.nome}
         onChange={alterar}
         erro={erros.nome}
@@ -99,11 +93,10 @@ export function FormularioProduto({ produto, aoSalvar, aoRemover, aoCancelar }) 
           rotulo="Preço de venda"
           name="preco"
           prefixo="R$"
-          inputMode="decimal"
+          formato="moeda"
           placeholder="0,00"
           value={valores.preco}
           onChange={alterar}
-          onBlur={formatarPreco}
           erro={erros.preco}
           autoComplete="off"
         />
@@ -111,8 +104,7 @@ export function FormularioProduto({ produto, aoSalvar, aoRemover, aoCancelar }) 
           <CampoTexto
             rotulo="Quantidade em estoque"
             name="quantidade"
-            inputMode="numeric"
-            placeholder="Ex.: 12"
+            formato="inteiro"
             value={valores.quantidade}
             onChange={alterar}
             erro={erros.quantidade}
@@ -136,9 +128,8 @@ export function FormularioProduto({ produto, aoSalvar, aoRemover, aoCancelar }) 
       <CampoTexto
         rotulo="Avisar quando restarem (opcional)"
         name="estoqueMinimo"
-        inputMode="numeric"
-        placeholder="Ex.: 3"
-        dica="Com 3, por exemplo, o produto aparece como “Acabando” quando restarem 3 unidades ou menos."
+        formato="inteiro"
+        dica="O produto aparece como “Acabando” ao chegar nessa quantidade."
         value={valores.estoqueMinimo}
         onChange={alterar}
         erro={erros.estoqueMinimo}

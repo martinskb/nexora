@@ -80,7 +80,6 @@ export function Carrinho({
       {mostrarObs ? (
         <CampoTexto
           rotulo="Observação (opcional)"
-          placeholder="Ex.: nome do cliente, entrega…"
           value={observacao}
           onChange={(e) => aoMudarObservacao(e.target.value)}
           maxLength={255}

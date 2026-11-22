@@ -30,7 +30,6 @@ export default function CriarConta() {
   return (
     <LayoutAuth
       titulo="Criar conta da loja"
-      subtitulo="Leva menos de um minuto. São só 3 campos."
       rodape={
         <>
           Já tem conta? <Link to="/entrar">Entrar</Link>
@@ -43,7 +42,6 @@ export default function CriarConta() {
           rotulo="Nome da loja"
           name="nome"
           autoComplete="organization"
-          placeholder="Ex.: Mercadinho Andorinhas"
           value={valores.nome}
           onChange={alterar}
           erro={erros.nome}
@@ -56,7 +54,6 @@ export default function CriarConta() {
           type="email"
           autoComplete="email"
           inputMode="email"
-          dica="Você vai usar este e-mail para entrar."
           value={valores.email}
           onChange={alterar}
           erro={erros.email}

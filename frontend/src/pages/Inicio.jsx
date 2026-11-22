@@ -228,7 +228,7 @@ export default function Inicio() {
                 </LinkApp>
               </header>
               {alertas.produtos.length === 0 ? (
-                <p className={estilos.info}>Nenhum produto acabando. Tudo em ordem.</p>
+                <p className={estilos.info}>Nenhum produto acabando.</p>
               ) : (
                 <ul className={estilos.lista}>
                   {alertas.produtos.slice(0, 5).map((p) => (
