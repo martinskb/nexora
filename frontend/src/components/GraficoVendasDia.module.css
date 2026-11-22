@@ -29,7 +29,7 @@
 .eixoX {
   fill: var(--cor-texto-suave);
   font-size: 13px;
-  font-family: var(--fonte-num);
+  
   font-variant-numeric: tabular-nums;
 }
 
@@ -44,8 +44,25 @@
 }
 
 .coluna {
-  fill: var(--serie-1);
+  fill: color-mix(in srgb, var(--cor-texto-suave) 30%, transparent);
   transition: opacity 0.12s;
+  transform-box: fill-box;
+  transform-origin: bottom;
+}
+
+.destaque {
+  fill: var(--cor-marca);
+}
+
+.cresce {
+  animation: cresce 0.8s var(--curva) both;
+  animation-delay: calc(0.9s + var(--i, 0) * 40ms);
+}
+
+@keyframes cresce {
+  from {
+    transform: scaleY(0);
+  }
 }
 
 .apagada {
@@ -53,9 +70,6 @@
 }
 
 /* Com um dia em destaque, os outros ficam em segundo plano. */
-.secundaria {
-  opacity: 0.5;
-}
 
 .alvo {
   fill: transparent;
@@ -119,7 +133,7 @@
   margin-top: var(--esp-2);
   border-collapse: collapse;
   font-size: var(--texto-sm);
-  font-family: var(--fonte-num);
+  
   font-variant-numeric: tabular-nums;
 }
 

@@ -24,9 +24,10 @@ function caminhoColuna(x, y, largura, altura) {
  * Colunas de valor vendido por dia (série única: sem legenda, o título nomeia).
  * Passar o mouse ou focar com o teclado mostra o dia, o valor e o nº de vendas.
  * A mesma informação fica disponível em tabela logo abaixo.
- * destaque: dia ("YYYY-MM-DD") em cor cheia, com os demais mais claros (ex.: hoje).
+ * destaque: dia ("YYYY-MM-DD") na cor da marca; os demais ficam neutros (ex.: hoje).
+ * animar: as colunas crescem da base, uma a uma (entrada da tela).
  */
-export function GraficoVendasDia({ dias, destaque = null }) {
+export function GraficoVendasDia({ dias, destaque = null, animar = false }) {
   const [ref, largura] = useLargura()
   const [ativo, setAtivo] = useState(null)
 
@@ -81,9 +82,10 @@ export function GraficoVendasDia({ dias, destaque = null }) {
                 <g key={d.dia}>
                   <path
                     d={caminhoColuna(xBarra, yBarra, larguraBarra, MARGEM.topo + alturaPlot - yBarra)}
-                    className={`${estilos.coluna} ${
-                      ativo !== null ? (ativo !== i ? estilos.apagada : '') : destaque && d.dia !== destaque ? estilos.secundaria : ''
+                    className={`${estilos.coluna} ${d.dia === destaque ? estilos.destaque : ''} ${animar ? estilos.cresce : ''} ${
+                      ativo !== null && ativo !== i ? estilos.apagada : ''
                     }`}
+                    style={{ '--i': i }}
                   />
                   {/* rótulo direto só no maior dia */}
                   {i === indiceMaior && d.valor > 0 && (

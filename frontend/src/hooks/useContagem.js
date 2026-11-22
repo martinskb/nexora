@@ -2,15 +2,16 @@ import { useEffect, useRef, useState } from 'react'
 import { useReduzirMovimento } from './useReduzirMovimento.js'
 
 /**
- * Número que "conta" até o alvo: na primeira vez a partir de 0; quando o alvo
- * muda, a partir do valor anterior. Desacelera no fim. Com "reduzir movimento"
+ * Número que "conta" até o alvo: na primeira vez a partir de 0 (desdeZero); quando
+ * o alvo muda, a partir do valor anterior. Desacelera no fim. Com "reduzir movimento"
  * (ou animar=false), devolve o alvo direto.
  */
-export function useContagem(alvo, { duracao = 1200, atraso = 0, animar = true } = {}) {
+export function useContagem(alvo, { duracao = 1200, atraso = 0, animar = true, desdeZero = true } = {}) {
   const reduzir = useReduzirMovimento()
   const direto = reduzir || !animar
-  const [valor, setValor] = useState(direto ? alvo : 0)
-  const atual = useRef(direto ? alvo : 0)
+  const partida = direto || !desdeZero ? alvo : 0
+  const [valor, setValor] = useState(partida)
+  const atual = useRef(partida)
 
   useEffect(() => {
     if (direto) {

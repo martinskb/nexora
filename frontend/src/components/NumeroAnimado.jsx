@@ -7,8 +7,16 @@ import estilos from './NumeroAnimado.module.css'
  * Número que conta até o valor. Em moeda com destaque, "R$" e centavos ficam
  * menores e levantados (R$ 1.284⁵⁰). O leitor de tela lê só o valor final.
  */
-export function NumeroAnimado({ valor = 0, moeda = false, destaque = false, animar = true, atraso = 400, className = '' }) {
-  const v = useContagem(valor, { atraso, animar })
+export function NumeroAnimado({
+  valor = 0,
+  moeda = false,
+  destaque = false,
+  animar = true,
+  desdeZero = true,
+  atraso = 400,
+  className = '',
+}) {
+  const v = useContagem(valor, { atraso: desdeZero ? atraso : 0, animar, desdeZero })
   const final = moeda ? formatarMoeda(valor) : Math.round(valor).toLocaleString('pt-BR')
   let visivel
   if (moeda && destaque) {

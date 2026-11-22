@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { LinkApp } from './LinkApp.jsx'
 import estilos from './Etiqueta.module.css'
 
 /**
@@ -26,16 +26,18 @@ export function Etiqueta({
   const conteudo = (
     <span className={estilos.forma}>
       {rotulo && <span className={estilos.rotulo}>{rotulo}</span>}
-      <span className={estilos.valor}>{valor}</span>
-      {comparacao && <span className={`${estilos.comparacao} ${estilos[comparacao.direcao] ?? ''}`}>{comparacao.texto}</span>}
+      <span className={estilos.direita}>
+        <span className={estilos.valor}>{valor}</span>
+        {comparacao && <span className={`${estilos.comparacao} ${estilos[comparacao.direcao] ?? ''}`}>{comparacao.texto}</span>}
+      </span>
     </span>
   )
   const props = { className: classes, style: { '--indice': indice }, 'aria-label': descricao }
   if (para) {
     return (
-      <Link to={para} state={estadoLink} {...props}>
+      <LinkApp to={para} state={estadoLink} {...props}>
         {conteudo}
-      </Link>
+      </LinkApp>
     )
   }
   return (
