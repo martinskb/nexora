@@ -1,4 +1,4 @@
-import { Logo } from './Logo.jsx'
+import { Marca } from './Marca.jsx'
 import { Preco } from './Preco.jsx'
 import estilos from './LayoutAuth.module.css'
 
@@ -25,7 +25,7 @@ export function LayoutAuth({ titulo, subtitulo, rodape, children }) {
       <div className={estilos.lado}>
         <main className={estilos.centro}>
           <header className={estilos.cabecalho}>
-            <Logo tamanho={44} />
+            <Marca tamanho={44} />
             <p className={estilos.slogan}>Vendas e estoque juntos, sem complicação.</p>
           </header>
           <section className={estilos.cartao} aria-labelledby="titulo-auth">

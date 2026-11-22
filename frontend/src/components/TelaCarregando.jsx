@@ -1,4 +1,4 @@
-import { Logo } from './Logo.jsx'
+import { Marca } from './Marca.jsx'
 
 export function TelaCarregando({ mensagem = 'Carregando…' }) {
   return (
@@ -13,7 +13,7 @@ export function TelaCarregando({ mensagem = 'Carregando…' }) {
         color: 'var(--cor-texto-suave)',
       }}
     >
-      <Logo tamanho={40} comTexto={false} />
+      <Marca tamanho={40} />
       <span>{mensagem}</span>
     </div>
   )

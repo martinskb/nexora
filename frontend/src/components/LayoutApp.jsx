@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { Botao } from './Botao.jsx'
 import { IconeCaixa, IconeCarrinho, IconeEstoque, IconeInicio, IconeRecibo, IconeSair } from './Icones.jsx'
-import { Logo } from './Logo.jsx'
+import { Marca } from './Marca.jsx'
 import estilos from './LayoutApp.module.css'
 
 // Itens do menu, na ordem do celular. "Vender" é a ação mais frequente no balcão:
@@ -48,7 +48,7 @@ export function LayoutApp() {
       <header className={estilos.cabecalho}>
         <div className={estilos.barra}>
           <Link to="/" aria-label="Início" className={estilos.marca}>
-            <Logo tamanho={30} />
+            <Marca tamanho={32} />
           </Link>
           <nav className={estilos.menuTopo} aria-label="Menu principal">
             {MENU.filter((m) => !m.principal).map((m) => (
