@@ -124,7 +124,8 @@ export default function Vender() {
     guardaAtiva.current = false
     setConfirmarSaida(false)
     setCarrinhoAberto(false)
-    await new Promise((ok) => setTimeout(ok, 60)) // folhas desfazem a própria entrada
+    // Folhas desfazem a própria entrada: espera esse voltar terminar antes de seguir.
+    if (window.history.state?.folha) await esperarVolta()
     for (let i = 0; i < 3 && window.history.state?.folha; i++) {
       window.history.back()
       await esperarVolta()

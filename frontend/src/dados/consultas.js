@@ -38,3 +38,6 @@ export function invalidacoesApos(evento, extra = {}) {
 export const deveRepetir = (falhas, erro) => falhas < 1 && (erro?.status === 0 || erro?.status >= 500)
 
 export const chavePersistencia = (lojaId) => `nexora-cache:v1:${lojaId}`
+
+/** Loja cujo cache apagar ao perder a sessão: a logada ou, se o app abriu já sem sessão, a última deste aparelho. */
+export const lojaParaLimpar = (lojaLogada, ultimaLojaId) => lojaLogada?.id ?? ultimaLojaId ?? null

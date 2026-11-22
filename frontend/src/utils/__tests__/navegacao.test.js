@@ -53,3 +53,11 @@ describe('ehAba', () => {
     expect(ehAba('/minha-loja')).toBe(false)
   })
 })
+
+describe('abas com query (#3)', () => {
+  it('/estoque?produto=3 continua sendo a aba Estoque', () => expect(ehAba('/estoque?produto=3')).toBe(true))
+  it('Início → Estoque com produto empilha como aba, e voltar ao Início volta', () => {
+    expect(acaoAoIrPara('/', '/estoque?produto=3', false)).toEqual({ tipo: 'navegar', replace: false })
+    expect(acaoAoIrPara('/estoque', '/', true)).toEqual({ tipo: 'voltar' })
+  })
+})

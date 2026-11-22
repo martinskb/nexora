@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { chavePersistencia, chaves, deveRepetir, invalidacoesApos } from '../consultas.js'
+import { chavePersistencia, chaves, deveRepetir, invalidacoesApos, lojaParaLimpar } from '../consultas.js'
 
 describe('invalidacoesApos', () => {
   it('venda atualiza resumo, vendas e produtos', () => {
@@ -38,4 +38,11 @@ describe('chaves e persistência', () => {
     expect(chaves.vendas({ periodo: 'hoje' })[0]).toBe('vendas')
     expect(chaves.historico(7)).toEqual(['historico', 7])
   })
+})
+
+describe('lojaParaLimpar (#5)', () => {
+  it('a loja logada tem prioridade', () => expect(lojaParaLimpar({ id: 3 }, '7')).toBe(3))
+  it('sessão expirada com o app fechado: limpa a última loja deste aparelho', () => expect(lojaParaLimpar(null, '7')).toBe('7'))
+  it('nada guardado', () => expect(lojaParaLimpar(null, null)).toBe(null))
+  it('a chave da última loja é a mesma do cache gravado', () => expect(chavePersistencia('7')).toBe(chavePersistencia(7)))
 })

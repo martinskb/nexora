@@ -5,7 +5,8 @@
 
 export const ABAS = ['/', '/produtos', '/estoque', '/vendas']
 
-export const ehAba = (caminho) => ABAS.includes(caminho)
+/** Compara só o caminho: /estoque?produto=3 ainda é a aba Estoque. */
+export const ehAba = (caminho) => ABAS.includes(caminho.split('?')[0])
 
 export function modoNavegacao(de, para) {
   if (!ehAba(para)) return 'empilhar'

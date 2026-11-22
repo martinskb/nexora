@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { authApi } from '../api/auth.js'
 import { definirAoPerderSessao } from '../api/client.js'
 import { limparCacheDaLoja } from '../dados/cliente.js'
+import { lojaParaLimpar } from '../dados/consultas.js'
 import { esquecerEstadoDasAbas } from '../hooks/useEstadoDaAba.js'
 
 const AuthContext = createContext(null)
@@ -37,7 +38,7 @@ export function AuthProvider({ children }) {
 
   // Ao sair ou perder a sessão, apaga os dados guardados ANTES de esquecer a loja.
   const esquecerLoja = useCallback(() => {
-    limparCacheDaLoja(lojaAtual.current?.id)
+    limparCacheDaLoja(lojaParaLimpar(lojaAtual.current, lerUltimaLoja()))
     esquecerEstadoDasAbas()
     gravarUltimaLoja(null)
     setLoja(null)

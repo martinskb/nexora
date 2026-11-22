@@ -4,6 +4,7 @@ import { useProdutos } from '../dados/hooks.js'
 import { useHistoricoFolha } from '../hooks/useHistoricoFolha.js'
 import { useNavegarApp } from '../hooks/useNavegarApp.js'
 import { formatarMoeda, normalizarTexto } from '../utils/formato.js'
+import { esperarVolta } from '../utils/historico.js'
 import { IconeBusca } from './Icones.jsx'
 import estilos from './BuscaRapida.module.css'
 
@@ -45,8 +46,8 @@ export function BuscaRapida({ aberta, aoFechar }) {
   function escolher(produto) {
     aoFechar()
     setTexto('')
-    // Espera a folha desfazer a entrada no histórico antes de navegar.
-    setTimeout(() => navegar('/produtos', { state: { editar: produto.id } }), 20)
+    // Espera a busca desfazer a própria entrada no histórico antes de navegar.
+    esperarVolta().then(() => navegar('/produtos', { state: { editar: produto.id } }))
   }
 
   function aoTeclar(e) {
