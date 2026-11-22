@@ -11,6 +11,11 @@
   animation: brilho 1.6s linear infinite;
 }
 
+.lista {
+  display: grid;
+  gap: var(--esp-2);
+}
+
 .circulo {
   border-radius: 50%;
   background: none;

@@ -22,3 +22,14 @@ export function Carregando({ children, className = '' }) {
     </div>
   )
 }
+
+/** Lista carregando: linhas no formato das listas de produtos/vendas. */
+export function SkeletonLista({ linhas = 7 }) {
+  return (
+    <Carregando className={estilos.lista}>
+      {Array.from({ length: linhas }, (_, i) => (
+        <Skeleton key={i} altura={48} />
+      ))}
+    </Carregando>
+  )
+}

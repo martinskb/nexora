@@ -9,7 +9,8 @@ import { Botao } from '../components/Botao.jsx'
 import { Carrinho } from '../components/Carrinho.jsx'
 import { Etiqueta } from '../components/Etiqueta.jsx'
 import { Folha } from '../components/Folha.jsx'
-import { IconeBusca, IconeCaixa, IconeFechar, IconeSeta } from '../components/Icones.jsx'
+import { CampoBusca } from '../components/CampoBusca.jsx'
+import { IconeCaixa, IconeFechar, IconeSeta } from '../components/Icones.jsx'
 import { LinkApp } from '../components/LinkApp.jsx'
 import { Carregando, Skeleton } from '../components/Skeleton.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
@@ -283,18 +284,7 @@ export default function Vender() {
       <section className={estilos.catalogo} aria-labelledby="titulo-vender">
         {topo}
 
-        <label className={estilos.busca}>
-          <IconeBusca />
-          <input
-            ref={campoBusca}
-            type="search"
-            placeholder="Buscar produto"
-            aria-label="Buscar produto"
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-          />
-          {telaGrande && <kbd className={estilos.atalho}>/</kbd>}
-        </label>
+        <CampoBusca ref={campoBusca} valor={busca} aoMudar={setBusca} atalho={telaGrande ? '/' : undefined} />
 
         {erroProdutos && (
           <div className={estilos.info}>

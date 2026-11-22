@@ -181,7 +181,7 @@ export default function Inicio() {
                 estado={reposicao > 0 ? 'alerta' : 'neutra'}
                 comparacao={{ direcao: 'igual', texto: 'Ver produtos →' }}
                 para="/estoque"
-                estadoLink={reposicao > 0 ? { filtro: 'acabando' } : undefined}
+                estadoLink={reposicao > 0 ? { filtro: 'baixo' } : undefined}
                 descricao={`Acabando: ${plural(reposicao, 'produto precisa', 'produtos precisam')} de reposição. Ver estoque`}
                 animar={animar}
                 indice={2}
