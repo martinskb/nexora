@@ -1,16 +1,27 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { authApi } from '../api/auth.js'
 import { definirAoPerderSessao } from '../api/client.js'
+import { limparCacheDaLoja } from '../dados/cliente.js'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [loja, setLoja] = useState(null)
   const [verificando, setVerificando] = useState(true)
+  const lojaAtual = useRef(null)
+  useEffect(() => {
+    lojaAtual.current = loja
+  }, [loja])
+
+  // Ao sair ou perder a sessão, apaga os dados guardados ANTES de esquecer a loja.
+  const esquecerLoja = useCallback(() => {
+    limparCacheDaLoja(lojaAtual.current?.id)
+    setLoja(null)
+  }, [])
 
   // Ao abrir o sistema, verifica se já existe uma sessão ativa.
   useEffect(() => {
-    definirAoPerderSessao(() => setLoja(null))
+    definirAoPerderSessao(esquecerLoja)
     const ctrl = new AbortController()
     authApi
       .me(ctrl.signal)
@@ -24,7 +35,7 @@ export function AuthProvider({ children }) {
         setVerificando(false)
       })
     return () => ctrl.abort()
-  }, [])
+  }, [esquecerLoja])
 
   const entrar = useCallback(async (dados) => {
     const r = await authApi.entrar(dados)
@@ -40,9 +51,9 @@ export function AuthProvider({ children }) {
     try {
       await authApi.sair()
     } finally {
-      setLoja(null)
+      esquecerLoja()
     }
-  }, [])
+  }, [esquecerLoja])
 
   const valor = useMemo(
     () => ({ loja, verificando, entrar, cadastrar, sair, atualizarLoja: setLoja }),

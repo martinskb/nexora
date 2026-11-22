@@ -6,7 +6,7 @@ import { CampoTexto } from '../components/CampoTexto.jsx'
 import { Modal } from '../components/Modal.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
-import { useCanais } from '../hooks/useCanais.js'
+import { useCanais } from '../dados/hooks.js'
 import estilos from './MinhaLoja.module.css'
 
 /** Uma linha da lista de canais: nome, renomear e arquivar/apagar (ou reativar). */
