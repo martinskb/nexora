@@ -59,3 +59,14 @@
   font-weight: 600;
   font-size: var(--t-15);
 }
+
+.margem {
+  margin-top: calc(-1 * var(--esp-2));
+  font-size: var(--t-15);
+  color: var(--cor-texto-suave);
+}
+
+.margem strong {
+  color: var(--cor-texto);
+  font-variant-numeric: tabular-nums;
+}

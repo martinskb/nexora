@@ -64,3 +64,18 @@
   font-size: var(--t-12);
   font-weight: 500;
 }
+
+.custo {
+  display: grid;
+  gap: var(--esp-3);
+}
+
+.previaCusto {
+  font-size: var(--t-15);
+  color: var(--cor-texto-suave);
+}
+
+.previaCusto strong {
+  color: var(--cor-texto);
+  font-variant-numeric: tabular-nums;
+}

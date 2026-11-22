@@ -56,7 +56,12 @@ describe('validarProduto', () => {
   it('converte os valores digitados para enviar à API', () => {
     const { erros, dados } = validarProduto(base, { novo: true })
     expect(erros).toEqual({})
-    expect(dados).toEqual({ nome: 'Arroz', preco: 6.5, quantidade: 10, estoqueMinimo: 0 })
+    expect(dados).toEqual({ nome: 'Arroz', preco: 6.5, quantidade: 10, estoqueMinimo: 0, custo: null })
+  })
+
+  it('custo opcional: vazio vira null; preenchido vira número', () => {
+    expect(validarProduto({ ...base, custo: '' }, { novo: true }).dados.custo).toBeNull()
+    expect(validarProduto({ ...base, custo: '4,35' }, { novo: true }).dados.custo).toBe(4.35)
   })
 
   it('na edição não envia quantidade', () => {

@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { produtosApi } from '../api/produtos.js'
 import { useFormulario } from '../hooks/useFormulario.js'
-import { formatarDecimal } from '../utils/formato.js'
+import { margem } from '../utils/custo.js'
+import { formatarDecimal, lerValorMonetario } from '../utils/formato.js'
 import { unidades } from '../utils/estoque.js'
 import { validarProduto } from '../utils/validacaoProduto.js'
 import { Alerta } from './Alerta.jsx'
@@ -19,6 +20,7 @@ export function FormularioProduto({ produto, aoSalvar, aoRemover, aoCancelar }) 
   const { valores, erros, erroGeral, enviando, alterar, enviar } = useFormulario({
     nome: produto?.nome ?? '',
     preco: produto ? formatarDecimal(produto.preco) : '',
+    custo: produto?.custo != null ? formatarDecimal(produto.custo) : '',
     quantidade: '',
     estoqueMinimo: produto?.estoqueMinimo ? String(produto.estoqueMinimo) : '',
   })
@@ -73,6 +75,8 @@ export function FormularioProduto({ produto, aoSalvar, aoRemover, aoCancelar }) 
     )
   }
 
+  const margemAtual = margem(lerValorMonetario(valores.preco), lerValorMonetario(valores.custo))
+
   return (
     <form className={estilos.form} onSubmit={aoEnviar} noValidate>
       <Alerta>{erroGeral}</Alerta>
@@ -112,6 +116,25 @@ export function FormularioProduto({ produto, aoSalvar, aoRemover, aoCancelar }) 
           />
         )}
       </div>
+
+      <div className={estilos.linha}>
+        <CampoTexto
+          rotulo="Custo (opcional)"
+          name="custo"
+          prefixo="R$"
+          formato="moeda"
+          placeholder="0,00"
+          dica="Quanto você paga por unidade"
+          value={valores.custo}
+          onChange={alterar}
+          erro={erros.custo}
+        />
+      </div>
+      {margemAtual !== null && (
+        <p className={estilos.margem} aria-live="polite">
+          Margem: <strong>{margemAtual}%</strong>
+        </p>
+      )}
 
       {!novo && (
         <div className={estilos.saldo}>

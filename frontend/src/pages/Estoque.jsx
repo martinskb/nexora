@@ -18,7 +18,9 @@ import { useEstadoDaAba, useRolagemDaAba } from '../hooks/useEstadoDaAba.js'
 import { useSkeleton } from '../hooks/useSkeleton.js'
 import { useTitulo } from '../hooks/useTitulo.js'
 import { ROTULO_SITUACAO, ordenarPorAtencao, situacaoEstoque, unidades } from '../utils/estoque.js'
-import { normalizarTexto } from '../utils/formato.js'
+import { compartilharTexto, textoReposicao } from '../utils/compartilhar.js'
+import { formatarMoeda, normalizarTexto } from '../utils/formato.js'
+import { useAuth } from '../context/AuthContext.jsx'
 import { esperarVolta, itemPedidoAberto } from '../utils/historico.js'
 import estilos from './Estoque.module.css'
 
@@ -26,6 +28,7 @@ export default function Estoque() {
   useTitulo('Estoque')
   useRolagemDaAba('estoque')
   const { avisar } = useAvisos()
+  const { loja } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
@@ -78,6 +81,13 @@ export default function Estoque() {
       ),
     )
   }, [produtos, filtro, busca])
+
+  // Lista de reposição: o que está acabando ou zerado, na mesma ordem da tela.
+  async function compartilharLista() {
+    const repor = ordenarPorAtencao(produtos.filter((p) => situacaoEstoque(p) !== 'ok'))
+    const r = await compartilharTexto(textoReposicao(loja.nome, new Date(), repor))
+    if (r === 'copiado') avisar('Lista copiada.')
+  }
 
   const produtoAberto = produtos.find((p) => p.id === selecionado)
 
@@ -145,6 +155,12 @@ export default function Estoque() {
 
           <CampoBusca valor={busca} aoMudar={setBusca} />
 
+          {filtro !== 'todos' && contagem.baixo + contagem.zerado > 0 && (
+            <Botao variante="secundario" className={estilos.compartilhar} onClick={compartilharLista}>
+              Compartilhar lista de reposição
+            </Botao>
+          )}
+
           {filtrados.length === 0 ? (
             <p className={estilos.info}>
               {busca
@@ -179,6 +195,9 @@ export default function Estoque() {
               <strong className="num">{produtoAberto.quantidade}</strong>
               <span className={`${estilos.situacao} ${estilos[`situacao_${situacaoEstoque(produtoAberto)}`]}`}>
                 {ROTULO_SITUACAO[situacaoEstoque(produtoAberto)]}
+              </span>
+              <span className={estilos.avisoMinimo}>
+                {produtoAberto.custo != null ? `Custo médio: ${formatarMoeda(produtoAberto.custo)}` : 'Custo não informado'}
               </span>
               {produtoAberto.estoqueMinimo > 0 && (
                 <span className={estilos.avisoMinimo}>Aviso quando restarem {produtoAberto.estoqueMinimo} un.</span>
