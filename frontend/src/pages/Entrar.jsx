@@ -6,8 +6,10 @@ import { LayoutAuth } from '../components/LayoutAuth.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useFormulario } from '../hooks/useFormulario.js'
 import { validarLogin } from '../utils/validacao.js'
+import { useTitulo } from '../hooks/useTitulo.js'
 
 export default function Entrar() {
+  useTitulo('Entrar')
   const { entrar } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()

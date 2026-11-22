@@ -5,10 +5,12 @@ import { Botao } from '../components/Botao.jsx'
 import { CartaoProduto } from '../components/CartaoProduto.jsx'
 import { FormularioProduto } from '../components/FormularioProduto.jsx'
 import { IconeBusca, IconeCaixa, IconeMais } from '../components/Icones.jsx'
-import { Modal } from '../components/Modal.jsx'
+import { Folha } from '../components/Folha.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
 import { normalizarTexto } from '../utils/formato.js'
 import estilos from './Produtos.module.css'
+import { useTitulo } from '../hooks/useTitulo.js'
+import { useEstadoDaAba } from '../hooks/useEstadoDaAba.js'
 
 const porNome = (a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' })
 
@@ -23,9 +25,10 @@ async function carregarProdutos(signal) {
 }
 
 export default function Produtos() {
+  useTitulo('Produtos')
   const { avisar } = useAvisos()
   const [estado, setEstado] = useState({ produtos: [], carregando: true, erro: '' })
-  const [busca, setBusca] = useState('')
+  const [busca, setBusca] = useEstadoDaAba('produtos.busca', '')
   // null = fechado; { produto: null } = novo; { produto } = edição
   const [janela, setJanela] = useState(null)
 
@@ -132,7 +135,7 @@ export default function Produtos() {
         </>
       )}
 
-      <Modal
+      <Folha
         aberto={janela !== null}
         aoFechar={() => setJanela(null)}
         titulo={janela?.produto ? 'Editar produto' : 'Novo produto'}
@@ -145,7 +148,7 @@ export default function Produtos() {
             aoCancelar={() => setJanela(null)}
           />
         )}
-      </Modal>
+      </Folha>
     </section>
   )
 }

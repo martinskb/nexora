@@ -1,0 +1,112 @@
+.folha {
+  width: min(100% - 2 * var(--esp-4), 480px);
+  max-height: calc(100dvh - 2 * var(--esp-6));
+  padding: 0;
+  border: 0;
+  border-radius: var(--raio-16);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  box-shadow: inset 0 0 0 1px var(--cor-contorno), var(--sombra-flutuante);
+  overflow: hidden;
+}
+
+.folha::backdrop {
+  background: var(--cor-overlay);
+  animation: esmaecer 0.25s var(--curva);
+}
+
+.folha[open] {
+  animation: surgir 0.25s var(--curva);
+}
+
+/* Só a caixa rola; o dialog recebe o toque no fundo. */
+.caixa {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  max-height: inherit;
+  overflow: auto;
+}
+
+.alca {
+  display: none;
+}
+
+.cabecalho {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-2);
+  padding: var(--esp-3) var(--esp-3) var(--esp-3) var(--esp-5);
+  background: var(--cor-superficie);
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.titulo {
+  font-size: var(--t-19);
+}
+
+.corpo {
+  padding: var(--esp-5);
+}
+
+.rodape {
+  position: sticky;
+  bottom: 0;
+  padding: var(--esp-4) var(--esp-5);
+  background: var(--cor-superficie);
+  border-top: 1px solid var(--cor-linha);
+}
+
+/* Celular: folha presa ao rodapé, com alça, fácil de usar com o polegar. */
+@media (max-width: 959px) {
+  .folha {
+    width: 100%;
+    max-width: 100%;
+    margin: auto 0 0;
+    max-height: 92dvh;
+    border-radius: 16px 16px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .folha[open] {
+    animation: subir 0.25s var(--curva);
+  }
+  .alca {
+    display: block;
+    justify-self: center;
+    width: 36px;
+    height: 4px;
+    margin-top: var(--esp-2);
+    border-radius: var(--raio-pilula);
+    background: var(--cor-contorno-campo);
+    opacity: 0.6;
+  }
+  .cabecalho {
+    border-bottom: 0;
+    padding-top: var(--esp-1);
+  }
+  .corpo {
+    padding-top: var(--esp-2);
+  }
+}
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes subir {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes esmaecer {
+  from {
+    opacity: 0;
+  }
+}

@@ -6,8 +6,10 @@ import { LayoutAuth } from '../components/LayoutAuth.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useFormulario } from '../hooks/useFormulario.js'
 import { validarCadastro } from '../utils/validacao.js'
+import { useTitulo } from '../hooks/useTitulo.js'
 
 export default function CriarConta() {
+  useTitulo('Criar conta')
   const { cadastrar } = useAuth()
   const navigate = useNavigate()
   const { valores, erros, erroGeral, enviando, alterar, enviar } = useFormulario({

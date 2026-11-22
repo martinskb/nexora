@@ -4,7 +4,7 @@ import { Alerta } from '../components/Alerta.jsx'
 import { Botao } from '../components/Botao.jsx'
 import { DetalheVenda } from '../components/DetalheVenda.jsx'
 import { IconeRecibo } from '../components/Icones.jsx'
-import { Modal } from '../components/Modal.jsx'
+import { Folha } from '../components/Folha.jsx'
 import { EscolhaCanal } from '../components/EscolhaCanal.jsx'
 import { Segmentado } from '../components/Segmentado.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
@@ -13,6 +13,8 @@ import { formatarHora, intervaloDoPeriodo, rotuloDoDia } from '../utils/datas.js
 import { SEM_CANAL, usarListaDeCanais } from '../utils/canais.js'
 import { formatarMoeda } from '../utils/formato.js'
 import estilos from './Vendas.module.css'
+import { useTitulo } from '../hooks/useTitulo.js'
+import { useEstadoDaAba } from '../hooks/useEstadoDaAba.js'
 
 const PERIODOS = [
   { valor: 'hoje', rotulo: 'Hoje' },
@@ -41,9 +43,10 @@ async function carregar(filtros, antesDe, signal) {
 }
 
 export default function Vendas() {
+  useTitulo('Vendas')
   const { avisar } = useAvisos()
   const { ativos: canais } = useCanais()
-  const [filtro, setFiltro] = useState({ periodo: 'hoje', canalId: '', status: '' }) // canalId: '' = todas, 'sem' = sem canal
+  const [filtro, setFiltro] = useEstadoDaAba('vendas.filtro', { periodo: 'hoje', canalId: '', status: '' }) // canalId: '' = todas, 'sem' = sem canal
   const [estado, setEstado] = useState({ vendas: [], temMais: false, carregando: true, erro: '' })
   const [carregandoMais, setCarregandoMais] = useState(false)
   const [detalhe, setDetalhe] = useState(null) // { carregando, venda, erro }
@@ -200,11 +203,11 @@ export default function Vendas() {
         </Botao>
       )}
 
-      <Modal aberto={detalhe !== null} aoFechar={() => setDetalhe(null)} titulo="Detalhes da venda">
+      <Folha aberto={detalhe !== null} aoFechar={() => setDetalhe(null)} titulo="Detalhes da venda">
         {detalhe?.carregando && <p className={estilos.info}>Carregando…</p>}
         {detalhe?.erro && <Alerta>{detalhe.erro}</Alerta>}
         {detalhe?.venda && <DetalheVenda key={detalhe.venda.status} venda={detalhe.venda} aoCancelar={aoCancelar} />}
-      </Modal>
+      </Folha>
     </section>
   )
 }

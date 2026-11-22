@@ -8,7 +8,7 @@ import { Alerta } from '../components/Alerta.jsx'
 import { Botao } from '../components/Botao.jsx'
 import { Carrinho } from '../components/Carrinho.jsx'
 import { IconeBusca, IconeCaixa, IconeMais } from '../components/Icones.jsx'
-import { Modal } from '../components/Modal.jsx'
+import { Folha } from '../components/Folha.jsx'
 import { Preco } from '../components/Preco.jsx'
 import { SeloEstoque } from '../components/SeloEstoque.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
@@ -17,6 +17,7 @@ import { useMediaQuery } from '../hooks/useMediaQuery.js'
 import { formatarMoeda, normalizarTexto } from '../utils/formato.js'
 import { unidades } from '../utils/estoque.js'
 import estilos from './Vender.module.css'
+import { useTitulo } from '../hooks/useTitulo.js'
 
 async function carregarProdutos(signal) {
   try {
@@ -29,6 +30,7 @@ async function carregarProdutos(signal) {
 }
 
 export default function Vender() {
+  useTitulo('Nova venda')
   const { avisar } = useAvisos()
   const telaGrande = useMediaQuery('(min-width: 900px)')
 
@@ -259,12 +261,12 @@ export default function Vender() {
       )}
 
       {!telaGrande && (
-        <Modal aberto={carrinhoAberto && !ajuste} aoFechar={() => setCarrinhoAberto(false)} titulo="Venda atual">
+        <Folha aberto={carrinhoAberto && !ajuste} aoFechar={() => setCarrinhoAberto(false)} titulo="Venda atual">
           <Carrinho {...carrinhoProps} />
-        </Modal>
+        </Folha>
       )}
 
-      <Modal aberto={ajuste !== null} aoFechar={() => setAjuste(null)} titulo="Corrigir estoque">
+      <Folha aberto={ajuste !== null} aoFechar={() => setAjuste(null)} titulo="Corrigir estoque">
         {ajuste && (
           <AjusteRapido
             produto={ajuste.produto}
@@ -273,7 +275,7 @@ export default function Vender() {
             aoCancelar={() => setAjuste(null)}
           />
         )}
-      </Modal>
+      </Folha>
     </div>
   )
 }

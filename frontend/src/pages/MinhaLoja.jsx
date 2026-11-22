@@ -3,11 +3,12 @@ import { canaisApi } from '../api/canais.js'
 import { Alerta } from '../components/Alerta.jsx'
 import { Botao } from '../components/Botao.jsx'
 import { CampoTexto } from '../components/CampoTexto.jsx'
-import { Modal } from '../components/Modal.jsx'
+import { Folha } from '../components/Folha.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
 import { useCanais } from '../dados/hooks.js'
 import estilos from './MinhaLoja.module.css'
+import { useTitulo } from '../hooks/useTitulo.js'
 
 /** Uma linha da lista de canais: nome, renomear e arquivar/apagar (ou reativar). */
 function LinhaCanal({ canal, aoMudar, aoPedirApagar }) {
@@ -112,6 +113,7 @@ function LinhaCanal({ canal, aoMudar, aoPedirApagar }) {
 }
 
 export default function MinhaLoja() {
+  useTitulo('Minha loja')
   const { loja } = useAuth()
   const { avisar } = useAvisos()
   const { canais, ativos, carregando, erro, recarregar } = useCanais()
@@ -219,7 +221,7 @@ export default function MinhaLoja() {
         )}
       </section>
 
-      <Modal
+      <Folha
         aberto={apagar !== null}
         aoFechar={() => {
           setApagar(null)
@@ -243,7 +245,7 @@ export default function MinhaLoja() {
             </div>
           </div>
         )}
-      </Modal>
+      </Folha>
     </div>
   )
 }

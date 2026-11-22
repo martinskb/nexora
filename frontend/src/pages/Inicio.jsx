@@ -14,6 +14,7 @@ import { intervaloDoPeriodo } from '../utils/datas.js'
 import { unidades } from '../utils/estoque.js'
 import { formatarMoeda } from '../utils/formato.js'
 import estilos from './Inicio.module.css'
+import { useTitulo } from '../hooks/useTitulo.js'
 
 const PERIODOS = [
   { valor: 'hoje', rotulo: 'Hoje' },
@@ -35,6 +36,7 @@ async function carregar(periodo, signal) {
 }
 
 export default function Inicio() {
+  useTitulo('Início')
   const { loja } = useAuth()
   const { canais } = useCanais() // todos (inclusive arquivados): a cor segue a ordem alfabética
   const [periodo, setPeriodo] = useState('hoje')

@@ -7,11 +7,13 @@ import { Botao } from '../components/Botao.jsx'
 import { CartaoProduto } from '../components/CartaoProduto.jsx'
 import { HistoricoEstoque } from '../components/HistoricoEstoque.jsx'
 import { IconeBusca } from '../components/Icones.jsx'
-import { Modal } from '../components/Modal.jsx'
+import { Folha } from '../components/Folha.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
 import { ROTULO_SITUACAO, situacaoEstoque, unidades } from '../utils/estoque.js'
 import { normalizarTexto } from '../utils/formato.js'
 import estilos from './Estoque.module.css'
+import { useTitulo } from '../hooks/useTitulo.js'
+import { useEstadoDaAba } from '../hooks/useEstadoDaAba.js'
 
 async function carregarProdutos(signal) {
   try {
@@ -24,11 +26,12 @@ async function carregarProdutos(signal) {
 }
 
 export default function Estoque() {
+  useTitulo('Estoque')
   const { avisar } = useAvisos()
   const [params, setParams] = useSearchParams()
   const [estado, setEstado] = useState({ produtos: [], carregando: true, erro: '' })
-  const [filtro, setFiltro] = useState('todos')
-  const [busca, setBusca] = useState('')
+  const [filtro, setFiltro] = useEstadoDaAba('estoque.filtro', 'todos')
+  const [busca, setBusca] = useEstadoDaAba('estoque.busca', '')
   const [selecionado, setSelecionado] = useState(null) // id do produto aberto
   const [versaoHistorico, setVersaoHistorico] = useState(0)
 
@@ -172,7 +175,7 @@ export default function Estoque() {
         </>
       )}
 
-      <Modal aberto={Boolean(produtoAberto)} aoFechar={fechar} titulo={produtoAberto?.nome ?? ''}>
+      <Folha aberto={Boolean(produtoAberto)} aoFechar={fechar} titulo={produtoAberto?.nome ?? ''}>
         {produtoAberto && (
           <div className={estilos.detalhe}>
             <div className={estilos.saldo}>
@@ -192,7 +195,7 @@ export default function Estoque() {
             </div>
           </div>
         )}
-      </Modal>
+      </Folha>
     </section>
   )
 }
