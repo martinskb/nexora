@@ -11,7 +11,7 @@
 
 .dica {
   color: var(--cor-texto-suave);
-  font-size: var(--texto-xs);
+  font-size: var(--t-12);
 }
 
 .caixa {
@@ -26,7 +26,7 @@
   border: 1px solid var(--cor-contorno-campo);
   border-radius: 10px;
   background: var(--cor-superficie);
-  font-size: var(--texto-md);
+  font-size: 1rem;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
@@ -55,11 +55,11 @@
 }
 
 .invalida {
-  border-color: var(--cor-erro);
+  border-color: var(--cor-critico);
 }
 .invalida:focus {
-  border-color: var(--cor-erro);
-  box-shadow: 0 0 0 3px var(--cor-erro-suave);
+  border-color: var(--cor-critico);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cor-critico) 14%, transparent);
 }
 
 .botaoVer {
@@ -81,7 +81,7 @@
 }
 
 .erro {
-  color: var(--cor-erro);
-  font-size: var(--texto-xs);
+  color: var(--cor-critico);
+  font-size: var(--t-12);
   font-weight: 500;
 }

@@ -79,7 +79,7 @@
 
 .info {
   color: var(--cor-texto-suave);
-  font-size: var(--texto-sm);
+  font-size: var(--t-15);
 }
 
 .secao {
@@ -111,10 +111,10 @@
 
 .vazio {
   padding: var(--esp-4);
-  border: 1px dashed var(--cor-borda);
-  border-radius: var(--raio-md);
+  border: 1px dashed var(--cor-contorno);
+  border-radius: var(--raio-8);
   color: var(--cor-texto-suave);
-  font-size: var(--texto-sm);
+  font-size: var(--t-15);
   text-align: center;
 }
 
@@ -131,7 +131,7 @@
 }
 
 .linha + .linha {
-  border-top: 1px solid var(--cor-borda);
+  border-top: 1px solid var(--cor-contorno);
 }
 
 .resumoLinha {
@@ -163,7 +163,7 @@
 .arquivados {
   display: grid;
   gap: var(--esp-2);
-  border-top: 1px solid var(--cor-borda);
+  border-top: 1px solid var(--cor-contorno);
   padding-top: var(--esp-3);
 }
 

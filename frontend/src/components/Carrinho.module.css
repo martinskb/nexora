@@ -10,7 +10,7 @@
   padding: var(--esp-6) var(--esp-4);
   text-align: center;
   color: var(--cor-texto-suave);
-  font-size: var(--texto-sm);
+  font-size: var(--t-15);
 }
 
 .itens {
@@ -27,7 +27,7 @@
 }
 
 .item + .item {
-  border-top: 1px solid var(--cor-borda);
+  border-top: 1px solid var(--cor-contorno);
 }
 
 .info {
@@ -44,7 +44,7 @@
 
 .unitario {
   color: var(--cor-texto-suave);
-  font-size: var(--texto-xs);
+  font-size: var(--t-12);
   white-space: nowrap;
 }
 
@@ -58,7 +58,7 @@
   flex: 1;
   text-align: right;
   font-weight: 700;
-  font-family: var(--fonte-num);
+  font-family: var(--fonte);
   font-variant-numeric: tabular-nums;
 }
 
@@ -68,15 +68,15 @@
   display: grid;
   place-items: center;
   border: 0;
-  border-radius: var(--raio-md);
+  border-radius: var(--raio-8);
   background: transparent;
   color: var(--cor-texto-suave);
   cursor: pointer;
 }
 
 .remover:hover {
-  background: var(--cor-erro-suave);
-  color: var(--cor-erro);
+  background: color-mix(in srgb, var(--cor-critico) 14%, transparent);
+  color: var(--cor-critico);
 }
 
 .link {
@@ -101,7 +101,7 @@
 
 .total small {
   color: var(--cor-texto-suave);
-  font-size: var(--texto-sm);
+  font-size: var(--t-15);
 }
 
 .valorTotal {

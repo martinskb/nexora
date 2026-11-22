@@ -39,7 +39,7 @@ export function AjusteRapido({ produto, necessario, aoAjustar, aoCancelar }) {
         O sistema mostra <strong>{unidades(produto.quantidade)}</strong> de <strong>{produto.nome}</strong>
         {necessario > produto.quantidade && <>, mas a venda precisa de {necessario}</>}.
       </Alerta>
-      <p style={{ color: 'var(--cor-texto-suave)', fontSize: 'var(--texto-sm)' }}>
+      <p style={{ color: 'var(--cor-texto-suave)', fontSize: 'var(--t-15)' }}>
         Se o produto está na loja, informe quantas unidades você tem agora (antes desta venda). A correção fica
         registrada no histórico.
       </p>

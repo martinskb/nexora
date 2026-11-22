@@ -5,19 +5,41 @@ import { limparCacheDaLoja } from '../dados/cliente.js'
 import { esquecerEstadoDasAbas } from '../hooks/useEstadoDaAba.js'
 
 const AuthContext = createContext(null)
+const CHAVE_ULTIMA_LOJA = 'nexora-ultima-loja'
+
+function lerUltimaLoja() {
+  try {
+    return window.localStorage.getItem(CHAVE_ULTIMA_LOJA)
+  } catch {
+    return null
+  }
+}
+
+function gravarUltimaLoja(id) {
+  try {
+    if (id == null) window.localStorage.removeItem(CHAVE_ULTIMA_LOJA)
+    else window.localStorage.setItem(CHAVE_ULTIMA_LOJA, String(id))
+  } catch {
+    /* armazenamento indisponível */
+  }
+}
 
 export function AuthProvider({ children }) {
   const [loja, setLoja] = useState(null)
   const [verificando, setVerificando] = useState(true)
+  // Indício de sessão (alguém já entrou neste aparelho): a abertura mostra a moldura do app.
+  const [ultimaLojaId] = useState(lerUltimaLoja)
   const lojaAtual = useRef(null)
   useEffect(() => {
     lojaAtual.current = loja
+    if (loja?.id != null) gravarUltimaLoja(loja.id)
   }, [loja])
 
   // Ao sair ou perder a sessão, apaga os dados guardados ANTES de esquecer a loja.
   const esquecerLoja = useCallback(() => {
     limparCacheDaLoja(lojaAtual.current?.id)
     esquecerEstadoDasAbas()
+    gravarUltimaLoja(null)
     setLoja(null)
   }, [])
 
@@ -58,8 +80,8 @@ export function AuthProvider({ children }) {
   }, [esquecerLoja])
 
   const valor = useMemo(
-    () => ({ loja, verificando, entrar, cadastrar, sair, atualizarLoja: setLoja }),
-    [loja, verificando, entrar, cadastrar, sair],
+    () => ({ loja, verificando, ultimaLojaId, entrar, cadastrar, sair, atualizarLoja: setLoja }),
+    [loja, verificando, ultimaLojaId, entrar, cadastrar, sair],
   )
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>

@@ -69,36 +69,6 @@
   --serie-6: #d55181;
   --cor-sem-canal: #7b8780;
 
-  /* Apelidos dos nomes antigos — removidos quando todas as telas forem refeitas. */
-  --cor-primaria: var(--cor-marca);
-  --cor-primaria-hover: var(--cor-marca-hover);
-  --cor-primaria-suave: var(--cor-marca-suave);
-  --cor-sobre-primaria: var(--cor-sobre-marca);
-  --cor-etiqueta: var(--cor-marca);
-  --cor-etiqueta-hover: var(--cor-marca-hover);
-  --cor-sobre-etiqueta: var(--cor-sobre-marca);
-  --cor-borda: var(--cor-contorno);
-  --cor-borda-campo: var(--cor-contorno-campo);
-  --cor-sucesso: var(--cor-dinheiro);
-  --cor-sucesso-suave: color-mix(in srgb, var(--cor-dinheiro) 14%, transparent);
-  --cor-alerta-suave: color-mix(in srgb, var(--cor-alerta) 14%, transparent);
-  --cor-erro: var(--cor-critico);
-  --cor-erro-suave: color-mix(in srgb, var(--cor-critico) 14%, transparent);
-  --cor-sobre-erro: #ffffff;
-  --fonte-titulo: var(--fonte);
-  --fonte-num: var(--fonte);
-  --texto-xs: var(--t-12);
-  --texto-sm: var(--t-15);
-  --texto-md: 1rem;
-  --texto-lg: var(--t-19);
-  --texto-xl: var(--t-24);
-  --texto-2xl: var(--t-30);
-  --raio-sm: 6px;
-  --raio-md: var(--raio-8);
-  --raio-lg: var(--raio-16);
-  --sombra-sm: none;
-  --sombra-md: var(--sombra-flutuante);
-
   color-scheme: light;
   font-family: var(--fonte);
   font-size: 16px;

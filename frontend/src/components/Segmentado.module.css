@@ -11,7 +11,7 @@
   padding: 0;
   margin-bottom: var(--esp-1);
   font-weight: 600;
-  font-size: var(--texto-sm);
+  font-size: var(--t-15);
 }
 
 .opcoes {
@@ -71,7 +71,7 @@
   .compacto .opcao {
     min-height: 34px;
     padding: 0 var(--esp-2);
-    font-size: var(--texto-xs);
+    font-size: var(--t-12);
   }
 }
 
