@@ -1,192 +1,215 @@
-/* Largura útil do app: usa a tela larga do computador sem deixar as linhas
-   longas demais; a margem lateral cresce junto com a tela. */
-.cabecalho,
+.app {
+  min-height: 100dvh;
+}
+
+/* ---------- Conteúdo ---------- */
 .conteudo {
-  --largura-app: 1600px;
-  --margem-app: clamp(var(--esp-4), 3vw, var(--esp-6));
-}
-
-.cabecalho {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--cor-superficie);
-  border-bottom: 1px solid var(--cor-borda);
-  padding-top: env(safe-area-inset-top, 0px);
-}
-
-.barra {
-  max-width: var(--largura-app);
+  width: 100%;
+  max-width: 1280px;
   margin: 0 auto;
-  min-height: 60px;
-  padding: 0 var(--margem-app);
+  padding: var(--esp-2) 20px calc(var(--altura-nav-inferior) + var(--esp-6) + env(safe-area-inset-bottom, 0px));
+}
+
+.modoVender .conteudo {
+  padding-top: 0;
+  padding-bottom: var(--esp-6);
+}
+
+/* ---------- Celular: topo ---------- */
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: env(safe-area-inset-top, 0px) 20px 0;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.topo a:first-child {
+  display: grid;
+  place-items: center;
+  min-width: var(--toque-min);
+  min-height: var(--toque-min);
+  margin-left: -6px;
+}
+
+.botaoLoja {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  min-height: var(--toque-min);
+  padding: 0 var(--esp-4);
+  border-radius: var(--raio-pilula);
+  box-shadow: inset 0 0 0 1px var(--cor-contorno);
+  color: var(--cor-texto);
+  font-size: var(--t-15);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.botaoLoja:hover,
+.botaoLoja.ativo {
+  background: var(--cor-superficie-2);
+}
+
+/* ---------- Celular: menu inferior ---------- */
+.menuInferior {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  justify-items: center;
+  height: calc(var(--altura-nav-inferior) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  background: color-mix(in srgb, var(--cor-fundo) 85%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--cor-linha);
+}
+
+.menuInferior .item {
+  flex-direction: column;
+  gap: 4px;
+  min-width: 64px;
+  min-height: 52px;
+  justify-content: center;
+  font-size: var(--t-12);
+}
+
+.venderCentral {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-top: -28px;
+  border-radius: var(--raio-pilula);
+  background: var(--cor-marca);
+  color: var(--cor-sobre-marca);
+  box-shadow:
+    0 0 0 4px var(--cor-fundo),
+    var(--sombra-flutuante);
+  transition: transform 0.15s var(--curva);
+}
+
+.venderCentral:active {
+  transform: scale(0.94);
+}
+
+/* ---------- Itens de menu ---------- */
+.item {
   display: flex;
   align-items: center;
   gap: var(--esp-3);
-}
-
-.marca {
-  display: flex;
-  align-items: center;
-  min-height: var(--toque-min);
-  text-decoration: none;
-  color: inherit;
-}
-
-.loja {
-  flex: 1;
-  min-width: 0;
-  min-height: var(--toque-min);
-  line-height: var(--toque-min);
-  color: var(--cor-texto-suave);
-  font-size: var(--texto-sm);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: right;
-  text-decoration: underline;
-  text-decoration-color: var(--cor-borda);
-  text-underline-offset: 4px;
-}
-
-.loja:hover,
-.loja.active {
-  color: var(--cor-texto);
-  text-decoration-color: currentColor;
-}
-
-.acoes {
-  display: flex;
-  align-items: center;
-  gap: var(--esp-1);
-}
-
-.textoSair {
-  display: none;
-}
-
-.conteudo {
-  max-width: var(--largura-app);
-  margin: 0 auto;
-  padding: var(--esp-5) var(--margem-app) calc(var(--altura-nav-inferior) + var(--esp-6) + env(safe-area-inset-bottom, 0px));
-}
-
-/* ---------- Menu ---------- */
-.link {
-  display: flex;
-  align-items: center;
-  gap: var(--esp-2);
   color: var(--cor-texto-suave);
   text-decoration: none;
-  font-weight: 600;
-  font-size: var(--texto-sm);
-  border-radius: var(--raio-md);
+  font-weight: 500;
+  border-radius: var(--raio-8);
+  transition: color 0.15s, background-color 0.15s;
 }
 
-.link:hover {
+.item:hover {
   color: var(--cor-texto);
 }
 
 .ativo {
-  color: var(--cor-primaria);
+  color: var(--cor-texto);
+  font-weight: 600;
 }
 
-/* Celular: barra fixa no rodapé, ao alcance do polegar. */
-.menuTopo,
-.venderTopo {
+/* ---------- PC: menu lateral ---------- */
+.lateral {
   display: none;
 }
 
-.menuInferior {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  height: calc(var(--altura-nav-inferior) + env(safe-area-inset-bottom, 0px));
-  padding: 0 var(--esp-1) env(safe-area-inset-bottom, 0px);
-  background: var(--cor-superficie);
-  border-top: 1px solid var(--cor-borda);
-}
-
-.menuInferior .link {
-  flex: 1;
-  height: 100%;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-  font-size: var(--texto-xs);
-  border-radius: 0;
-}
-
-.menuInferior .ativo {
-  color: var(--cor-primaria);
-  box-shadow: inset 0 3px 0 var(--cor-primaria);
-}
-
-/* A ação principal: botão preenchido no centro, sem sair da altura do menu
-   (não cobre a barra de total da tela de venda). */
-.menuInferior .venderInferior {
-  flex: 1.15;
-  height: calc(100% - 2 * var(--esp-2));
-  margin: 0 var(--esp-1);
-  border-radius: var(--raio-md);
-  background: var(--cor-etiqueta);
-  color: var(--cor-sobre-etiqueta);
-  font-weight: 700;
-}
-
-.menuInferior .venderInferior.ativo {
-  box-shadow: inset 0 0 0 2px var(--cor-sobre-etiqueta);
-  color: var(--cor-sobre-etiqueta);
-}
-
-/* Telas maiores: menu no topo, sem barra inferior. */
-@media (min-width: 768px) {
-  .textoSair {
-    display: inline;
-  }
-
+@media (min-width: 960px) {
+  .topo,
   .menuInferior {
     display: none;
   }
 
-  .menuTopo {
-    display: flex;
-    gap: var(--esp-1);
-    margin-left: var(--esp-5);
+  .app {
+    display: grid;
+    grid-template-columns: 248px minmax(0, 1fr);
   }
 
-  .menuTopo .link {
-    min-height: 60px;
+  .lateral {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    display: grid;
+    grid-template-rows: 40px 1fr auto;
+    gap: var(--esp-6);
+    padding: var(--esp-5) var(--esp-4);
+    border-right: 1px solid var(--cor-linha);
+    background: color-mix(in srgb, var(--cor-superficie) 55%, transparent);
+  }
+
+  .marcaLateral {
+    display: inline-flex;
+    align-items: center;
     padding: 0 var(--esp-3);
+    width: fit-content;
   }
 
-  .menuTopo .ativo {
-    color: var(--cor-texto);
-    box-shadow: inset 0 -3px 0 var(--cor-primaria);
-    border-radius: 0;
+  .menuLateral {
+    display: grid;
+    gap: var(--esp-1);
+    align-content: start;
   }
 
-  .venderTopo {
-    display: flex;
-    min-height: var(--toque-min);
-    padding: 0 var(--esp-5);
-    background: var(--cor-etiqueta);
-    color: var(--cor-sobre-etiqueta);
-    font-weight: 700;
-    font-size: var(--texto-md);
+  .menuLateral .item {
+    height: var(--toque-min);
+    padding: 0 var(--esp-3);
+    font-size: var(--t-15);
   }
 
-  .venderTopo:hover {
-    background: var(--cor-etiqueta-hover);
-    color: var(--cor-sobre-etiqueta);
+  .menuLateral .item:hover {
+    background: var(--cor-superficie-2);
   }
 
-  .venderTopo.ativo {
-    box-shadow: inset 0 0 0 2px var(--cor-sobre-etiqueta);
-    color: var(--cor-sobre-etiqueta);
+  .menuLateral .ativo {
+    background: var(--cor-superficie-2);
+    box-shadow: inset 0 0 0 1px var(--cor-contorno);
+  }
+
+  .numero {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.55;
+    font-variant-numeric: tabular-nums;
+    vertical-align: baseline;
+  }
+
+  .menuLateral .venderLateral {
+    margin-top: var(--esp-4);
+    justify-content: center;
+    background: var(--cor-marca);
+    color: var(--cor-sobre-marca);
+    font-weight: 600;
+  }
+
+  .menuLateral .venderLateral:hover,
+  .menuLateral .venderLateral.ativo {
+    background: var(--cor-marca-hover);
+    color: var(--cor-sobre-marca);
+    box-shadow: none;
+  }
+
+  .nomeLoja {
+    padding: 0 var(--esp-3);
+    font-size: var(--t-15);
+    color: var(--cor-texto-suave);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .conteudo,
+  .modoVender .conteudo {
+    padding: var(--esp-6) var(--esp-7) var(--esp-7);
   }
 }

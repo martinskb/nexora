@@ -118,3 +118,8 @@ export function useAntecipar() {
     [cliente],
   )
 }
+
+/** Filtros da lista de Vendas na forma da API (a mesma chave usada pela tela e pela busca antecipada). */
+export const filtrosDeVendas = ({ periodo, canalId, status }) => ({ ...intervaloDoPeriodo(periodo), canalId, status })
+
+export const FILTRO_VENDAS_PADRAO = { periodo: 'hoje', canalId: '', status: '' }

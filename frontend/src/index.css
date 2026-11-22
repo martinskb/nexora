@@ -152,7 +152,7 @@
 /* Ao rolar até um elemento (ex.: foco pelo teclado), não deixá-lo
    escondido atrás do cabeçalho fixo nem do menu inferior. */
 html {
-  scroll-padding-top: calc(60px + var(--esp-4));
+  scroll-padding-top: var(--esp-4);
   scroll-padding-bottom: calc(var(--altura-nav-inferior) + var(--esp-4));
 }
 
