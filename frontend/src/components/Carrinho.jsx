@@ -7,6 +7,7 @@ import { CampoTexto } from './CampoTexto.jsx'
 import { ControleQuantidade } from './ControleQuantidade.jsx'
 import { IconeCarrinho, IconeLixeira } from './Icones.jsx'
 import { EscolhaCanal } from './EscolhaCanal.jsx'
+import { FormaPagamento } from './FormaPagamento.jsx'
 import { NumeroAnimado } from './NumeroAnimado.jsx'
 import estilos from './Carrinho.module.css'
 
@@ -24,6 +25,7 @@ export function Carrinho({
   enviando,
   erro,
   atalhoConfirmar, // ex.: 'Enter' (PC)
+  pagamento, // props de FormaPagamento (sem o total)
 }) {
   const [mostrarObs, setMostrarObs] = useState(Boolean(observacao))
   const opcoesCanal = [{ valor: '', rotulo: 'Nenhum' }, ...canais.map((c) => ({ valor: String(c.id), rotulo: c.nome }))]
@@ -76,6 +78,8 @@ export function Carrinho({
           usarLista={usarListaDeCanais(opcoesCanal, canais.length)}
         />
       )}
+
+      {pagamento && <FormaPagamento total={total} {...pagamento} />}
 
       {mostrarObs ? (
         <CampoTexto
