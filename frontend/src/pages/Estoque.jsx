@@ -19,6 +19,7 @@ import { useSkeleton } from '../hooks/useSkeleton.js'
 import { useTitulo } from '../hooks/useTitulo.js'
 import { ROTULO_SITUACAO, ordenarPorAtencao, situacaoEstoque, unidades } from '../utils/estoque.js'
 import { normalizarTexto } from '../utils/formato.js'
+import { esperarVolta, itemPedidoAberto } from '../utils/historico.js'
 import estilos from './Estoque.module.css'
 
 export default function Estoque() {
@@ -45,13 +46,19 @@ export default function Estoque() {
     navigate(location.pathname + location.search, { replace: true, state: { ...location.state, filtro: undefined } })
   }, [filtroPedido, setFiltro, navigate, location.pathname, location.search, location.state])
 
-  // ?produto=id (vindo do Início) abre direto o produto pedido.
+  // ?produto=id (vindo do Início) abre direto o produto pedido, até ser dispensado.
   const idPedido = Number(params.get('produto')) || null
-  const selecionado = selecionadoEstado ?? idPedido
+  const [dispensado, setDispensado] = useState(null)
+  const selecionado = itemPedidoAberto(selecionadoEstado, idPedido, dispensado === idPedido)
 
   function fechar() {
     setSelecionado(null)
-    if (params.has('produto')) setParams({}, { replace: true, state: location.state })
+    if (!idPedido) return
+    // Limpa o ?produto só na entrada de baixo, depois que a folha sai do histórico:
+    // regravar a entrada da folha deixaria um "voltar" que reabre o produto.
+    setDispensado(idPedido)
+    const estado = location.state
+    esperarVolta().then(() => setParams({}, { replace: true, state: estado }))
   }
 
   const contagem = useMemo(() => {

@@ -1,17 +1,19 @@
 import { useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { tentarSair } from '../utils/guardaSaida.js'
 import { acaoAoIrPara, ehAba } from '../utils/navegacao.js'
 
 /**
  * Navegação do menu com as regras de histórico do app (utils/navegacao.js):
  * abas não empilham; voltar numa aba leva ao Início; Vender e Minha loja
- * guardam de onde a pessoa veio (state.origem).
+ * guardam de onde a pessoa veio (state.origem). Se a tela atual tem trabalho
+ * em andamento (Vender com itens), ela pergunta antes de sair.
  */
 export function useNavegarApp() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  return useCallback(
+  const ir = useCallback(
     (para, { state: extra } = {}) => {
       const de = location.pathname
       const inicioAtras = Boolean(location.state?.inicioAtras)
@@ -29,4 +31,6 @@ export function useNavegarApp() {
     },
     [location, navigate],
   )
+
+  return useCallback((para, opcoes) => tentarSair(() => ir(para, opcoes)), [ir])
 }

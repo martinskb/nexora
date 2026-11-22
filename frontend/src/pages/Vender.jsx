@@ -21,21 +21,13 @@ import { useSkeleton } from '../hooks/useSkeleton.js'
 import { useTitulo } from '../hooks/useTitulo.js'
 import { situacaoEstoque, unidades } from '../utils/estoque.js'
 import { formatarMoeda, normalizarTexto } from '../utils/formato.js'
+import { definirGuardaSaida } from '../utils/guardaSaida.js'
+import { esperarVolta, estadoComGuarda } from '../utils/historico.js'
 import { precisaConfirmarSaidaVenda } from '../utils/navegacao.js'
 import estilos from './Vender.module.css'
 
 const NOME_DA_TELA = { '/': 'Início', '/produtos': 'Produtos', '/estoque': 'Estoque', '/vendas': 'Vendas', '/minha-loja': 'Minha loja' }
 
-/** Espera o próximo "popstate" (ou um tempo máximo), para encadear voltas no histórico. */
-const esperarVolta = () =>
-  new Promise((ok) => {
-    const fim = () => {
-      window.removeEventListener('popstate', fim)
-      ok()
-    }
-    window.addEventListener('popstate', fim)
-    setTimeout(fim, 300)
-  })
 
 const ehCampoDeTexto = (el) => el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable)
 
@@ -91,7 +83,7 @@ export default function Vender() {
 
   useEffect(() => {
     if (temItens && !guardaAtiva.current) {
-      window.history.pushState({ ...window.history.state, guardaVenda: true }, '')
+      window.history.pushState(estadoComGuarda(window.history.state), '')
       guardaAtiva.current = true
     } else if (!temItens && guardaAtiva.current) {
       guardaAtiva.current = false
@@ -103,15 +95,32 @@ export default function Vender() {
     const aoVoltar = () => {
       if (!guardaAtiva.current || window.history.state?.guardaVenda) return
       // Saiu da entrada de guarda: recoloca e pergunta.
-      window.history.pushState({ ...window.history.state, guardaVenda: true }, '')
+      window.history.pushState(estadoComGuarda(window.history.state), '')
       setConfirmarSaida(true)
     }
     window.addEventListener('popstate', aoVoltar)
     return () => window.removeEventListener('popstate', aoVoltar)
   }, [])
 
-  /** Volta para a tela de onde a pessoa veio, desfazendo folhas e a guarda. */
-  async function sairDaVenda() {
+  // Qualquer outra navegação do app (menu lateral, trilha, busca Ctrl K) também pergunta antes.
+  const temItensAgora = useRef(false)
+  const continuacao = useRef(null) // para onde ir depois de descartar
+  useEffect(() => {
+    temItensAgora.current = temItens
+  })
+  useEffect(() => {
+    definirGuardaSaida({
+      temItens: () => guardaAtiva.current && temItensAgora.current,
+      pedir: (continuar) => {
+        continuacao.current = continuar
+        setConfirmarSaida(true)
+      },
+    })
+    return () => definirGuardaSaida(null)
+  }, [])
+
+  /** Desfaz as entradas de folhas e da guarda, deixando o histórico na entrada de Vender. */
+  async function limparEntradas() {
     guardaAtiva.current = false
     setConfirmarSaida(false)
     setCarrinhoAberto(false)
@@ -124,8 +133,27 @@ export default function Vender() {
       window.history.back()
       await esperarVolta()
     }
+  }
+
+  /** Volta para a tela de onde a pessoa veio. */
+  async function sairDaVenda() {
+    await limparEntradas()
     if (origem) navigate(-1)
     else navigate('/', { replace: true })
+  }
+
+  /** "Descartar venda": segue para onde a pessoa pediu, ou volta para a origem. */
+  async function descartar() {
+    const continuar = continuacao.current
+    continuacao.current = null
+    if (!continuar) return sairDaVenda()
+    await limparEntradas()
+    continuar()
+  }
+
+  function continuarVendendo() {
+    continuacao.current = null
+    setConfirmarSaida(false)
   }
 
   const aoFecharTela = () => (temItens ? setConfirmarSaida(true) : sairDaVenda())
@@ -369,15 +397,15 @@ export default function Vender() {
         )}
       </Folha>
 
-      <Folha aberto={confirmarSaida} aoFechar={() => setConfirmarSaida(false)} titulo="Descartar esta venda?">
+      <Folha aberto={confirmarSaida} aoFechar={continuarVendendo} titulo="Descartar esta venda?">
         <div className={estilos.confirmar}>
           <p>
             {totalUnidades === 1 ? 'O item escolhido vai' : `Os ${totalUnidades} itens escolhidos vão`} sair da venda. Nada é registrado.
           </p>
-          <Botao variante="perigo" larguraTotal onClick={sairDaVenda}>
+          <Botao variante="perigo" larguraTotal onClick={descartar}>
             Descartar venda
           </Botao>
-          <Botao variante="secundario" larguraTotal onClick={() => setConfirmarSaida(false)}>
+          <Botao variante="secundario" larguraTotal onClick={continuarVendendo}>
             Continuar vendendo
           </Botao>
         </div>

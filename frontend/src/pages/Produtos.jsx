@@ -17,6 +17,7 @@ import { useSkeleton } from '../hooks/useSkeleton.js'
 import { useTitulo } from '../hooks/useTitulo.js'
 import { situacaoEstoque } from '../utils/estoque.js'
 import { formatarMoeda, normalizarTexto } from '../utils/formato.js'
+import { esperarVolta } from '../utils/historico.js'
 import estilos from './Produtos.module.css'
 
 const porNome = (a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' })
@@ -45,10 +46,16 @@ export default function Produtos() {
 
   // Vindo da busca rápida (Ctrl K): a edição do produto escolhido já abre aberta.
   const idEditar = location.state?.editar
-  const produtoPedido = idEditar ? produtos.find((p) => p.id === idEditar) : null
+  const [dispensado, setDispensado] = useState(null)
+  const produtoPedido = idEditar && dispensado !== idEditar ? produtos.find((p) => p.id === idEditar) : null
   const janela = janelaAberta ?? (produtoPedido ? { produto: produtoPedido } : null)
   function setJanela(valor) {
-    if (idEditar) navigate(location.pathname, { replace: true, state: { ...location.state, editar: undefined } })
+    if (valor === null && produtoPedido) {
+      // Tira o pedido da entrada de baixo só depois que a folha sai do histórico.
+      setDispensado(idEditar)
+      const { pathname, state } = location
+      esperarVolta().then(() => navigate(pathname, { replace: true, state: { ...state, editar: undefined } }))
+    }
     setJanelaAberta(valor)
   }
 
