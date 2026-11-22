@@ -1,5 +1,6 @@
 import { pool, withTransaction } from '../config/db.js';
 import { AppError } from '../utils/AppError.js';
+import { custoMedio, custoPorUnidade } from '../utils/custo.js';
 import { buscar as buscarProduto } from './produtoService.js';
 
 const LIMITE_ESTOQUE = 1_000_000;
@@ -7,12 +8,18 @@ const LIMITE_ESTOQUE = 1_000_000;
 /**
  * Ajuste de estoque (F4), registrado no histórico com o motivo.
  * - modo 'contagem': define o saldo real (quantidade = total contado agora)
- * - modo 'entrada' : soma as unidades que chegaram
+ * - modo 'entrada' : soma as unidades que chegaram; com custo (por unidade ou total),
+ *   atualiza o custo médio do produto. Contagem nunca mexe no custo.
  */
-export async function ajustar(lojaId, produtoId, { modo, quantidade, motivo }) {
+export async function ajustar(lojaId, produtoId, { modo, quantidade, motivo, custoUnitario, custoTotal }) {
+  if (custoUnitario != null && custoTotal != null) {
+    throw new AppError('Informe o custo por unidade ou o total, não os dois.', 400, {
+      custo: 'Informe o custo por unidade ou o total, não os dois.',
+    });
+  }
   await withTransaction(async (conn) => {
     const [rows] = await conn.execute(
-      'SELECT quantidade FROM produtos WHERE id = ? AND loja_id = ? AND ativo = TRUE FOR UPDATE',
+      'SELECT quantidade, custo FROM produtos WHERE id = ? AND loja_id = ? AND ativo = TRUE FOR UPDATE',
       [produtoId, lojaId],
     );
     if (!rows[0]) throw new AppError('Produto não encontrado.', 404);
@@ -30,15 +37,21 @@ export async function ajustar(lojaId, produtoId, { modo, quantidade, motivo }) {
       throw new AppError('O estoque ficaria alto demais.', 400, { quantidade: 'Quantidade muito alta.' });
     }
 
-    await conn.execute('UPDATE produtos SET quantidade = ? WHERE id = ? AND loja_id = ?', [
+    const custoEntrada = modo === 'entrada' ? custoPorUnidade({ custoUnitario, custoTotal, quantidade }) : null;
+    const custoAtual = rows[0].custo === null ? null : Number(rows[0].custo);
+    const novoCusto =
+      custoEntrada === null ? custoAtual : custoMedio({ saldoAntes: atual, custoAtual, quantidade, custoEntrada });
+
+    await conn.execute('UPDATE produtos SET quantidade = ?, custo = ? WHERE id = ? AND loja_id = ?', [
       novoSaldo,
+      novoCusto,
       produtoId,
       lojaId,
     ]);
     await conn.execute(
-      `INSERT INTO movimentacoes_estoque (loja_id, produto_id, tipo, quantidade, saldo_apos, motivo)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [lojaId, produtoId, modo === 'entrada' ? 'entrada' : 'ajuste', diferenca, novoSaldo, motivo],
+      `INSERT INTO movimentacoes_estoque (loja_id, produto_id, tipo, quantidade, saldo_apos, motivo, custo_unitario)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [lojaId, produtoId, modo === 'entrada' ? 'entrada' : 'ajuste', diferenca, novoSaldo, motivo, custoEntrada],
     );
   });
   return buscarProduto(lojaId, produtoId);
@@ -60,7 +73,7 @@ export async function historico(lojaId, produtoId, { limite, antesDe }) {
     params.push(antesDe);
   }
   const [rows] = await pool.query(
-    `SELECT id, tipo, quantidade, saldo_apos, motivo, venda_id, criado_em
+    `SELECT id, tipo, quantidade, saldo_apos, motivo, custo_unitario, venda_id, criado_em
      FROM movimentacoes_estoque
      WHERE loja_id = ? AND produto_id = ? ${filtroId}
      ORDER BY id DESC
@@ -74,6 +87,7 @@ export async function historico(lojaId, produtoId, { limite, antesDe }) {
       quantidade: r.quantidade,
       saldoApos: r.saldo_apos,
       motivo: r.motivo,
+      custoUnitario: r.custo_unitario === null ? null : Number(r.custo_unitario),
       vendaId: r.venda_id,
       criadoEm: r.criado_em,
     })),

@@ -111,3 +111,51 @@ describe('Histórico de movimentações', () => {
     expect((await lojaA.agente.get(`/api/produtos/${p.id}`)).body.produto.quantidade).toBe(10);
   });
 });
+
+describe('Entrada com custo (fechamento do dia)', () => {
+  async function produtoCom(agente, quantidade, custo) {
+    const { body } = await agente.post('/api/produtos').send({ nome: `Leite ${Math.random()}`, preco: 7, quantidade, custo });
+    return body.produto;
+  }
+
+  it('custo total da entrada vira custo por unidade e custo do produto', async () => {
+    const { agente } = await criarLojaLogada();
+    const p = await produtoCom(agente, 0);
+    const res = await agente.post(`/api/produtos/${p.id}/ajustes`).send({ modo: 'entrada', quantidade: 12, custoTotal: 54 });
+    expect(res.status).toBe(200);
+    expect(res.body.produto.custo).toBe(4.5);
+    const { body } = await agente.get(`/api/produtos/${p.id}/movimentacoes`);
+    expect(body.movimentacoes[0]).toMatchObject({ tipo: 'entrada', custoUnitario: 4.5 });
+  });
+
+  it('custo médio ponderado pelo saldo antes da entrada', async () => {
+    const { agente } = await criarLojaLogada();
+    const p = await produtoCom(agente, 6, 4.5);
+    const res = await agente.post(`/api/produtos/${p.id}/ajustes`).send({ modo: 'entrada', quantidade: 12, custoUnitario: 5 });
+    expect(res.body.produto.custo).toBe(4.83);
+  });
+
+  it('entrada sem custo mantém o custo', async () => {
+    const { agente } = await criarLojaLogada();
+    const p = await produtoCom(agente, 6, 4.5);
+    const res = await agente.post(`/api/produtos/${p.id}/ajustes`).send({ modo: 'entrada', quantidade: 2 });
+    expect(res.body.produto.custo).toBe(4.5);
+  });
+
+  it('custo por unidade e total juntos são recusados', async () => {
+    const { agente } = await criarLojaLogada();
+    const p = await produtoCom(agente, 6);
+    const res = await agente
+      .post(`/api/produtos/${p.id}/ajustes`)
+      .send({ modo: 'entrada', quantidade: 2, custoUnitario: 1, custoTotal: 2 });
+    expect(res.status).toBe(400);
+    expect(res.body.detalhes.custo).toBe('Informe o custo por unidade ou o total, não os dois.');
+  });
+
+  it('contagem não altera o custo', async () => {
+    const { agente } = await criarLojaLogada();
+    const p = await produtoCom(agente, 6, 4.5);
+    const res = await agente.post(`/api/produtos/${p.id}/ajustes`).send({ modo: 'contagem', quantidade: 3, motivo: 'Contagem' });
+    expect(res.body.produto.custo).toBe(4.5);
+  });
+});
