@@ -12,6 +12,7 @@ import Vender from './pages/Vender.jsx'
 import Vendas from './pages/Vendas.jsx'
 import Estoque from './pages/Estoque.jsx'
 import MinhaLoja from './pages/MinhaLoja.jsx'
+import Relatorio from './pages/Relatorio.jsx'
 
 /** Cada loja tem o próprio cache: o provedor é remontado quando a loja muda. */
 function DadosDaLoja({ children }) {
@@ -42,6 +43,7 @@ export default function App() {
                   <Route path="/estoque" element={<Estoque />} />
                   <Route path="/produtos" element={<Produtos />} />
                   <Route path="/minha-loja" element={<MinhaLoja />} />
+                  <Route path="/relatorio" element={<Relatorio />} />
                 </Route>
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />

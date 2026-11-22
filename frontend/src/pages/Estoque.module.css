@@ -148,3 +148,7 @@
   color: var(--cor-texto-suave);
   font-size: var(--t-12);
 }
+
+.compartilhar {
+  justify-self: start;
+}

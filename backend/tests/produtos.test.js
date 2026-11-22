@@ -168,3 +168,40 @@ describe('Produtos — segurança', () => {
     expect((await lojaB.agente.post('/api/produtos').send(arroz)).status).toBe(201);
   });
 });
+
+describe('Custo do produto (fechamento do dia)', () => {
+  it('cadastro aceita custo opcional', async () => {
+    const { agente } = await criarLojaLogada();
+    const com = await agente.post('/api/produtos').send({ nome: 'Leite', preco: 5.29, quantidade: 3, custo: 3.2 });
+    expect(com.status).toBe(201);
+    expect(com.body.produto.custo).toBe(3.2);
+    const sem = await agente.post('/api/produtos').send({ nome: 'Pão', preco: 1, quantidade: 3 });
+    expect(sem.body.produto.custo).toBeNull();
+  });
+
+  it('edição substitui o custo quando enviado e mantém quando ausente', async () => {
+    const { agente } = await criarLojaLogada();
+    const { body } = await agente.post('/api/produtos').send({ nome: 'Café', preco: 12, quantidade: 3, custo: 8 });
+    const id = body.produto.id;
+    const trocado = await agente.put(`/api/produtos/${id}`).send({ nome: 'Café', preco: 12, custo: 9.5 });
+    expect(trocado.body.produto.custo).toBe(9.5);
+    const mantido = await agente.put(`/api/produtos/${id}`).send({ nome: 'Café', preco: 13 });
+    expect(mantido.body.produto.custo).toBe(9.5);
+    const limpo = await agente.put(`/api/produtos/${id}`).send({ nome: 'Café', preco: 13, custo: null });
+    expect(limpo.body.produto.custo).toBeNull();
+  });
+
+  it('custo negativo é recusado', async () => {
+    const { agente } = await criarLojaLogada();
+    const res = await agente.post('/api/produtos').send({ nome: 'Óleo', preco: 8, quantidade: 1, custo: -1 });
+    expect(res.status).toBe(400);
+    expect(res.body.detalhes.custo).toBeDefined();
+  });
+
+  it('a listagem traz o custo', async () => {
+    const { agente } = await criarLojaLogada();
+    await agente.post('/api/produtos').send({ nome: 'Sal', preco: 3, quantidade: 1, custo: 1.75 });
+    const { body } = await agente.get('/api/produtos');
+    expect(body.produtos[0].custo).toBe(1.75);
+  });
+});

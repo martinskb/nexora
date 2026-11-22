@@ -20,7 +20,8 @@ import { useMediaQuery } from '../hooks/useMediaQuery.js'
 import { useSkeleton } from '../hooks/useSkeleton.js'
 import { useTitulo } from '../hooks/useTitulo.js'
 import { situacaoEstoque, unidades } from '../utils/estoque.js'
-import { formatarMoeda, normalizarTexto } from '../utils/formato.js'
+import { formatarMoeda, lerValorMonetario, normalizarTexto } from '../utils/formato.js'
+import { alternarForma, montarPagamentos } from '../utils/pagamento.js'
 import { definirGuardaSaida } from '../utils/guardaSaida.js'
 import { esperarVolta, estadoComGuarda } from '../utils/historico.js'
 import { precisaConfirmarSaidaVenda } from '../utils/navegacao.js'
@@ -54,6 +55,9 @@ export default function Vender() {
   const { ativos: canais, recarregar: recarregarCanais } = useCanais()
   const [canalId, setCanalId] = useState('') // '' = venda sem canal
   const [observacao, setObservacao] = useState('')
+  const [formas, setFormas] = useState([]) // forma de pagamento (opcional), até duas
+  const [valorPrimeira, setValorPrimeira] = useState('')
+  const [recebido, setRecebido] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [erroVenda, setErroVenda] = useState('')
   const [ajuste, setAjuste] = useState(null) // { produto, necessario }
@@ -215,11 +219,17 @@ export default function Vender() {
 
   async function confirmarVenda() {
     if (!temItens || enviando) return
+    const pagamentos = montarPagamentos(formas, total, lerValorMonetario(valorPrimeira))
+    if (pagamentos === null) {
+      setErroVenda('O valor da primeira forma precisa ser menor que o total.')
+      return
+    }
     setEnviando(true)
     setErroVenda('')
     try {
       const { venda } = await vendasApi.registrar({
         itens: carrinho,
+        pagamentos,
         canalId: canalId ? Number(canalId) : null,
         observacao: observacao.trim() || undefined,
       })
@@ -267,6 +277,18 @@ export default function Vender() {
     aoConfirmar: confirmarVenda,
     enviando,
     erro: erroVenda,
+    pagamento: {
+      formas,
+      // A partir do estado mais recente: toques seguidos não se perdem.
+      aoAlternarForma: (forma) => {
+        setFormas((f) => alternarForma(f, forma))
+        setErroVenda('')
+      },
+      valorPrimeira,
+      aoMudarValorPrimeira: setValorPrimeira,
+      recebido,
+      aoMudarRecebido: setRecebido,
+    },
   }
 
   const topo = (

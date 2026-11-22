@@ -30,7 +30,15 @@ export function validarProduto(valores, { novo }) {
     else if (estoqueMinimo > 1_000_000) erros.estoqueMinimo = 'Valor muito alto.'
   }
 
-  const dados = { nome, preco, estoqueMinimo }
+  // Custo (opcional): vazio = não informado.
+  let custo = null
+  if ((valores.custo ?? '').trim() !== '') {
+    custo = lerValorMonetario(valores.custo)
+    if (custo === null) erros.custo = 'Custo inválido.'
+    else if (custo > 9_999_999.99) erros.custo = 'Custo muito alto.'
+  }
+
+  const dados = { nome, preco, estoqueMinimo, custo }
   if (novo) dados.quantidade = quantidade
   return { erros, dados }
 }

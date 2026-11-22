@@ -14,6 +14,16 @@ const preco = z
   .max(9_999_999.99, 'Preço muito alto.')
   .transform((v) => Math.round(v * 100) / 100);
 
+// Custo por unidade (opcional). null = não informado; ausente na edição = mantém.
+const custo = z
+  .number({ error: 'Custo inválido.' })
+  .finite('Custo inválido.')
+  .min(0, 'O custo não pode ser negativo.')
+  .max(9_999_999.99, 'Custo muito alto.')
+  .transform((v) => Math.round(v * 100) / 100)
+  .nullable()
+  .optional();
+
 const inteiroNaoNegativo = (rotulo) =>
   z
     .number({ error: `Informe ${rotulo}.` })
@@ -26,12 +36,14 @@ export const criarProdutoSchema = z.object({
   preco,
   quantidade: inteiroNaoNegativo('a quantidade'),
   estoqueMinimo: inteiroNaoNegativo('o estoque mínimo').optional().default(0),
+  custo,
 });
 
 export const atualizarProdutoSchema = z.object({
   nome,
   preco,
   estoqueMinimo: inteiroNaoNegativo('o estoque mínimo').optional().default(0),
+  custo,
   // A quantidade só muda por venda ou por ajuste de estoque (com motivo registrado).
   quantidade: z
     .undefined({ error: 'A quantidade não pode ser editada aqui. Use o ajuste de estoque.' })

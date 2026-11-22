@@ -5,6 +5,7 @@ import { Botao } from '../components/Botao.jsx'
 import { CampoBuscaRapida } from '../components/BuscaRapida.jsx'
 import { Etiqueta } from '../components/Etiqueta.jsx'
 import { GraficoVendasDia } from '../components/GraficoVendasDia.jsx'
+import { IconeSeta } from '../components/Icones.jsx'
 import { LinkApp } from '../components/LinkApp.jsx'
 import { NumeroAnimado } from '../components/NumeroAnimado.jsx'
 import { Segmentado } from '../components/Segmentado.jsx'
@@ -204,6 +205,14 @@ export default function Inicio() {
               </div>
             )}
           </section>
+
+          <LinkApp to="/relatorio" className={estilos.acessoRelatorio}>
+            <span>
+              <strong>Relatório do dia</strong>
+              <small>Vendido, formas de pagamento e lucro</small>
+            </span>
+            <IconeSeta />
+          </LinkApp>
 
           <div className={estilos.grade}>
             {mostrarGrafico && (

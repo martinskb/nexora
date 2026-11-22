@@ -5,8 +5,9 @@
 }
 
 .rotulo {
-  font-weight: 600;
+  font-weight: 500;
   font-size: var(--t-15);
+  color: var(--cor-texto-suave);
 }
 
 .lista {

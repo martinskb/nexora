@@ -4,9 +4,45 @@
   gap: var(--esp-4);
 }
 
+.topo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  margin-bottom: var(--esp-2);
+}
+
 .titulo {
   font-size: var(--t-30);
-  margin-bottom: var(--esp-2);
+}
+
+.linkRelatorio {
+  font-size: var(--t-15);
+  font-weight: 600;
+  color: var(--cor-marca-texto);
+  text-decoration: none;
+}
+
+.linkRelatorio:hover {
+  text-decoration: underline;
+}
+
+.linhaVendido {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  min-height: 56px;
+  padding: var(--esp-3) var(--esp-4);
+}
+
+.linhaVendido .principal {
+  flex: 1;
+  min-width: 0;
+}
+
+.qtd {
+  color: var(--cor-texto-suave);
+  font-size: var(--t-15);
 }
 
 .filtros {
