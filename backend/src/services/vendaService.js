@@ -1,5 +1,6 @@
 import { pool, withTransaction } from '../config/db.js';
 import { AppError } from '../utils/AppError.js';
+import { normalizarPagamentos } from '../utils/pagamentos.js';
 import { buscarAtivo } from './canalService.js';
 
 const NAO_ENCONTRADA = 'Venda não encontrada.';
@@ -26,7 +27,7 @@ function agruparItens(itens) {
  * Este é o ponto único de registro de vendas: tela de venda e futuras
  * integrações (WhatsApp, marketplaces) devem usar esta função.
  */
-export async function registrar(lojaId, { itens, canalId = null, observacao }) {
+export async function registrar(lojaId, { itens, canalId = null, observacao, pagamentos }) {
   const pedidos = agruparItens(itens).sort((a, b) => a.produtoId - b.produtoId);
   const ids = pedidos.map((p) => p.produtoId);
 
@@ -35,7 +36,7 @@ export async function registrar(lojaId, { itens, canalId = null, observacao }) {
       throw new AppError('Origem da venda inválida.', 400, { canalId: 'Origem da venda inválida.' });
     }
     const [produtos] = await conn.query(
-      `SELECT id, nome, preco, quantidade FROM produtos
+      `SELECT id, nome, preco, custo, quantidade FROM produtos
        WHERE loja_id = ? AND ativo = TRUE AND id IN (?) ORDER BY id FOR UPDATE`,
       [lojaId, ids],
     );
@@ -67,9 +68,18 @@ export async function registrar(lojaId, { itens, canalId = null, observacao }) {
     const linhas = pedidos.map((p) => {
       const prod = porId.get(p.produtoId);
       const subtotalCentavos = centavos(prod.preco) * p.quantidade;
-      return { ...p, preco: prod.preco, subtotal: subtotalCentavos / 100, saldoApos: prod.quantidade - p.quantidade };
+      return {
+        ...p,
+        preco: prod.preco,
+        custo: prod.custo, // cópia do custo atual: o lucro desta venda não muda depois
+        subtotal: subtotalCentavos / 100,
+        saldoApos: prod.quantidade - p.quantidade,
+      };
     });
-    const total = linhas.reduce((s, l) => s + centavos(l.subtotal), 0) / 100;
+    const totalCentavos = linhas.reduce((s, l) => s + centavos(l.subtotal), 0);
+    const total = totalCentavos / 100;
+    // Confere a forma de pagamento antes de gravar qualquer coisa.
+    const formas = normalizarPagamentos(pagamentos, totalCentavos);
 
     const [venda] = await conn.execute(
       'INSERT INTO vendas (loja_id, total, canal_id, observacao) VALUES (?, ?, ?, ?)',
@@ -78,8 +88,9 @@ export async function registrar(lojaId, { itens, canalId = null, observacao }) {
 
     for (const l of linhas) {
       await conn.execute(
-        'INSERT INTO itens_venda (venda_id, produto_id, quantidade, preco_unitario, subtotal) VALUES (?, ?, ?, ?, ?)',
-        [venda.insertId, l.produtoId, l.quantidade, l.preco, l.subtotal],
+        `INSERT INTO itens_venda (venda_id, produto_id, quantidade, preco_unitario, custo_unitario, subtotal)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [venda.insertId, l.produtoId, l.quantidade, l.preco, l.custo, l.subtotal],
       );
       await conn.execute('UPDATE produtos SET quantidade = ? WHERE id = ? AND loja_id = ?', [
         l.saldoApos,
@@ -92,10 +103,29 @@ export async function registrar(lojaId, { itens, canalId = null, observacao }) {
         [lojaId, l.produtoId, -l.quantidade, l.saldoApos, venda.insertId],
       );
     }
+    for (const f of formas) {
+      await conn.execute('INSERT INTO pagamentos_venda (venda_id, forma, valor) VALUES (?, ?, ?)', [
+        venda.insertId,
+        f.forma,
+        f.valorCentavos / 100,
+      ]);
+    }
     return venda.insertId;
   });
 
   return buscar(lojaId, vendaId);
+}
+
+/** Pagamentos de várias vendas de uma vez: Map vendaId → [{ forma, valor }]. */
+async function pagamentosDe(ids) {
+  const mapa = new Map(ids.map((id) => [id, []]));
+  if (ids.length === 0) return mapa;
+  const [rows] = await pool.query(
+    'SELECT venda_id, forma, valor FROM pagamentos_venda WHERE venda_id IN (?) ORDER BY id',
+    [ids],
+  );
+  for (const r of rows) mapa.get(r.venda_id)?.push({ forma: r.forma, valor: Number(r.valor) });
+  return mapa;
 }
 
 function paraVendaPublica(row) {
@@ -126,8 +156,10 @@ export async function buscar(lojaId, id) {
      WHERE i.venda_id = ? ORDER BY i.id`,
     [id],
   );
+  const pagamentos = (await pagamentosDe([rows[0].id])).get(rows[0].id);
   return {
     ...paraVendaPublica(rows[0]),
+    pagamentos,
     itens: itens.map((i) => ({
       produtoId: i.produto_id,
       nome: i.nome,
@@ -139,7 +171,7 @@ export async function buscar(lojaId, id) {
 }
 
 /** Lista vendas (mais recentes primeiro) com filtros e paginação por id. */
-export async function listar(lojaId, { de, ate, canalId, status, limite, antesDe }) {
+export async function listar(lojaId, { de, ate, canalId, status, forma, limite, antesDe }) {
   const condicoes = ['v.loja_id = ?'];
   const params = [lojaId];
   if (de) {
@@ -159,6 +191,12 @@ export async function listar(lojaId, { de, ate, canalId, status, limite, antesDe
   if (status) {
     condicoes.push('v.status = ?');
     params.push(status);
+  }
+  if (forma === 'nao_informado') {
+    condicoes.push('NOT EXISTS (SELECT 1 FROM pagamentos_venda pg WHERE pg.venda_id = v.id)');
+  } else if (forma) {
+    condicoes.push('EXISTS (SELECT 1 FROM pagamentos_venda pg WHERE pg.venda_id = v.id AND pg.forma = ?)');
+    params.push(forma);
   }
   if (antesDe) {
     condicoes.push('v.id < ?');
@@ -180,8 +218,11 @@ export async function listar(lojaId, { de, ate, canalId, status, limite, antesDe
   );
 
   const temMais = rows.length > limite;
-  const vendas = rows.slice(0, limite).map((r) => ({
+  const pagina = rows.slice(0, limite);
+  const pagamentos = await pagamentosDe(pagina.map((r) => r.id));
+  const vendas = pagina.map((r) => ({
     ...paraVendaPublica(r),
+    pagamentos: pagamentos.get(r.id),
     quantidadeItens: Number(r.qtd_itens),
     resumo: r.resumo,
   }));

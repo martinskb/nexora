@@ -381,3 +381,67 @@ describe('Vendas — segurança', () => {
     expect(await saldo(lojaA.agente, p.id)).toBe(9);
   });
 });
+
+describe('Forma de pagamento e custo nos itens (fechamento do dia)', () => {
+  it('venda com Pix + Cartão grava e devolve os pagamentos', async () => {
+    const { agente } = await criarLojaLogada();
+    const p = await criarProduto(agente, { nome: 'Arroz', preco: 10 });
+    const res = await agente.post('/api/vendas').send({
+      itens: [{ produtoId: p.id, quantidade: 2 }],
+      pagamentos: [
+        { forma: 'pix', valor: 12.5 },
+        { forma: 'cartao', valor: 7.5 },
+      ],
+    });
+    expect(res.status).toBe(201);
+    expect(res.body.venda.pagamentos).toEqual([
+      { forma: 'pix', valor: 12.5 },
+      { forma: 'cartao', valor: 7.5 },
+    ]);
+    const lista = await agente.get('/api/vendas');
+    expect(lista.body.vendas[0].pagamentos).toHaveLength(2);
+  });
+
+  it('sem pagamentos: lista vazia', async () => {
+    const { agente } = await criarLojaLogada();
+    const p = await criarProduto(agente, { nome: 'Feijão' });
+    const res = await agente.post('/api/vendas').send({ itens: [{ produtoId: p.id, quantidade: 1 }] });
+    expect(res.body.venda.pagamentos).toEqual([]);
+  });
+
+  it('soma errada é recusada e não baixa o estoque', async () => {
+    const { agente } = await criarLojaLogada();
+    const p = await criarProduto(agente, { nome: 'Óleo', preco: 10 });
+    const res = await agente.post('/api/vendas').send({
+      itens: [{ produtoId: p.id, quantidade: 1 }],
+      pagamentos: [
+        { forma: 'pix', valor: 3 },
+        { forma: 'dinheiro', valor: 3 },
+      ],
+    });
+    expect(res.status).toBe(400);
+    expect(res.body.detalhes.pagamentos).toBeDefined();
+    expect(await saldo(agente, p.id)).toBe(10);
+  });
+
+  it('o item guarda o custo do produto no momento da venda', async () => {
+    const { agente } = await criarLojaLogada();
+    const p = await criarProduto(agente, { nome: 'Café', preco: 12, custo: 8 });
+    const res = await agente.post('/api/vendas').send({ itens: [{ produtoId: p.id, quantidade: 1 }] });
+    await agente.put(`/api/produtos/${p.id}`).send({ nome: 'Café', preco: 12, custo: 9 });
+    const [[item]] = await pool.query('SELECT custo_unitario FROM itens_venda WHERE venda_id = ?', [res.body.venda.id]);
+    expect(Number(item.custo_unitario)).toBe(8);
+  });
+
+  it('filtra por forma de pagamento e por "não informado"', async () => {
+    const { agente } = await criarLojaLogada();
+    const p = await criarProduto(agente, { nome: 'Sal', preco: 2 });
+    const item = [{ produtoId: p.id, quantidade: 1 }];
+    await agente.post('/api/vendas').send({ itens: item, pagamentos: [{ forma: 'pix' }] });
+    await agente.post('/api/vendas').send({ itens: item, pagamentos: [{ forma: 'dinheiro' }] });
+    await agente.post('/api/vendas').send({ itens: item });
+    expect((await agente.get('/api/vendas?forma=pix')).body.vendas).toHaveLength(1);
+    expect((await agente.get('/api/vendas?forma=nao_informado')).body.vendas).toHaveLength(1);
+    expect((await agente.get('/api/vendas')).body.vendas).toHaveLength(3);
+  });
+});
