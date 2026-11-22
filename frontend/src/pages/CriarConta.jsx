@@ -7,9 +7,12 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useFormulario } from '../hooks/useFormulario.js'
 import { validarCadastro } from '../utils/validacao.js'
 import { useTitulo } from '../hooks/useTitulo.js'
+import { useMediaQuery } from '../hooks/useMediaQuery.js'
 
 export default function CriarConta() {
   useTitulo('Criar conta')
+  // No celular o foco automático abriria o teclado e esconderia a apresentação.
+  const focoAutomatico = useMediaQuery('(min-width: 960px)')
   const { cadastrar } = useAuth()
   const navigate = useNavigate()
   const { valores, erros, erroGeral, enviando, alterar, enviar } = useFormulario({
@@ -45,7 +48,7 @@ export default function CriarConta() {
           onChange={alterar}
           erro={erros.nome}
           maxLength={120}
-          autoFocus
+          autoFocus={focoAutomatico}
         />
         <CampoTexto
           rotulo="E-mail"

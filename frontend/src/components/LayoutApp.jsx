@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { FILTRO_VENDAS_PADRAO, filtrosDeVendas, useAntecipar } from '../dados/hooks.js'
 import { useNavegarApp } from '../hooks/useNavegarApp.js'
+import { ehAba } from '../utils/navegacao.js'
 import { BuscaRapida } from './BuscaRapida.jsx'
 import { IconeCaixa, IconeEstoque, IconeInicio, IconeLoja, IconeMais, IconeRecibo } from './Icones.jsx'
 import { Marca } from './Marca.jsx'
@@ -112,7 +113,8 @@ export function LayoutApp() {
         <p className={estilos.nomeLoja}>{loja?.nome}</p>
       </aside>
 
-      {!modoVender && (
+      {/* Fora das abas (Vender, Minha loja) a tela tem o próprio topo, com voltar. */}
+      {ehAba(location.pathname) && (
         <header className={estilos.topo}>
           <NavLink to="/" aria-label="Início" onClick={(e) => cliqueSimples(e) && (e.preventDefault(), aoIr('/'))}>
             <Marca tamanho={32} />

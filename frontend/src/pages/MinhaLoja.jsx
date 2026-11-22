@@ -6,7 +6,11 @@ import { CampoTexto } from '../components/CampoTexto.jsx'
 import { Folha } from '../components/Folha.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
-import { useCanais } from '../dados/hooks.js'
+import { useCanais, useInvalidar } from '../dados/hooks.js'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { IconeSair, IconeVoltar } from '../components/Icones.jsx'
+import { Skeleton } from '../components/Skeleton.jsx'
+import { useMediaQuery } from '../hooks/useMediaQuery.js'
 import estilos from './MinhaLoja.module.css'
 import { useTitulo } from '../hooks/useTitulo.js'
 
@@ -114,9 +118,24 @@ function LinhaCanal({ canal, aoMudar, aoPedirApagar }) {
 
 export default function MinhaLoja() {
   useTitulo('Minha loja')
-  const { loja } = useAuth()
+  const { loja, sair } = useAuth()
   const { avisar } = useAvisos()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const telaGrande = useMediaQuery('(min-width: 960px)')
   const { canais, ativos, carregando, erro, recarregar } = useCanais()
+  const invalidar = useInvalidar()
+  const aoMudarCanal = () => invalidar('canal')
+  const [saindo, setSaindo] = useState(false)
+
+  // Voltar: para a aba de onde a pessoa veio (Minha loja empilha no histórico).
+  const voltar = () => (location.state?.origem ? navigate(-1) : navigate('/', { replace: true }))
+
+  async function aoSair() {
+    setSaindo(true)
+    await sair()
+    navigate('/entrar', { replace: true })
+  }
   const [novo, setNovo] = useState('')
   const [erroNovo, setErroNovo] = useState('')
   const [adicionando, setAdicionando] = useState(false)
@@ -134,7 +153,7 @@ export default function MinhaLoja() {
       const { canal } = await canaisApi.criar({ nome: novo })
       avisar(`Canal "${canal.nome}" adicionado.`)
       setNovo('')
-      await recarregar()
+      await aoMudarCanal()
     } catch (err) {
       setErroNovo(err.details?.nome ?? err.message)
     } finally {
@@ -149,7 +168,7 @@ export default function MinhaLoja() {
       await canaisApi.remover(apagar.id)
       avisar(`Canal "${apagar.nome}" apagado.`)
       setApagar(null)
-      await recarregar()
+      await aoMudarCanal()
     } catch (err) {
       setErroApagar(err.message)
     } finally {
@@ -159,10 +178,24 @@ export default function MinhaLoja() {
 
   return (
     <div className={estilos.pagina}>
-      <header>
+      <header className={estilos.topo}>
+        {telaGrande ? (
+          <p className={estilos.trilha} aria-label="Você está em">
+            Minha loja
+          </p>
+        ) : (
+          <button type="button" className={estilos.voltar} onClick={voltar} aria-label="Voltar">
+            <IconeVoltar />
+          </button>
+        )}
         <h1 className={estilos.titulo}>Minha loja</h1>
-        <p className={estilos.info}>{loja.nome}</p>
       </header>
+
+      <section className={estilos.cartaoLoja} aria-label="Sua loja">
+        <span className="cap">Loja</span>
+        <strong>{loja.nome}</strong>
+        {loja.email && <span className={estilos.info}>{loja.email}</span>}
+      </section>
 
       <section className={estilos.secao} aria-labelledby="t-canais">
         <div>
@@ -194,7 +227,12 @@ export default function MinhaLoja() {
             </Botao>
           </div>
         )}
-        {carregando && <p className={estilos.info}>Carregando canais…</p>}
+        {carregando && (
+          <div className={estilos.skeleton} aria-busy="true">
+            <Skeleton altura={52} />
+            <Skeleton altura={52} />
+          </div>
+        )}
 
         {!carregando && !erro && ativos.length === 0 && (
           <p className={estilos.vazio}>Nenhum canal ainda. Sem canais, as vendas são registradas sem origem.</p>
@@ -203,7 +241,7 @@ export default function MinhaLoja() {
         {ativos.length > 0 && (
           <ul className={estilos.lista}>
             {ativos.map((c) => (
-              <LinhaCanal key={`${c.id}-${c.nome}`} canal={c} aoMudar={recarregar} aoPedirApagar={setApagar} />
+              <LinhaCanal key={`${c.id}-${c.nome}`} canal={c} aoMudar={aoMudarCanal} aoPedirApagar={setApagar} />
             ))}
           </ul>
         )}
@@ -214,11 +252,20 @@ export default function MinhaLoja() {
             <p className={estilos.info}>Não aparecem na hora de vender, mas continuam nas vendas antigas.</p>
             <ul className={estilos.lista}>
               {arquivados.map((c) => (
-                <LinhaCanal key={c.id} canal={c} aoMudar={recarregar} aoPedirApagar={setApagar} />
+                <LinhaCanal key={c.id} canal={c} aoMudar={aoMudarCanal} aoPedirApagar={setApagar} />
               ))}
             </ul>
           </details>
         )}
+      </section>
+
+      <section className={estilos.secao} aria-labelledby="t-conta">
+        <h2 id="t-conta" className={estilos.subtitulo}>
+          Conta
+        </h2>
+        <Botao variante="perigo" onClick={aoSair} carregando={saindo} className={estilos.sair}>
+          {!saindo && <IconeSair />} Sair da conta
+        </Botao>
       </section>
 
       <Folha
