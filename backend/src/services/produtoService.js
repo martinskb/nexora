@@ -2,13 +2,14 @@ import { pool, withTransaction } from '../config/db.js';
 import { AppError } from '../utils/AppError.js';
 
 const NAO_ENCONTRADO = 'Produto não encontrado.';
-const COLUNAS = 'id, nome, preco, quantidade, estoque_minimo, criado_em, atualizado_em';
+const COLUNAS = 'id, nome, preco, custo, quantidade, estoque_minimo, criado_em, atualizado_em';
 
 export function paraProdutoPublico(row) {
   return {
     id: row.id,
     nome: row.nome,
     preco: Number(row.preco),
+    custo: row.custo === null || row.custo === undefined ? null : Number(row.custo),
     quantidade: row.quantidade,
     estoqueMinimo: row.estoque_minimo,
     criadoEm: row.criado_em,
@@ -62,12 +63,12 @@ async function garantirNomeLivre(conn, lojaId, nome, ignorarId = 0) {
   }
 }
 
-export async function criar(lojaId, { nome, preco, quantidade, estoqueMinimo }) {
+export async function criar(lojaId, { nome, preco, quantidade, estoqueMinimo, custo = null }) {
   const id = await withTransaction(async (conn) => {
     await garantirNomeLivre(conn, lojaId, nome);
     const [res] = await conn.execute(
-      'INSERT INTO produtos (loja_id, nome, preco, quantidade, estoque_minimo) VALUES (?, ?, ?, ?, ?)',
-      [lojaId, nome, preco, quantidade, estoqueMinimo],
+      'INSERT INTO produtos (loja_id, nome, preco, custo, quantidade, estoque_minimo) VALUES (?, ?, ?, ?, ?, ?)',
+      [lojaId, nome, preco, custo, quantidade, estoqueMinimo],
     );
     // A quantidade inicial entra no histórico, para que todo saldo tenha origem.
     await conn.execute(
@@ -80,7 +81,7 @@ export async function criar(lojaId, { nome, preco, quantidade, estoqueMinimo }) 
   return buscar(lojaId, id);
 }
 
-export async function atualizar(lojaId, id, { nome, preco, estoqueMinimo }) {
+export async function atualizar(lojaId, id, { nome, preco, estoqueMinimo, custo }) {
   await withTransaction(async (conn) => {
     const [rows] = await conn.execute(
       'SELECT id FROM produtos WHERE id = ? AND loja_id = ? AND ativo = TRUE FOR UPDATE',
@@ -92,6 +93,10 @@ export async function atualizar(lojaId, id, { nome, preco, estoqueMinimo }) {
       'UPDATE produtos SET nome = ?, preco = ?, estoque_minimo = ? WHERE id = ? AND loja_id = ?',
       [nome, preco, estoqueMinimo, id, lojaId],
     );
+    // Custo enviado (inclusive null) substitui o atual; ausente, mantém.
+    if (custo !== undefined) {
+      await conn.execute('UPDATE produtos SET custo = ? WHERE id = ? AND loja_id = ?', [custo, id, lojaId]);
+    }
   });
   return buscar(lojaId, id);
 }
