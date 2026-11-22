@@ -7,6 +7,7 @@ import { CampoTexto } from './CampoTexto.jsx'
 import { ControleQuantidade } from './ControleQuantidade.jsx'
 import { IconeCarrinho, IconeLixeira } from './Icones.jsx'
 import { EscolhaCanal } from './EscolhaCanal.jsx'
+import { NumeroAnimado } from './NumeroAnimado.jsx'
 import estilos from './Carrinho.module.css'
 
 /** Itens da venda em andamento, origem, observação e confirmação. */
@@ -22,6 +23,7 @@ export function Carrinho({
   aoConfirmar,
   enviando,
   erro,
+  atalhoConfirmar, // ex.: 'Enter' (PC)
 }) {
   const [mostrarObs, setMostrarObs] = useState(Boolean(observacao))
   const opcoesCanal = [{ valor: '', rotulo: 'Nenhum' }, ...canais.map((c) => ({ valor: String(c.id), rotulo: c.nome }))]
@@ -94,13 +96,14 @@ export function Carrinho({
         <span>
           Total <small>({totalUnidades === 1 ? '1 item' : `${totalUnidades} itens`})</small>
         </span>
-        <strong>{formatarMoeda(total)}</strong>
+        <NumeroAnimado valor={total} moeda destaque desdeZero={false} className={estilos.valorTotal} />
       </div>
 
       <Alerta>{erro}</Alerta>
 
       <Botao larguraTotal onClick={aoConfirmar} carregando={enviando}>
         {enviando ? 'Registrando…' : 'Confirmar venda'}
+        {atalhoConfirmar && !enviando && <kbd className={estilos.atalho}>{atalhoConfirmar}</kbd>}
       </Botao>
     </div>
   )
