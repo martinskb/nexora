@@ -18,11 +18,6 @@ function consultaResumo(intervalo) {
   }
 }
 
-export function useResumo(periodo) {
-  const intervalo = intervaloDoPeriodo(periodo)
-  return useQuery(consultaResumo(intervalo))
-}
-
 /** Resumo do período e do período anterior equivalente (para as comparações). */
 export function useResumoComparado(periodo) {
   const atual = useQuery(consultaResumo(intervaloDoPeriodo(periodo)))
@@ -81,20 +76,6 @@ export function useVendas(filtros) {
 
 export const useVenda = (id) =>
   useQuery({ queryKey: chaves.venda(id), queryFn: () => vendasApi.buscar(id), enabled: id != null })
-
-/** Histórico de movimentações de um produto, paginado. */
-export function useHistoricoProduto(produtoId) {
-  const q = useInfiniteQuery({
-    queryKey: chaves.historico(produtoId),
-    queryFn: ({ pageParam, signal }) => produtosApi.historico(produtoId, { antesDe: pageParam }, signal),
-    initialPageParam: undefined,
-    getNextPageParam: (ultima) => (ultima.temMais ? ultima.movimentacoes.at(-1)?.id : undefined),
-    staleTime: VALIDADE_MS.historico,
-    enabled: produtoId != null,
-  })
-  const itens = useMemo(() => q.data?.pages.flatMap((p) => p.movimentacoes) ?? [], [q.data])
-  return { ...q, itens }
-}
 
 /**
  * Relatório do dia local "AAAA-MM-DD". Sem reaproveitar os dados de outro dia

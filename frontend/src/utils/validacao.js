@@ -26,5 +26,3 @@ export function validarCadastro({ nome, email, senha }) {
   else if (senha.length > 72) erros.senha = 'Senha muito longa (máximo 72 caracteres).'
   return erros
 }
-
-export const temErros = (erros) => Object.keys(erros).length > 0

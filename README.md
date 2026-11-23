@@ -1,106 +1,95 @@
 # NEXORA
 
-**Gestão simples de vendas e estoque para o pequeno comerciante.**
+**Gestão de vendas e estoque para o pequeno comércio.**
 
-Projeto do Laboratório de Empreendimentos Inovadores — Análise e Desenvolvimento de Sistemas, Turma A · Belém/PA · 2026.
-
----
-
-## Do que se trata
-
-Muitos mercadinhos e pequenos comércios ainda controlam o estoque num caderno, numa planilha
-ou num grupo de WhatsApp. Venda de um lado, mercadoria do outro: o que sai no balcão nem sempre
-é anotado, o saldo fica errado, aparecem furos no caixa e o cliente pede um produto que "tinha
-no sistema" mas já acabou.
-
-O NEXORA junta as duas pontas num lugar só. O comerciante cadastra o produto com poucos campos,
-registra a venda e o estoque baixa sozinho. Dá para consultar o saldo a qualquer hora, inclusive
-pelo celular.
+NEXORA é um sistema web para mercadinhos e pequenos comércios que ainda controlam vendas e mercadorias em cadernos, planilhas ou mensagens. Venda e estoque ficam integrados: cada venda registrada baixa o estoque automaticamente, e o saldo, o caixa e o lucro do dia podem ser consultados a qualquer momento, inclusive pelo celular.
 
 ```
-cadastrar produto  →  registrar venda  →  baixa automática no estoque  →  consultar
+cadastrar produto  →  registrar venda  →  baixa automática no estoque  →  acompanhar resultados
 ```
 
-**Para quem:** pequenos comerciantes locais de Belém, começando por mercadinhos e negócios
-que hoje controlam os produtos à mão.
+## Funcionalidades
 
-**Aposta do produto:** ser fácil de aprender. A meta é que 4 em cada 5 comerciantes consigam
-cadastrar, vender e consultar **sem ajuda**, depois de uma orientação curta.
+| Módulo | Descrição |
+|---|---|
+| **Produtos** | Cadastro com nome, preço, quantidade inicial e custo opcional. |
+| **Vender** | Carrinho com vários itens, atalhos de teclado e busca rápida. Impede vender além do estoque, com ajuste rápido no momento da venda. |
+| **Pagamentos** | Até duas formas de pagamento por venda, com divisão de valores e cálculo de troco. |
+| **Vendas** | Histórico com filtros por período, forma de pagamento e canal; cancelamento devolve os itens ao estoque. |
+| **Estoque** | Saldo por produto, ajustes com motivo, entrada de mercadoria com custo médio e lista de reposição. |
+| **Canais de venda** | Origens definidas pela própria loja (balcão, Instagram, encomenda etc.). |
+| **Início** | Indicadores do período com comparação ao período anterior, gráfico de vendas e mais vendidos. |
+| **Fechamento do dia** | Total vendido, divisão por forma de pagamento, custo e lucro do dia. |
 
-## O que o sistema faz
+### Regras de negócio
 
-| | Funcionalidade | Como funciona |
-|---|---|---|
-| F1 | **Cadastro de produtos** | Só nome, preço e quantidade inicial. |
-| F2 | **Registro de vendas** | Carrinho com vários itens; o estoque baixa automaticamente. Não deixa vender além do que existe, mas oferece um ajuste rápido na hora (o caderno do balcão pode estar desatualizado). Origem da venda opcional, com canais que a própria loja define (ex.: Instagram, encomenda). |
-| F3 | **Consulta de estoque** | Saldo de cada produto, rápido e legível no celular. |
-| F4 | **Ajuste de estoque** | Corrige divergências da conferência, sempre com motivo registrado. |
-| F5 | **Resumo de vendas** | O que foi vendido no período e os mais vendidos. |
-| F6 | **Orientação inicial** | Passo a passo curto no primeiro uso. *(planejada)* |
-
-### Regras importantes
-
-- **A quantidade não se edita à mão.** Ela só muda por venda, cancelamento de venda ou ajuste
-  com motivo, o que deixa todo movimento rastreável.
-- **Cancelar uma venda devolve os itens ao estoque.** Venda e estoque ficam sempre consistentes.
-- **Cada loja vê só os próprios dados.** Um login por loja; a sessão fica num cookie `httpOnly`.
-
-**Fora do escopo por enquanto:** relatórios avançados, financeiro completo (incluindo fiado),
-integrações automáticas com outros canais e importação de planilhas.
+- **Toda alteração de estoque é rastreável.** A quantidade só muda por venda, cancelamento, entrada de mercadoria ou ajuste com motivo registrado.
+- **Venda e estoque são sempre consistentes.** Registro e cancelamento ocorrem em transação.
+- **Isolamento por loja.** Cada conta acessa apenas os próprios dados; a sessão usa cookie `httpOnly`.
+- **Custo histórico preservado.** O custo do produto é copiado para cada item vendido, mantendo o lucro correto mesmo após mudanças de preço ou custo.
 
 ## Tecnologias
 
 | Camada | Tecnologia |
 |---|---|
-| Frontend | React 19 + Vite, React Router, CSS Modules |
-| Backend | Node.js + Express 5 (API REST), validação com Zod, autenticação JWT + bcrypt |
-| Banco | MySQL / MariaDB (`mysql2`), migrações numeradas |
-| Testes | Vitest + Supertest (API contra banco de testes real) |
+| Frontend | React 19, Vite, React Router, TanStack Query, CSS Modules, PWA |
+| Backend | Node.js, Express 5, Zod, JWT, bcrypt, Helmet, rate limiting |
+| Banco de dados | MySQL 8 / MariaDB (`mysql2`), com migrações versionadas |
+| Testes | Vitest e Supertest (integração contra banco de testes real) |
 
 ## Estrutura
 
 ```
 backend/
-  src/            API: rotas, controllers, services, validators, middlewares
-  database/       schema.sql (base) e migracoes/ (alterações numeradas)
-  tests/          testes de integração da API
+  src/
+    routes/        definição das rotas da API
+    controllers/   entrada e saída HTTP
+    services/      regras de negócio e acesso ao banco
+    validators/    esquemas de validação (Zod)
+    middlewares/   autenticação, validação e tratamento de erros
+  database/
+    schema.sql     estrutura base
+    migracoes/     alterações numeradas
+  scripts/         configuração do banco e carga de dados de demonstração
+  tests/           testes de integração
 frontend/
-  src/pages/      telas: Entrar, Criar conta, Início, Vender, Vendas, Produtos, Estoque, Minha loja
-  src/components/ componentes reutilizáveis
-docs/
-  PROJETO.md      documento do projeto (problema, escopo, riscos, equipe)
+  src/
+    pages/         telas do aplicativo
+    components/    componentes reutilizáveis
+    dados/         cache e consultas (TanStack Query)
+    api/           cliente HTTP
+    hooks/ utils/ context/
 ```
 
-### API (resumo)
+## API
 
-Tudo sob `/api`:
+Todas as rotas ficam sob `/api` e, exceto `/health` e `/auth`, exigem autenticação.
 
-| Rota | Para quê |
+| Rota | Descrição |
 |---|---|
-| `GET /health` | Verifica se a API e o banco estão no ar |
-| `/auth` | Criar conta da loja, entrar, sair, sessão atual |
-| `/produtos` | Cadastro, listagem, ajustes de estoque e histórico de movimentações |
-| `/vendas` | Registrar, listar e cancelar vendas |
-| `/resumo` | Números do Início (vendas do período, mais vendidos, origem por canal) |
-| `/canais` | Canais de venda definidos pela loja |
+| `GET /health` | Status da API e do banco |
+| `/auth` | Cadastro da loja, login, logout e sessão atual |
+| `/produtos` | CRUD de produtos, ajustes de estoque e histórico de movimentações |
+| `/vendas` | Registro, listagem, detalhe e cancelamento de vendas; produtos vendidos no período |
+| `/resumo` | Indicadores do período |
+| `/relatorio` | Fechamento do dia |
+| `/canais` | Canais de venda da loja |
 
-## Como rodar (desenvolvimento)
+## Desenvolvimento
 
-Pré-requisitos: Node.js 20+ e MySQL ou MariaDB.
+Requisitos: Node.js 20+ e MySQL 8 ou MariaDB.
 
-### 1. Banco de dados
-
-Crie os bancos e um usuário dedicado (exemplo para MariaDB local):
+### Banco de dados
 
 ```sql
 CREATE DATABASE nexora      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE DATABASE nexora_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'nexora'@'localhost' IDENTIFIED BY '<sua-senha>';
+CREATE USER 'nexora'@'localhost' IDENTIFIED BY '<senha>';
 GRANT ALL PRIVILEGES ON nexora.*      TO 'nexora'@'localhost';
 GRANT ALL PRIVILEGES ON nexora_test.* TO 'nexora'@'localhost';
 ```
 
-### 2. Backend
+### Backend
 
 ```bash
 cd backend
@@ -108,54 +97,42 @@ cp .env.example .env      # preencha DB_PASSWORD e JWT_SECRET
 npm install
 npm run db:setup          # cria as tabelas e aplica as migrações pendentes
 npm run dev               # http://localhost:3333/api/health
-npm test                  # prepara o banco de testes e roda a suíte
+npm test                  # prepara o banco de testes e executa a suíte
 ```
 
-### 3. Frontend
+### Frontend
 
 ```bash
 cd frontend
 npm install
 npm run dev               # http://localhost:5173
+npm test
 ```
 
-### Migrações do banco
+### Migrações
 
-A estrutura base está em `backend/database/schema.sql` e **não deve ser editada**.
-Para alterar o banco, crie um arquivo numerado em `backend/database/migracoes/`
-(ex.: `00N_descricao.sql`) e rode `npm run db:setup`. Cada migração é aplicada uma única vez
-(o controle fica na tabela `migracoes`).
+`backend/database/schema.sql` contém a estrutura base e não deve ser alterado. Mudanças no banco entram como arquivos numerados em `backend/database/migracoes/` (ex.: `007_descricao.sql`) e são aplicadas por `npm run db:setup`. Cada migração roda uma única vez, controlada pela tabela `migracoes`.
 
-## Loja de demonstração
-
-Para apresentar o sistema com dados de um mês de uso (produtos, vendas, reposições e avisos de estoque):
+### Dados de demonstração
 
 ```bash
 cd backend
-npm run seed:demo                 # cria o "Mercadinho da Esquina" no banco do .env
-npm run seed:demo -- --recriar    # apaga e cria de novo (vendas até hoje)
+npm run seed:demo                 # cria uma loja com um mês de movimento
+npm run seed:demo -- --recriar    # recria a loja com vendas até a data atual
 ```
 
-O e-mail e a senha aparecem no fim. Para outro banco, aponte o arquivo de configuração:
-`DOTENV_CONFIG_PATH=.env.producao npm run seed:demo`.
+As credenciais são exibidas ao final. Para outro banco, use `DOTENV_CONFIG_PATH=.env.producao npm run seed:demo`.
 
-## Versão de teste publicada
+## Deploy
 
-| Parte | Onde |
+| Componente | Plataforma |
 |---|---|
-| Frontend | Vercel (`frontend/vercel.json` repassa `/api` ao backend, mantendo o login por cookie) |
-| Backend | Render, plano gratuito (dorme sem uso; o primeiro acesso leva ~50 s) |
-| Banco | MySQL no Aiven, com SSL (`DB_SSL_CA`) |
+| Frontend | Vercel (`frontend/vercel.json` encaminha `/api` ao backend, preservando o cookie de sessão) |
+| Backend | Render |
+| Banco de dados | MySQL gerenciado (Aiven), com SSL via `DB_SSL_CA` |
 
-## Equipe
+## Roadmap
 
-| Integrante | Papel |
-|---|---|
-| João Rafael | Gestão e negócios / Product Owner |
-| Kaio Barra | Banco de dados e infraestrutura; fluxo e acompanhamento das tarefas |
-| Eduardo Costa | Desenvolvimento / Tech Lead |
-| Issac Guimarães | Desenvolvimento |
-| Kevin Monteiro | Desenvolvimento |
-| Lucas Souza | UX e design |
-
-Mais detalhes sobre o problema, o escopo e os riscos em [`docs/PROJETO.md`](docs/PROJETO.md).
+- Orientação guiada no primeiro uso.
+- Relatórios avançados e controle de fiado.
+- Importação de planilhas.

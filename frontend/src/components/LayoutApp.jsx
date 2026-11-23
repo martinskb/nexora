@@ -15,7 +15,7 @@ import { IconeCaixa, IconeEstoque, IconeInicio, IconeLoja, IconeMais, IconeRecib
 import { Marca } from './Marca.jsx'
 import estilos from './LayoutApp.module.css'
 
-// Ordem do celular (spec §2.1): Vender no centro do menu inferior.
+// Ordem do celular: Vender no centro do menu inferior.
 const INICIO = { para: '/', rotulo: 'Início', Icone: IconeInicio, numero: '01' }
 const PRODUTOS = { para: '/produtos', rotulo: 'Produtos', Icone: IconeCaixa, numero: '02' }
 const ESTOQUE = { para: '/estoque', rotulo: 'Estoque', Icone: IconeEstoque, numero: '03' }

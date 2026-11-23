@@ -1,4 +1,4 @@
-// Regras de histórico do app, como num app nativo (spec §3):
+// Regras de histórico do app, como num app nativo:
 // - as abas são irmãs: trocar de aba não empilha (exceto saindo do Início);
 // - assim, voltar em qualquer aba leva ao Início, e voltar no Início sai;
 // - Vender e Minha loja são caminhos de ida e volta: empilham.

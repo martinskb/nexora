@@ -1,4 +1,4 @@
-// Chaves, validades e regras de atualização do cache de dados (spec §4.2).
+// Chaves, validades e regras de atualização do cache de dados.
 
 export const chaves = {
   resumo: (de, ate) => ['resumo', de, ate],
