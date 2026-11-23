@@ -21,5 +21,12 @@ backups/
 .vscode/
 *.log
 
-# Documento original da disciplina (resumo em docs/PROJETO.md)
+# Documentos e material de trabalho local
 *.pdf
+docs/
+d/
+
+# Esboços temporários de brainstorming
+.superpowers/
+
+frontend/README.md

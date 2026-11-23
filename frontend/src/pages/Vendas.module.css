@@ -1,39 +1,83 @@
 .pagina {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--esp-4);
 }
 
+.topo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  margin-bottom: var(--esp-2);
+}
+
 .titulo {
-  font-size: var(--texto-2xl);
+  font-size: var(--t-30);
+}
+
+.linkRelatorio {
+  font-size: var(--t-15);
+  font-weight: 600;
+  color: var(--cor-marca-texto);
+  text-decoration: none;
+}
+
+.linkRelatorio:hover {
+  text-decoration: underline;
+}
+
+.linhaVendido {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  min-height: 56px;
+  padding: var(--esp-3) var(--esp-4);
+}
+
+.linhaVendido .principal {
+  flex: 1;
+  min-width: 0;
+}
+
+.qtd {
+  color: var(--cor-texto-suave);
+  font-size: var(--t-15);
 }
 
 .filtros {
-  display: grid;
-  gap: var(--esp-2);
-}
-
-@media (min-width: 768px) {
-  .filtros {
-    grid-template-columns: 1.3fr 1fr 1.1fr;
-    gap: var(--esp-3);
-  }
-}
-
-.info {
-  color: var(--cor-texto-suave);
-  font-size: var(--texto-sm);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-3);
+  align-items: end;
 }
 
 .vazio {
   display: grid;
   justify-items: center;
-  gap: var(--esp-2);
+  gap: var(--esp-3);
   padding: var(--esp-7) var(--esp-4);
-  color: var(--cor-texto-suave);
   text-align: center;
-  background: var(--cor-superficie);
-  border: 1px dashed var(--cor-borda);
-  border-radius: var(--raio-lg);
+  color: var(--cor-texto-suave);
+}
+
+.vazio svg {
+  opacity: 0.6;
+}
+
+.vazio h2 {
+  font-size: var(--t-19);
+  color: var(--cor-texto);
+}
+
+.grupos {
+  display: grid;
+  gap: var(--esp-5);
+  transition: opacity 0.2s;
+}
+
+.trocando {
+  opacity: 0.55;
 }
 
 .grupo {
@@ -41,101 +85,100 @@
   gap: var(--esp-2);
 }
 
-.dia {
-  font-size: var(--texto-sm);
-  color: var(--cor-texto-suave);
-  font-weight: 700;
+.cabecalhoDia {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0 var(--esp-1);
+}
+
+.cabecalhoDia strong {
+  font-size: var(--t-19);
+  font-weight: 600;
+}
+
+.totalHoje {
+  color: var(--cor-dinheiro);
 }
 
 .lista {
   list-style: none;
   margin: 0;
   padding: 0;
+  border-radius: var(--raio-16);
   background: var(--cor-superficie);
-  border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-lg);
+  box-shadow: inset 0 0 0 1px var(--cor-contorno);
   overflow: hidden;
 }
 
 .lista li + li {
-  border-top: 1px solid var(--cor-borda);
+  border-top: 1px solid var(--cor-linha);
 }
 
-.item {
-  width: 100%;
-  display: grid;
-  grid-template-columns: auto 1fr auto auto;
+.linha {
+  display: flex;
   align-items: center;
   gap: var(--esp-3);
+  width: 100%;
   min-height: 64px;
   padding: var(--esp-3) var(--esp-4);
   border: 0;
   background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
   text-align: left;
   cursor: pointer;
 }
 
-.item:hover {
-  background: var(--cor-fundo);
+.linha:hover {
+  background: var(--cor-superficie-2);
 }
 
-.hora {
-  font-weight: 700;
-  font-family: var(--fonte-num);
-  font-variant-numeric: tabular-nums;
-  color: var(--cor-texto-suave);
+.linha:focus-visible {
+  outline-offset: -2px;
 }
 
-.resumo {
-  display: grid;
+.texto {
+  flex: 1;
   min-width: 0;
+  display: grid;
+  gap: 2px;
 }
 
-.produtos {
-  font-weight: 600;
-  white-space: nowrap;
+.principal {
+  font-size: var(--t-15);
+  font-weight: 500;
+}
+
+.texto small {
+  font-size: var(--t-12);
+  color: var(--cor-texto-suave);
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0 var(--esp-3);
-  color: var(--cor-texto-suave);
-  font-size: var(--texto-xs);
-}
-
-.canal {
-  font-weight: 600;
-}
-
-.canal_whatsapp {
-  color: var(--cor-sucesso);
-  font-weight: 600;
-}
-
-.seloCancelada {
-  padding: 0 0.5em;
-  border-radius: 999px;
-  background: var(--cor-erro-suave);
-  color: var(--cor-erro);
-  font-weight: 700;
+  white-space: nowrap;
 }
 
 .valor {
-  font-weight: 700;
-  font-family: var(--fonte-num);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  flex: none;
+  font-size: var(--t-15);
+  font-weight: 600;
 }
 
+/* Cancelada: riscada e suave, mas visível. */
+.cancelada .principal,
 .cancelada .valor {
-  text-decoration: line-through;
   color: var(--cor-texto-suave);
+  text-decoration: line-through;
 }
 
-.seta {
-  color: var(--cor-texto-suave);
+.skDetalhe {
+  display: grid;
+  gap: var(--esp-3);
+}
+
+@media (min-width: 960px) {
+  .titulo {
+    font-size: var(--t-37);
+    letter-spacing: -0.03em;
+  }
 }

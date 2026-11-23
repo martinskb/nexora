@@ -10,7 +10,7 @@
   padding: var(--esp-6) var(--esp-4);
   text-align: center;
   color: var(--cor-texto-suave);
-  font-size: var(--texto-sm);
+  font-size: var(--t-15);
 }
 
 .itens {
@@ -27,7 +27,7 @@
 }
 
 .item + .item {
-  border-top: 1px solid var(--cor-borda);
+  border-top: 1px solid var(--cor-contorno);
 }
 
 .info {
@@ -44,7 +44,7 @@
 
 .unitario {
   color: var(--cor-texto-suave);
-  font-size: var(--texto-xs);
+  font-size: var(--t-12);
   white-space: nowrap;
 }
 
@@ -58,7 +58,7 @@
   flex: 1;
   text-align: right;
   font-weight: 700;
-  font-family: var(--fonte-num);
+  font-family: var(--fonte);
   font-variant-numeric: tabular-nums;
 }
 
@@ -68,15 +68,15 @@
   display: grid;
   place-items: center;
   border: 0;
-  border-radius: var(--raio-md);
+  border-radius: var(--raio-8);
   background: transparent;
   color: var(--cor-texto-suave);
   cursor: pointer;
 }
 
 .remover:hover {
-  background: var(--cor-erro-suave);
-  color: var(--cor-erro);
+  background: color-mix(in srgb, var(--cor-critico) 14%, transparent);
+  color: var(--cor-critico);
 }
 
 .link {
@@ -84,7 +84,7 @@
   padding: var(--esp-2) 0;
   border: 0;
   background: transparent;
-  color: var(--cor-primaria);
+  color: var(--cor-marca-texto);
   font-weight: 600;
   cursor: pointer;
 }
@@ -94,17 +94,30 @@
   justify-content: space-between;
   align-items: baseline;
   padding-top: var(--esp-3);
-  border-top: 2px solid var(--cor-borda);
-  font-size: var(--texto-lg);
+  border-top: 1px solid var(--cor-linha);
+  font-size: var(--t-15);
+  color: var(--cor-texto-suave);
 }
 
 .total small {
   color: var(--cor-texto-suave);
-  font-size: var(--texto-sm);
+  font-size: var(--t-15);
 }
 
-.total strong {
-  font-size: var(--texto-xl);
-  font-family: var(--fonte-num);
-  font-variant-numeric: tabular-nums;
+.valorTotal {
+  font-size: var(--t-30);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--cor-texto);
+}
+
+.atalho {
+  margin-left: var(--esp-2);
+  padding: 1px 6px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.35);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.85;
 }

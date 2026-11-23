@@ -7,7 +7,7 @@ function Icone({ children, tamanho = 20, ...props }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -18,19 +18,6 @@ function Icone({ children, tamanho = 20, ...props }) {
     </svg>
   )
 }
-
-export const IconeSol = (p) => (
-  <Icone {...p}>
-    <circle cx="12" cy="12" r="4" />
-    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-  </Icone>
-)
-
-export const IconeLua = (p) => (
-  <Icone {...p}>
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-  </Icone>
-)
 
 export const IconeOlho = (p) => (
   <Icone {...p}>
@@ -126,6 +113,20 @@ export const IconeFechar = (p) => (
 export const IconeSeta = (p) => (
   <Icone {...p}>
     <path d="M9 18l6-6-6-6" />
+  </Icone>
+)
+
+export const IconeLoja = (p) => (
+  <Icone {...p}>
+    <path d="M4 9h16l-1.2-5H5.2z" />
+    <path d="M5 9v11h14V9" />
+    <path d="M10 20v-5h4v5" />
+  </Icone>
+)
+
+export const IconeVoltar = (p) => (
+  <Icone {...p}>
+    <path d="M15 18l-6-6 6-6" />
   </Icone>
 )
 

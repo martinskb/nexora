@@ -1,8 +1,8 @@
 .controle {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-md);
+  border: 1px solid var(--cor-contorno-campo);
+  border-radius: var(--raio-8);
   background: var(--cor-superficie);
   overflow: hidden;
 }
@@ -14,7 +14,7 @@
   place-items: center;
   border: 0;
   background: transparent;
-  color: var(--cor-primaria);
+  color: var(--cor-marca);
   font-size: 1.4rem;
   font-weight: 700;
   line-height: 1;
@@ -22,7 +22,7 @@
 }
 
 .botao:hover {
-  background: var(--cor-primaria-suave);
+  background: var(--cor-marca-suave);
 }
 
 .campo {
@@ -30,15 +30,15 @@
   min-width: 2.5rem;
   height: var(--toque-min);
   border: 0;
-  border-inline: 1px solid var(--cor-borda);
+  border-inline: 1px solid var(--cor-contorno);
   background: transparent;
   text-align: center;
   font-weight: 700;
-  font-family: var(--fonte-num);
+  font-family: var(--fonte);
   font-variant-numeric: tabular-nums;
 }
 
 .campo:focus {
   outline: none;
-  background: var(--cor-primaria-suave);
+  background: var(--cor-marca-suave);
 }

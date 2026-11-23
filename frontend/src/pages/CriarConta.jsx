@@ -6,8 +6,13 @@ import { LayoutAuth } from '../components/LayoutAuth.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useFormulario } from '../hooks/useFormulario.js'
 import { validarCadastro } from '../utils/validacao.js'
+import { useTitulo } from '../hooks/useTitulo.js'
+import { useMediaQuery } from '../hooks/useMediaQuery.js'
 
 export default function CriarConta() {
+  useTitulo('Criar conta')
+  // No celular o foco automático abriria o teclado e esconderia a apresentação.
+  const focoAutomatico = useMediaQuery('(min-width: 960px)')
   const { cadastrar } = useAuth()
   const navigate = useNavigate()
   const { valores, erros, erroGeral, enviando, alterar, enviar } = useFormulario({
@@ -25,7 +30,6 @@ export default function CriarConta() {
   return (
     <LayoutAuth
       titulo="Criar conta da loja"
-      subtitulo="Leva menos de um minuto. São só 3 campos."
       rodape={
         <>
           Já tem conta? <Link to="/entrar">Entrar</Link>
@@ -38,12 +42,11 @@ export default function CriarConta() {
           rotulo="Nome da loja"
           name="nome"
           autoComplete="organization"
-          placeholder="Ex.: Mercadinho Andorinhas"
           value={valores.nome}
           onChange={alterar}
           erro={erros.nome}
           maxLength={120}
-          autoFocus
+          autoFocus={focoAutomatico}
         />
         <CampoTexto
           rotulo="E-mail"
@@ -51,7 +54,6 @@ export default function CriarConta() {
           type="email"
           autoComplete="email"
           inputMode="email"
-          dica="Você vai usar este e-mail para entrar."
           value={valores.email}
           onChange={alterar}
           erro={erros.email}

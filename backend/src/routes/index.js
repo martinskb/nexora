@@ -4,6 +4,8 @@ import { authRoutes } from './authRoutes.js';
 import { produtoRoutes } from './produtoRoutes.js';
 import { vendaRoutes } from './vendaRoutes.js';
 import { resumoRoutes } from './resumoRoutes.js';
+import { canalRoutes } from './canalRoutes.js';
+import { relatorioRoutes } from './relatorioRoutes.js';
 
 export const routes = Router();
 
@@ -21,3 +23,5 @@ routes.use('/auth', authRoutes);
 routes.use('/produtos', produtoRoutes);
 routes.use('/vendas', vendaRoutes);
 routes.use('/resumo', resumoRoutes);
+routes.use('/canais', canalRoutes);
+routes.use('/relatorio', relatorioRoutes);

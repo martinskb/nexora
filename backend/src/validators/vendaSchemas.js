@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-export const CANAIS = ['balcao', 'whatsapp'];
-
 const textoOpcional = (max) =>
   z
     .string()
@@ -25,8 +23,26 @@ export const criarVendaSchema = z.object({
     )
     .min(1, 'Adicione pelo menos um produto à venda.')
     .max(200, 'Muitos itens em uma única venda.'),
-  canal: z.enum(CANAIS, { error: 'Origem da venda inválida.' }).optional().default('balcao'),
+  // Origem opcional: id de um canal ativo da loja, ou null (venda sem canal).
+  canalId: z
+    .number({ error: 'Origem da venda inválida.' })
+    .int('Origem da venda inválida.')
+    .positive('Origem da venda inválida.')
+    .nullable()
+    .optional()
+    .transform((v) => v ?? null),
   observacao: textoOpcional(255),
+  // Forma de pagamento (opcional): até duas; a soma é conferida no serviço contra o total.
+  pagamentos: z
+    .array(
+      z.object({
+        forma: z.enum(['dinheiro', 'pix', 'cartao'], { error: 'Forma de pagamento inválida.' }),
+        valor: z.number({ error: 'Valor de pagamento inválido.' }).finite().min(0).max(99_999_999.99).optional(),
+      }),
+      { error: 'Forma de pagamento inválida.' },
+    )
+    .max(2, 'Use no máximo duas formas de pagamento.')
+    .optional(),
 });
 
 export const cancelarVendaSchema = z.object({
@@ -39,11 +55,15 @@ export const cancelarVendaSchema = z.object({
 
 const dataIso = z.iso.datetime({ offset: true, error: 'Data inválida.' });
 
+/** Produtos vendidos no período (concluídas). */
+export const filtroProdutosVendidosSchema = z.object({ de: dataIso.optional(), ate: dataIso.optional() });
+
 export const filtroVendasSchema = z.object({
   de: dataIso.optional(),
   ate: dataIso.optional(),
-  canal: z.enum(CANAIS).optional(),
+  canalId: z.union([z.literal('sem'), z.coerce.number().int().positive()]).optional(), // 'sem' = vendas sem canal
   status: z.enum(['concluida', 'cancelada']).optional(),
+  forma: z.enum(['dinheiro', 'pix', 'cartao', 'nao_informado']).optional(),
   limite: z.coerce.number().int().min(1).max(100).optional().default(50),
   antesDe: z.coerce.number().int().positive().optional(), // paginação: id da última venda já carregada
 });

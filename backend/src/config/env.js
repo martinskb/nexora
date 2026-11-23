@@ -18,6 +18,16 @@ if (jwtSecret.length < 32) {
 
 const sessaoDias = Number(process.env.SESSAO_DIAS) || 7;
 
+// Conexão criptografada com o banco (obrigatória em bancos na nuvem, ex.: Aiven).
+// DB_SSL_CA: conteúdo do certificado da autoridade (ca.pem) do provedor.
+// DB_SSL=true sem CA: usa os certificados públicos do sistema.
+function sslDoBanco() {
+  const ca = process.env.DB_SSL_CA;
+  if (ca) return { ca: ca.replace(/\\n/g, '\n'), rejectUnauthorized: true };
+  if (process.env.DB_SSL === 'true') return { rejectUnauthorized: true };
+  return undefined;
+}
+
 export const env = Object.freeze({
   nodeEnv,
   isTest,
@@ -30,7 +40,11 @@ export const env = Object.freeze({
     user: required('DB_USER'),
     password: process.env.DB_PASSWORD ?? '',
     database: isTest ? required('DB_NAME_TEST') : required('DB_NAME'),
+    ssl: sslDoBanco(),
   },
+  // Quantos proxies confiáveis existem na frente da API (ex.: Vercel → Render = 2).
+  // Necessário para o limite de tentativas usar o IP real de quem acessa.
+  trustProxy: Number(process.env.TRUST_PROXY) || 0,
   sessao: {
     segredo: jwtSecret,
     dias: sessaoDias,

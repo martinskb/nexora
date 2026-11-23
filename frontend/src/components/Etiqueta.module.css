@@ -1,0 +1,166 @@
+/* O contorno vem de drop-shadow no contêiner: `border` seria cortado pelo clip-path. */
+.contorno {
+  --furo: var(--cor-fundo);
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  filter: drop-shadow(1px 0 0 var(--cor-contorno)) drop-shadow(-1px 0 0 var(--cor-contorno))
+    drop-shadow(0 1px 0 var(--cor-contorno)) drop-shadow(0 -1px 0 var(--cor-contorno));
+  transform-origin: 22px 50%;
+}
+
+.forma {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--esp-4);
+  min-height: 56px;
+  padding: 0 var(--esp-4) 0 42px;
+  background: var(--cor-superficie);
+  clip-path: polygon(16px 0, 100% 0, 100% 100%, 16px 100%, 0 50%);
+  border-radius: 0 var(--raio-8) var(--raio-8) 0;
+}
+
+/* Furo do barbante, dentro da caixa (a borda esquerda alinha com o grid). */
+.forma::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  background: var(--furo);
+  box-shadow: 0 0 0 1px var(--cor-contorno);
+}
+
+.rotulo {
+  font-size: var(--t-12);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cor-texto-suave);
+  white-space: nowrap;
+}
+
+.valor {
+  font-size: var(--t-24);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.direita {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  margin-left: auto;
+  text-align: right;
+}
+
+.comparacao {
+  font-size: var(--t-12);
+  font-weight: 500;
+  color: var(--cor-texto-suave);
+  white-space: nowrap;
+}
+
+.alta {
+  color: var(--cor-dinheiro);
+}
+
+/* indicador: rótulo à esquerda, valor e comparação à direita */
+.indicador .rotulo {
+  flex: 1;
+}
+.indicador .forma {
+  min-height: 64px;
+}
+
+/* No PC há espaço: valor e comparação lado a lado. */
+@media (min-width: 960px) {
+  .indicador .forma {
+    min-height: 60px;
+  }
+  .indicador .direita {
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--esp-4);
+  }
+  .indicador .comparacao {
+    min-width: 150px;
+  }
+}
+
+.alerta .rotulo,
+.alerta .valor {
+  color: var(--cor-alerta);
+}
+
+.critico .rotulo,
+.critico .valor {
+  color: var(--cor-critico);
+}
+
+a.contorno:hover .forma {
+  background: var(--cor-superficie-2);
+}
+
+a.contorno:focus-visible {
+  outline: none;
+}
+a.contorno:focus-visible .forma {
+  background: var(--cor-superficie-2);
+  box-shadow: inset 0 0 0 2px var(--cor-marca);
+}
+
+/* preço: pequena, só o valor */
+.preco {
+  display: inline-block;
+  transform-origin: 12px 50%;
+}
+.preco .forma {
+  min-height: 28px;
+  padding: 0 var(--esp-3) 0 22px;
+  clip-path: polygon(10px 0, 100% 0, 100% 100%, 10px 100%, 0 50%);
+  border-radius: 0 6px 6px 0;
+  background: var(--cor-superficie-2);
+}
+.preco .forma::before {
+  left: 11px;
+  width: 5px;
+  height: 5px;
+  margin-top: -2.5px;
+  background: var(--cor-superficie);
+}
+.preco .valor {
+  font-size: var(--t-15);
+}
+
+/* "Pendura": gira a partir do furo, com leve balanço. */
+.pendura {
+  animation: pendura 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(0.55s + var(--indice, 0) * 120ms);
+}
+
+@keyframes pendura {
+  0% {
+    opacity: 0;
+    transform: rotate(-8deg) translateY(-4px);
+  }
+  40% {
+    opacity: 1;
+  }
+  65% {
+    transform: rotate(2deg);
+  }
+  85% {
+    transform: rotate(-0.8deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -4,13 +4,14 @@
 }
 
 .rotulo {
-  font-weight: 600;
-  font-size: var(--texto-sm);
+  font-weight: 500;
+  font-size: var(--t-15);
+  color: var(--cor-texto-suave);
 }
 
 .dica {
   color: var(--cor-texto-suave);
-  font-size: var(--texto-xs);
+  font-size: var(--t-12);
 }
 
 .caixa {
@@ -20,19 +21,19 @@
 
 .entrada {
   width: 100%;
-  min-height: var(--toque-min);
-  padding: 0 var(--esp-3);
-  border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-md);
+  min-height: 48px;
+  padding: 0 var(--esp-4);
+  border: 1px solid var(--cor-contorno-campo);
+  border-radius: 10px;
   background: var(--cor-superficie);
-  font-size: var(--texto-md);
+  font-size: 1rem;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .entrada:focus {
   outline: none;
-  border-color: var(--cor-primaria);
-  box-shadow: 0 0 0 3px var(--cor-primaria-suave);
+  border-color: var(--cor-marca);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cor-marca) 25%, transparent);
 }
 
 .comBotao {
@@ -54,11 +55,11 @@
 }
 
 .invalida {
-  border-color: var(--cor-erro);
+  border-color: var(--cor-critico);
 }
 .invalida:focus {
-  border-color: var(--cor-erro);
-  box-shadow: 0 0 0 3px var(--cor-erro-suave);
+  border-color: var(--cor-critico);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cor-critico) 14%, transparent);
 }
 
 .botaoVer {
@@ -73,14 +74,14 @@
   background: transparent;
   color: var(--cor-texto-suave);
   cursor: pointer;
-  border-radius: 0 var(--raio-md) var(--raio-md) 0;
+  border-radius: 0 10px 10px 0;
 }
 .botaoVer:hover {
   color: var(--cor-texto);
 }
 
 .erro {
-  color: var(--cor-erro);
-  font-size: var(--texto-xs);
+  color: var(--cor-critico);
+  font-size: var(--t-12);
   font-weight: 500;
 }

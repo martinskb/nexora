@@ -70,6 +70,24 @@ describe('Produtos — listagem, edição e remoção', () => {
     expect(res.body.produtos.map((p) => p.nome)).toEqual(['Arroz', 'Feijão']);
   });
 
+  it('informa quanto cada produto vendeu nos últimos 30 dias (sem contar canceladas nem vendas antigas)', async () => {
+    const { agente } = await criarLojaLogada();
+    const { body: a } = await agente.post('/api/produtos').send(arroz);
+    const { body: f } = await agente.post('/api/produtos').send({ ...arroz, nome: 'Feijão' });
+    const id = a.produto.id;
+    await agente.post('/api/vendas').send({ itens: [{ produtoId: id, quantidade: 3 }] });
+    await agente.post('/api/vendas').send({ itens: [{ produtoId: id, quantidade: 2 }] });
+    const cancelada = await agente.post('/api/vendas').send({ itens: [{ produtoId: id, quantidade: 4 }] });
+    await agente.post(`/api/vendas/${cancelada.body.venda.id}/cancelar`).send({ motivo: 'Cliente desistiu' });
+    const antiga = await agente.post('/api/vendas').send({ itens: [{ produtoId: id, quantidade: 7 }] });
+    await pool.execute('UPDATE vendas SET criado_em = NOW() - INTERVAL 31 DAY WHERE id = ?', [antiga.body.venda.id]);
+
+    const res = await agente.get('/api/produtos');
+    const porId = Object.fromEntries(res.body.produtos.map((p) => [p.id, p]));
+    expect(porId[id].vendidos30d).toBe(5);
+    expect(porId[f.produto.id].vendidos30d).toBe(0);
+  });
+
   it('edita nome, preço e estoque mínimo', async () => {
     const { agente } = await criarLojaLogada();
     const { body } = await agente.post('/api/produtos').send(arroz);
@@ -148,5 +166,42 @@ describe('Produtos — segurança', () => {
     const lojaB = await criarLojaLogada();
     expect((await lojaA.agente.post('/api/produtos').send(arroz)).status).toBe(201);
     expect((await lojaB.agente.post('/api/produtos').send(arroz)).status).toBe(201);
+  });
+});
+
+describe('Custo do produto (fechamento do dia)', () => {
+  it('cadastro aceita custo opcional', async () => {
+    const { agente } = await criarLojaLogada();
+    const com = await agente.post('/api/produtos').send({ nome: 'Leite', preco: 5.29, quantidade: 3, custo: 3.2 });
+    expect(com.status).toBe(201);
+    expect(com.body.produto.custo).toBe(3.2);
+    const sem = await agente.post('/api/produtos').send({ nome: 'Pão', preco: 1, quantidade: 3 });
+    expect(sem.body.produto.custo).toBeNull();
+  });
+
+  it('edição substitui o custo quando enviado e mantém quando ausente', async () => {
+    const { agente } = await criarLojaLogada();
+    const { body } = await agente.post('/api/produtos').send({ nome: 'Café', preco: 12, quantidade: 3, custo: 8 });
+    const id = body.produto.id;
+    const trocado = await agente.put(`/api/produtos/${id}`).send({ nome: 'Café', preco: 12, custo: 9.5 });
+    expect(trocado.body.produto.custo).toBe(9.5);
+    const mantido = await agente.put(`/api/produtos/${id}`).send({ nome: 'Café', preco: 13 });
+    expect(mantido.body.produto.custo).toBe(9.5);
+    const limpo = await agente.put(`/api/produtos/${id}`).send({ nome: 'Café', preco: 13, custo: null });
+    expect(limpo.body.produto.custo).toBeNull();
+  });
+
+  it('custo negativo é recusado', async () => {
+    const { agente } = await criarLojaLogada();
+    const res = await agente.post('/api/produtos').send({ nome: 'Óleo', preco: 8, quantidade: 1, custo: -1 });
+    expect(res.status).toBe(400);
+    expect(res.body.detalhes.custo).toBeDefined();
+  });
+
+  it('a listagem traz o custo', async () => {
+    const { agente } = await criarLojaLogada();
+    await agente.post('/api/produtos').send({ nome: 'Sal', preco: 3, quantidade: 1, custo: 1.75 });
+    const { body } = await agente.get('/api/produtos');
+    expect(body.produtos[0].custo).toBe(1.75);
   });
 });

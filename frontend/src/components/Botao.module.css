@@ -3,15 +3,19 @@
   align-items: center;
   justify-content: center;
   gap: var(--esp-2);
-  min-height: var(--toque-min);
+  min-height: 48px;
   padding: 0 var(--esp-5);
-  border: 1px solid transparent;
-  border-radius: var(--raio-md);
+  border: 0;
+  border-radius: 10px;
   font-weight: 600;
-  font-size: var(--texto-md);
+  font-size: var(--t-15);
   cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  transition: background-color 0.15s, box-shadow 0.15s, color 0.15s, transform 0.1s;
   white-space: nowrap;
+}
+
+.botao:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .botao:disabled {
@@ -24,20 +28,20 @@
 }
 
 .primario {
-  background: var(--cor-primaria);
-  color: var(--cor-sobre-primaria);
+  background: var(--cor-marca);
+  color: var(--cor-sobre-marca);
 }
 .primario:hover:not(:disabled) {
-  background: var(--cor-primaria-hover);
+  background: var(--cor-marca-hover);
 }
 
 .secundario {
   background: var(--cor-superficie);
   color: var(--cor-texto);
-  border-color: var(--cor-borda);
+  box-shadow: inset 0 0 0 1px var(--cor-contorno);
 }
 .secundario:hover:not(:disabled) {
-  border-color: var(--cor-texto-suave);
+  background: var(--cor-superficie-2);
 }
 
 .fantasma {
@@ -46,13 +50,17 @@
   padding: 0 var(--esp-3);
 }
 .fantasma:hover:not(:disabled) {
-  background: var(--cor-primaria-suave);
+  background: var(--cor-superficie-2);
   color: var(--cor-texto);
 }
 
 .perigo {
-  background: var(--cor-erro);
-  color: var(--cor-sobre-erro);
+  background: color-mix(in srgb, var(--cor-critico) 12%, transparent);
+  color: var(--cor-critico);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cor-critico) 30%, transparent);
+}
+.perigo:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--cor-critico) 18%, transparent);
 }
 
 .spinner {

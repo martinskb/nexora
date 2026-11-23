@@ -6,8 +6,13 @@ import { LayoutAuth } from '../components/LayoutAuth.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useFormulario } from '../hooks/useFormulario.js'
 import { validarLogin } from '../utils/validacao.js'
+import { useTitulo } from '../hooks/useTitulo.js'
+import { useMediaQuery } from '../hooks/useMediaQuery.js'
 
 export default function Entrar() {
+  useTitulo('Entrar')
+  // No celular o foco automático abriria o teclado e esconderia a apresentação.
+  const focoAutomatico = useMediaQuery('(min-width: 960px)')
   const { entrar } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -41,7 +46,7 @@ export default function Entrar() {
           value={valores.email}
           onChange={alterar}
           erro={erros.email}
-          autoFocus
+          autoFocus={focoAutomatico}
         />
         <CampoTexto
           rotulo="Senha"

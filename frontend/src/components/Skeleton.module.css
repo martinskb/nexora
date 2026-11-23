@@ -1,0 +1,53 @@
+.sk {
+  display: block;
+  border-radius: var(--raio-8);
+  background: linear-gradient(
+    100deg,
+    var(--cor-superficie-2) 30%,
+    color-mix(in srgb, var(--cor-superficie-2), var(--cor-texto) 7%) 50%,
+    var(--cor-superficie-2) 70%
+  );
+  background-size: 300% 100%;
+  animation: brilho 1.6s linear infinite;
+}
+
+.lista {
+  display: grid;
+  gap: var(--esp-2);
+}
+
+.circulo {
+  border-radius: 50%;
+  background: none;
+  animation: none;
+  box-shadow: inset 0 0 0 6px var(--cor-superficie-2);
+}
+
+.pilula {
+  border-radius: var(--raio-pilula);
+}
+
+.cartao {
+  border-radius: var(--raio-16);
+}
+
+.etiqueta {
+  border-radius: 0 var(--raio-8) var(--raio-8) 0;
+  clip-path: polygon(16px 0, 100% 0, 100% 100%, 16px 100%, 0 50%);
+}
+
+@keyframes brilho {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+/* Reduzir movimento: estático. */
+@media (prefers-reduced-motion: reduce) {
+  .sk {
+    animation: none;
+  }
+}

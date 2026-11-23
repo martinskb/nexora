@@ -1,105 +1,119 @@
-import { useEffect, useMemo, useState } from 'react'
-import { produtosApi } from '../api/produtos.js'
+import { useQueryClient } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Alerta } from '../components/Alerta.jsx'
 import { Botao } from '../components/Botao.jsx'
+import { Folha } from '../components/Folha.jsx'
 import { FormularioProduto } from '../components/FormularioProduto.jsx'
-import { IconeBusca, IconeCaixa, IconeMais, IconeSeta } from '../components/Icones.jsx'
-import { Modal } from '../components/Modal.jsx'
-import { SeloEstoque } from '../components/SeloEstoque.jsx'
+import { CampoBusca } from '../components/CampoBusca.jsx'
+import { IconeCaixa, IconeMais } from '../components/Icones.jsx'
+import { LinhaProduto, ListaProdutos } from '../components/LinhaProduto.jsx'
+import { SkeletonLista } from '../components/Skeleton.jsx'
 import { useAvisos } from '../context/AvisosContext.jsx'
+import { chaves } from '../dados/consultas.js'
+import { useInvalidar, useProdutos } from '../dados/hooks.js'
+import { useEstadoDaAba, useRolagemDaAba } from '../hooks/useEstadoDaAba.js'
+import { useSkeleton } from '../hooks/useSkeleton.js'
+import { useTitulo } from '../hooks/useTitulo.js'
+import { situacaoEstoque } from '../utils/estoque.js'
 import { formatarMoeda, normalizarTexto } from '../utils/formato.js'
+import { esperarVolta } from '../utils/historico.js'
 import estilos from './Produtos.module.css'
 
 const porNome = (a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' })
 
-async function carregarProdutos(signal) {
-  try {
-    const r = await produtosApi.listar(signal)
-    return { produtos: r.produtos, carregando: false, erro: '' }
-  } catch (err) {
-    if (err.name === 'AbortError') return null
-    return { produtos: [], carregando: false, erro: err.message }
-  }
+/** Detalhe da linha: quantidade, e a situação em cor só quando importa. */
+function detalheEstoque(p) {
+  const s = situacaoEstoque(p)
+  if (s === 'zerado') return { detalhe: 'Zerado', tom: 'critico' }
+  if (s === 'baixo') return { detalhe: `${p.quantidade} un · acabando`, tom: 'alerta' }
+  return { detalhe: `${p.quantidade} un`, tom: 'neutro' }
 }
 
 export default function Produtos() {
+  useTitulo('Produtos')
+  useRolagemDaAba('produtos')
   const { avisar } = useAvisos()
-  const [estado, setEstado] = useState({ produtos: [], carregando: true, erro: '' })
-  const [busca, setBusca] = useState('')
+  const location = useLocation()
+  const navigate = useNavigate()
+  const cliente = useQueryClient()
+  const invalidar = useInvalidar()
+  const { data: produtos = [], isPending: carregando, error, refetch } = useProdutos()
+  const mostrarSkeleton = useSkeleton(produtos.length > 0, carregando)
+  const [busca, setBusca] = useEstadoDaAba('produtos.busca', '')
   // null = fechado; { produto: null } = novo; { produto } = edição
-  const [janela, setJanela] = useState(null)
+  const [janelaAberta, setJanelaAberta] = useState(null)
 
-  useEffect(() => {
-    const ctrl = new AbortController()
-    carregarProdutos(ctrl.signal).then((r) => r && setEstado(r))
-    return () => ctrl.abort()
-  }, [])
-
-  function tentarDeNovo() {
-    setEstado((e) => ({ ...e, carregando: true, erro: '' }))
-    carregarProdutos().then((r) => r && setEstado(r))
+  // Vindo da busca rápida (Ctrl K): a edição do produto escolhido já abre aberta.
+  const idEditar = location.state?.editar
+  const [dispensado, setDispensado] = useState(null)
+  const produtoPedido = idEditar && dispensado !== idEditar ? produtos.find((p) => p.id === idEditar) : null
+  const janela = janelaAberta ?? (produtoPedido ? { produto: produtoPedido } : null)
+  function setJanela(valor) {
+    if (valor === null && produtoPedido) {
+      // Tira o pedido da entrada de baixo só depois que a folha sai do histórico.
+      setDispensado(idEditar)
+      const { pathname, state } = location
+      esperarVolta().then(() => navigate(pathname, { replace: true, state: { ...state, editar: undefined } }))
+    }
+    setJanelaAberta(valor)
   }
 
+  const ordenados = useMemo(() => [...produtos].sort(porNome), [produtos])
   const filtrados = useMemo(() => {
     const termo = normalizarTexto(busca)
-    if (!termo) return estado.produtos
-    return estado.produtos.filter((p) => normalizarTexto(p.nome).includes(termo))
-  }, [estado.produtos, busca])
+    return termo ? ordenados.filter((p) => normalizarTexto(p.nome).includes(termo)) : ordenados
+  }, [ordenados, busca])
+
+  function atualizarLista(fn) {
+    cliente.setQueryData(chaves.produtos(), (d) => (d ? { ...d, produtos: fn(d.produtos) } : d))
+    invalidar('produto')
+  }
 
   function aoSalvar(produto, { novo }) {
-    setEstado((e) => ({
-      ...e,
-      produtos: (novo ? [...e.produtos, produto] : e.produtos.map((p) => (p.id === produto.id ? produto : p))).sort(
-        porNome,
-      ),
-    }))
+    atualizarLista((lista) => (novo ? [...lista, produto] : lista.map((p) => (p.id === produto.id ? { ...p, ...produto } : p))))
     setJanela(null)
     avisar(novo ? `"${produto.nome}" cadastrado.` : 'Alterações salvas.')
   }
 
   function aoRemover(produto) {
-    setEstado((e) => ({ ...e, produtos: e.produtos.filter((p) => p.id !== produto.id) }))
+    atualizarLista((lista) => lista.filter((p) => p.id !== produto.id))
     setJanela(null)
     avisar(`"${produto.nome}" removido.`)
   }
 
-  const total = estado.produtos.length
+  const total = produtos.length
+  const novo = () => setJanela({ produto: null })
 
   return (
     <section className={estilos.pagina}>
       <header className={estilos.topo}>
-        <div>
-          <h1 className={estilos.titulo}>Produtos</h1>
-          {total > 0 && (
-            <p className={estilos.contagem}>
-              {total === 1 ? '1 produto cadastrado' : `${total} produtos cadastrados`}
-            </p>
-          )}
-        </div>
+        <h1 className={estilos.titulo}>Produtos</h1>
+        {total > 0 && <span className="cap">{total === 1 ? '1 item' : `${total} itens`}</span>}
         {total > 0 && (
-          <Botao onClick={() => setJanela({ produto: null })}>
-            <IconeMais /> Novo produto
+          <Botao className={estilos.novoPc} onClick={novo}>
+            <IconeMais /> Produto
           </Botao>
         )}
       </header>
 
-      {estado.carregando && <p className={estilos.info}>Carregando produtos…</p>}
+      {mostrarSkeleton && <SkeletonLista />}
 
-      {estado.erro && (
+      {error && (
         <div className={estilos.erro}>
-          <Alerta>{estado.erro}</Alerta>
-          <Botao variante="secundario" onClick={tentarDeNovo}>
+          <Alerta>{error.message}</Alerta>
+          <Botao variante="secundario" onClick={() => refetch()}>
             Tentar de novo
           </Botao>
         </div>
       )}
 
-      {!estado.carregando && !estado.erro && total === 0 && (
+      {!carregando && !error && total === 0 && (
         <div className={estilos.vazio}>
           <IconeCaixa tamanho={40} />
           <h2>Nenhum produto ainda</h2>
           <p>Cadastre os produtos que você vende. Depois, cada venda desconta o estoque automaticamente.</p>
-          <Botao onClick={() => setJanela({ produto: null })}>
+          <Botao onClick={novo}>
             <IconeMais /> Cadastrar primeiro produto
           </Botao>
         </div>
@@ -107,57 +121,36 @@ export default function Produtos() {
 
       {total > 0 && (
         <>
-          <div className={estilos.busca}>
-            <IconeBusca />
-            <input
-              type="search"
-              placeholder="Buscar produto pelo nome"
-              aria-label="Buscar produto pelo nome"
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-            />
-          </div>
+          <CampoBusca valor={busca} aoMudar={setBusca} rotulo="Buscar produto pelo nome" />
 
           {filtrados.length === 0 ? (
             <p className={estilos.info}>Nenhum produto encontrado para “{busca}”.</p>
           ) : (
-            <ul className={estilos.lista}>
+            <ListaProdutos>
               {filtrados.map((p) => (
-                <li key={p.id}>
-                  <button
-                    type="button"
-                    className={estilos.item}
-                    onClick={() => setJanela({ produto: p })}
-                    aria-label={`Editar ${p.nome}`}
-                  >
-                    <span className={estilos.nome}>{p.nome}</span>
-                    <span className={estilos.preco}>{formatarMoeda(p.preco)}</span>
-                    <span className={estilos.saldo}>
-                      <SeloEstoque produto={p} />
-                    </span>
-                    <IconeSeta className={estilos.seta} />
-                  </button>
-                </li>
+                <LinhaProduto
+                  key={p.id}
+                  nome={p.nome}
+                  {...detalheEstoque(p)}
+                  acao="Editar"
+                  direita={<span className={`${estilos.preco} num`}>{formatarMoeda(p.preco)}</span>}
+                  aoAbrir={() => setJanela({ produto: p })}
+                />
               ))}
-            </ul>
+            </ListaProdutos>
           )}
+
+          <button type="button" className={estilos.flutuante} onClick={novo}>
+            <IconeMais /> Produto
+          </button>
         </>
       )}
 
-      <Modal
-        aberto={janela !== null}
-        aoFechar={() => setJanela(null)}
-        titulo={janela?.produto ? 'Editar produto' : 'Novo produto'}
-      >
+      <Folha aberto={janela !== null} aoFechar={() => setJanela(null)} titulo={janela?.produto ? 'Editar produto' : 'Novo produto'}>
         {janela && (
-          <FormularioProduto
-            produto={janela.produto}
-            aoSalvar={aoSalvar}
-            aoRemover={aoRemover}
-            aoCancelar={() => setJanela(null)}
-          />
+          <FormularioProduto produto={janela.produto} aoSalvar={aoSalvar} aoRemover={aoRemover} aoCancelar={() => setJanela(null)} />
         )}
-      </Modal>
+      </Folha>
     </section>
   )
 }

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { vendasApi } from '../api/vendas.js'
-import { CANAL_ROTULO, formatarDataHora } from '../utils/datas.js'
+import { formatarDataHora } from '../utils/datas.js'
 import { formatarMoeda } from '../utils/formato.js'
+import { ROTULO_FORMA } from '../utils/pagamento.js'
 import { Alerta } from './Alerta.jsx'
 import { Botao } from './Botao.jsx'
 import { CampoTexto } from './CampoTexto.jsx'
@@ -38,9 +39,19 @@ export function DetalheVenda({ venda, aoCancelar }) {
           <dt>Data</dt>
           <dd>{formatarDataHora(venda.criadoEm)}</dd>
         </div>
+        {venda.canal && (
+          <div>
+            <dt>Origem</dt>
+            <dd>{venda.canal.nome}</dd>
+          </div>
+        )}
         <div>
-          <dt>Origem</dt>
-          <dd>{CANAL_ROTULO[venda.canal]}</dd>
+          <dt>Pagamento</dt>
+          <dd>
+            {venda.pagamentos?.length
+              ? venda.pagamentos.map((p) => `${ROTULO_FORMA[p.forma]} ${formatarMoeda(p.valor)}`).join(' · ')
+              : 'Não informado'}
+          </dd>
         </div>
         <div>
           <dt>Situação</dt>

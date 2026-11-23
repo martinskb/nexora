@@ -1,5 +1,13 @@
 import { z } from 'zod';
 
+// Custo informado na entrada (opcional): por unidade OU total da entrada.
+const valorCusto = z
+  .number({ error: 'Custo inválido.' })
+  .finite('Custo inválido.')
+  .min(0, 'O custo não pode ser negativo.')
+  .max(99_999_999.99, 'Custo muito alto.')
+  .optional();
+
 const motivo = z
   .string({ error: 'Informe o motivo do ajuste.' })
   .trim()
@@ -32,6 +40,8 @@ export const ajusteSchema = z.discriminatedUnion(
         .min(1, 'Informe pelo menos 1 unidade.')
         .max(1_000_000, 'Quantidade muito alta.'),
       motivo: motivo.optional().default('Chegou mercadoria'),
+      custoUnitario: valorCusto,
+      custoTotal: valorCusto,
     }),
   ],
   { error: 'Tipo de ajuste inválido.' },

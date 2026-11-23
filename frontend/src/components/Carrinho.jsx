@@ -1,23 +1,22 @@
 import { useState } from 'react'
+import { usarListaDeCanais } from '../utils/canais.js'
 import { formatarMoeda } from '../utils/formato.js'
 import { Alerta } from './Alerta.jsx'
 import { Botao } from './Botao.jsx'
 import { CampoTexto } from './CampoTexto.jsx'
 import { ControleQuantidade } from './ControleQuantidade.jsx'
 import { IconeCarrinho, IconeLixeira } from './Icones.jsx'
-import { Segmentado } from './Segmentado.jsx'
+import { EscolhaCanal } from './EscolhaCanal.jsx'
+import { FormaPagamento } from './FormaPagamento.jsx'
+import { NumeroAnimado } from './NumeroAnimado.jsx'
 import estilos from './Carrinho.module.css'
-
-const OPCOES_CANAL = [
-  { valor: 'balcao', rotulo: 'Balcão' },
-  { valor: 'whatsapp', rotulo: 'WhatsApp' },
-]
 
 /** Itens da venda em andamento, origem, observação e confirmação. */
 export function Carrinho({
   itens,
   total,
-  canal,
+  canais, // canais ativos da loja ([] = loja não usa canais: a origem não aparece)
+  canalId, // '' = nenhum
   aoMudarCanal,
   observacao,
   aoMudarObservacao,
@@ -25,8 +24,11 @@ export function Carrinho({
   aoConfirmar,
   enviando,
   erro,
+  atalhoConfirmar, // ex.: 'Enter' (PC)
+  pagamento, // props de FormaPagamento (sem o total)
 }) {
   const [mostrarObs, setMostrarObs] = useState(Boolean(observacao))
+  const opcoesCanal = [{ valor: '', rotulo: 'Nenhum' }, ...canais.map((c) => ({ valor: String(c.id), rotulo: c.nome }))]
   const totalUnidades = itens.reduce((s, i) => s + i.quantidade, 0)
 
   if (itens.length === 0) {
@@ -67,12 +69,21 @@ export function Carrinho({
         ))}
       </ul>
 
-      <Segmentado rotulo="Origem da venda" opcoes={OPCOES_CANAL} valor={canal} aoMudar={aoMudarCanal} />
+      {canais.length > 0 && (
+        <EscolhaCanal
+          rotulo="Origem da venda (opcional)"
+          opcoes={opcoesCanal}
+          valor={canalId}
+          aoMudar={aoMudarCanal}
+          usarLista={usarListaDeCanais(opcoesCanal, canais.length)}
+        />
+      )}
+
+      {pagamento && <FormaPagamento total={total} {...pagamento} />}
 
       {mostrarObs ? (
         <CampoTexto
           rotulo="Observação (opcional)"
-          placeholder="Ex.: nome do cliente, entrega…"
           value={observacao}
           onChange={(e) => aoMudarObservacao(e.target.value)}
           maxLength={255}
@@ -88,13 +99,14 @@ export function Carrinho({
         <span>
           Total <small>({totalUnidades === 1 ? '1 item' : `${totalUnidades} itens`})</small>
         </span>
-        <strong>{formatarMoeda(total)}</strong>
+        <NumeroAnimado valor={total} moeda destaque desdeZero={false} className={estilos.valorTotal} />
       </div>
 
       <Alerta>{erro}</Alerta>
 
       <Botao larguraTotal onClick={aoConfirmar} carregando={enviando}>
         {enviando ? 'Registrando…' : 'Confirmar venda'}
+        {atalhoConfirmar && !enviando && <kbd className={estilos.atalho}>{atalhoConfirmar}</kbd>}
       </Botao>
     </div>
   )

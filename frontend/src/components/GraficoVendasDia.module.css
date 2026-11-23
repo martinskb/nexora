@@ -15,21 +15,21 @@
 }
 
 .grade {
-  stroke: var(--cor-borda);
+  stroke: var(--cor-contorno);
   stroke-width: 1;
   opacity: 0.6;
 }
 
 .base {
-  stroke: var(--cor-borda);
+  stroke: var(--cor-contorno);
   stroke-width: 1;
 }
 
 .eixoY,
 .eixoX {
   fill: var(--cor-texto-suave);
-  font-size: 11px;
-  font-family: var(--fonte-num);
+  font-size: 13px;
+  
   font-variant-numeric: tabular-nums;
 }
 
@@ -39,18 +39,37 @@
 
 .rotuloValor {
   fill: var(--cor-texto);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
 }
 
 .coluna {
-  fill: var(--serie-1);
+  fill: color-mix(in srgb, var(--cor-texto-suave) 30%, transparent);
   transition: opacity 0.12s;
+  transform-box: fill-box;
+  transform-origin: bottom;
+}
+
+.destaque {
+  fill: var(--cor-marca);
+}
+
+.cresce {
+  animation: cresce 0.8s var(--curva) both;
+  animation-delay: calc(0.9s + var(--i, 0) * 40ms);
+}
+
+@keyframes cresce {
+  from {
+    transform: scaleY(0);
+  }
 }
 
 .apagada {
   opacity: 0.35;
 }
+
+/* Com um dia em destaque, os outros ficam em segundo plano. */
 
 .alvo {
   fill: transparent;
@@ -62,7 +81,7 @@
 }
 
 .alvo:focus-visible {
-  stroke: var(--cor-primaria);
+  stroke: var(--cor-marca);
   stroke-width: 2;
 }
 
@@ -75,10 +94,10 @@
   display: grid;
   gap: 2px;
   padding: var(--esp-2) var(--esp-3);
-  border-radius: var(--raio-md);
+  border-radius: var(--raio-8);
   background: var(--cor-superficie);
-  border: 1px solid var(--cor-borda);
-  box-shadow: var(--sombra-md);
+  border: 1px solid var(--cor-contorno);
+  box-shadow: var(--sombra-flutuante);
   pointer-events: none;
   z-index: 2;
 }
@@ -92,19 +111,19 @@
 }
 
 .dica strong {
-  font-size: var(--texto-md);
+  font-size: 1rem;
 }
 
 .dica span {
   color: var(--cor-texto-suave);
-  font-size: var(--texto-xs);
+  font-size: var(--t-12);
 }
 
 .tabela summary {
   cursor: pointer;
-  color: var(--cor-primaria);
+  color: var(--cor-marca);
   font-weight: 600;
-  font-size: var(--texto-sm);
+  font-size: var(--t-15);
   width: fit-content;
   padding: var(--esp-1) 0;
 }
@@ -113,15 +132,15 @@
   width: 100%;
   margin-top: var(--esp-2);
   border-collapse: collapse;
-  font-size: var(--texto-sm);
-  font-family: var(--fonte-num);
+  font-size: var(--t-15);
+  
   font-variant-numeric: tabular-nums;
 }
 
 .tabela th,
 .tabela td {
   padding: var(--esp-1) var(--esp-2);
-  border-bottom: 1px solid var(--cor-borda);
+  border-bottom: 1px solid var(--cor-contorno);
   text-align: right;
 }
 

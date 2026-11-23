@@ -1,0 +1,46 @@
+// Chaves, validades e regras de atualização do cache de dados.
+
+export const chaves = {
+  resumo: (de, ate) => ['resumo', de, ate],
+  produtos: () => ['produtos'],
+  vendas: (filtros) => ['vendas', filtros],
+  venda: (id) => ['venda', id],
+  canais: () => ['canais'],
+  historico: (produtoId) => ['historico', produtoId],
+  relatorio: (dia) => ['relatorio', dia],
+  vendasProdutos: (filtros) => ['vendasProdutos', filtros],
+}
+
+export const VALIDADE_MS = {
+  resumo: 30_000,
+  produtos: 60_000,
+  vendas: 30_000,
+  canais: 60_000,
+  historico: 60_000,
+  relatorio: 30_000,
+}
+
+/** Prefixos de chave a atualizar depois de cada tipo de mudança. */
+export function invalidacoesApos(evento, extra = {}) {
+  switch (evento) {
+    case 'venda':
+    case 'cancelamento':
+      return [['resumo'], ['vendas'], ['venda'], ['produtos'], ['relatorio'], ['vendasProdutos']]
+    case 'produto':
+      return [['produtos'], ['resumo'], ['relatorio'], ['vendasProdutos']]
+    case 'ajuste':
+      return [['produtos'], ['resumo'], ['historico', extra.produtoId], ['relatorio'], ['vendasProdutos']]
+    case 'canal':
+      return [['canais'], ['vendas'], ['resumo']]
+    default:
+      return []
+  }
+}
+
+/** Uma nova tentativa só para falha de rede ou erro do servidor (5xx). */
+export const deveRepetir = (falhas, erro) => falhas < 1 && (erro?.status === 0 || erro?.status >= 500)
+
+export const chavePersistencia = (lojaId) => `nexora-cache:v1:${lojaId}`
+
+/** Loja cujo cache apagar ao perder a sessão: a logada ou, se o app abriu já sem sessão, a última deste aparelho. */
+export const lojaParaLimpar = (lojaLogada, ultimaLojaId) => lojaLogada?.id ?? ultimaLojaId ?? null

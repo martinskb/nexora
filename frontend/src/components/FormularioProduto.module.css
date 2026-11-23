@@ -19,14 +19,14 @@
   display: grid;
   gap: var(--esp-1);
   padding: var(--esp-3);
-  border-radius: var(--raio-md);
+  border-radius: var(--raio-8);
   background: var(--cor-fundo);
-  border: 1px solid var(--cor-borda);
+  border: 1px solid var(--cor-contorno);
 }
 
 .ajuda {
   color: var(--cor-texto-suave);
-  font-size: var(--texto-xs);
+  font-size: var(--t-12);
 }
 
 .acoes {
@@ -42,20 +42,31 @@
   padding: 0 var(--esp-4);
   border: 0;
   background: transparent;
-  color: var(--cor-erro);
+  color: var(--cor-critico);
   font-weight: 600;
   cursor: pointer;
-  border-radius: var(--raio-md);
+  border-radius: var(--raio-8);
 }
 
 .remover:hover {
-  background: var(--cor-erro-suave);
+  background: color-mix(in srgb, var(--cor-critico) 14%, transparent);
 }
 
 .linkAjuste {
   justify-self: start;
   padding: var(--esp-1) 0;
-  color: var(--cor-primaria);
+  color: var(--cor-marca);
   font-weight: 600;
-  font-size: var(--texto-sm);
+  font-size: var(--t-15);
+}
+
+.margem {
+  margin-top: calc(-1 * var(--esp-2));
+  font-size: var(--t-15);
+  color: var(--cor-texto-suave);
+}
+
+.margem strong {
+  color: var(--cor-texto);
+  font-variant-numeric: tabular-nums;
 }

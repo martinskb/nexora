@@ -1,0 +1,35 @@
+.busca {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  height: 48px;
+  padding: 0 var(--esp-4);
+  border-radius: 10px;
+  background: var(--cor-superficie);
+  box-shadow: inset 0 0 0 1px var(--cor-contorno-campo);
+  color: var(--cor-texto-suave);
+}
+
+.busca:focus-within {
+  box-shadow:
+    inset 0 0 0 1px var(--cor-marca),
+    0 0 0 3px color-mix(in srgb, var(--cor-marca) 25%, transparent);
+}
+
+.busca input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font-size: var(--t-15);
+  color: var(--cor-texto);
+  outline: none;
+}
+
+.atalho {
+  padding: 2px 6px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--cor-contorno);
+  font: inherit;
+  font-size: 11px;
+}
