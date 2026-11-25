@@ -7,6 +7,14 @@ import estilos from './LayoutAuth.module.css'
  * por cima; com o teclado aberto, o painel encolhe. PC: lado a lado.
  */
 export function LayoutAuth({ titulo, subtitulo, rodape, children }) {
+  // Com o teclado aberto o painel encolhe. Se tocar num botão tirasse o foco do
+  // campo, o painel voltaria a crescer e empurraria o botão para longe do dedo
+  // antes do clique (o toque em "Entrar" não fazia nada). Por isso, apertar um
+  // botão do formulário não tira o foco do campo.
+  function manterFocoNoCampo(e) {
+    if (e.target.closest('button') && document.activeElement?.tagName === 'INPUT') e.preventDefault()
+  }
+
   return (
     <div className={estilos.pagina}>
       <aside className={estilos.painel}>
@@ -31,7 +39,7 @@ export function LayoutAuth({ titulo, subtitulo, rodape, children }) {
       </aside>
 
       <main className={estilos.folha}>
-        <section className={estilos.cartao} aria-labelledby="titulo-auth">
+        <section className={estilos.cartao} aria-labelledby="titulo-auth" onMouseDown={manterFocoNoCampo}>
           <div>
             <h1 id="titulo-auth" className={estilos.titulo}>
               {titulo}
